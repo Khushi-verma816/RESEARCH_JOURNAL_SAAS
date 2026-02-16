@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Users - Research Journal SaaS{% endblock %}
+
+{% block content %}
+<div style="background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+    <h1 style="color: #007bff; margin-bottom: 25px;">👥 Manage Users</h1>
+    
+    <div style="display: grid; gap: 15px;">
+        {% for user in users %}
+        <div style="border: 1px solid #ddd; padding: 20px; border-radius: 8px;">
+            <div style="display: flex; justify-content: space-between; align-items: start;">
+                <div style="flex: 1;">
+                    <h3 style="margin: 0 0 10px 0; color: #333;">{{ user.full_name }}</h3>
+                    <p style="margin: 5px 0; color: #666;"><strong>Email:</strong> {{ user.email }}</p>
+                    <p style="margin: 5px 0; color: #666;">
+                        <strong>Roles:</strong>
+                        {% if user.roles %}
+                            {% for role in user.roles %}
+                                <span style="background: #007bff; color: white; padding: 2px 8px; border-radius: 10px; font-size: 12px; margin-right: 5px;">
+                                    {{ role.name|upper }}
+                                </span>
+                            {% endfor %}
+                        {% else %}
+                            <span style="color: #999;">No roles</span>
+                        {% endif %}
+                    </p>
+                </div>
+                <div>
+                    <form method="POST" action="{{ url_for('admin.assign_role', user_id=user.id) }}" style="display: flex; gap: 10px;">
+                        <select name="role_id" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                            <option value="">Assign Role</option>
+                            {% for role in roles %}
+                                <option value="{{ role.id }}">{{ role.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit" style="padding: 8px 16px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                            Assign
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

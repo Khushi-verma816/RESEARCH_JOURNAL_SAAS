@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Submit to {{ journal.name }} - Research Journal SaaS{% endblock %}
+
+{% block content %}
+<div style="max-width: 800px; margin: 0 auto;">
+    <div style="background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+        <h1 style="color: #007bff; margin-bottom: 10px;">📄 Submit Manuscript</h1>
+        <h3 style="color: #666; margin-bottom: 25px;">{{ journal.name }}</h3>
+        
+        <form method="POST">
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; color: #333; font-weight: bold;">
+                    Manuscript Title <span style="color: red;">*</span>
+                </label>
+                <input type="text" name="title" required
+                       placeholder="Enter your manuscript title"
+                       style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 16px;">
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; color: #333; font-weight: bold;">
+                    Abstract <span style="color: red;">*</span>
+                </label>
+                <textarea name="abstract" rows="8" required
+                          placeholder="Enter your abstract here (250-300 words recommended)"
+                          style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 16px; resize: vertical;"></textarea>
+            </div>
+            
+            <div style="display: flex; gap: 10px;">
+                <button type="submit" 
+                        style="padding: 12px 24px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px;">
+                    Submit Manuscript
+                </button>
+                <a href="{{ url_for('journal.view', journal_id=journal.id) }}" 
+                   style="padding: 12px 24px; background: #6c757d; color: white; text-decoration: none; border-radius: 4px; font-size: 16px; display: inline-block;">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

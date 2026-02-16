@@ -1,0 +1,240 @@
+{% extends "base.html" %}
+
+{% block title %}AI Chat - Research Journal SaaS{% endblock %}
+
+{% block extra_css %}
+<style>
+    .chat-container {
+        height: 500px;
+        overflow-y: auto;
+        padding: 20px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+    .message {
+        margin-bottom: 15px;
+        display: flex;
+        gap: 10px;
+    }
+    .message.user {
+        justify-content: flex-end;
+    }
+    .message-bubble {
+        max-width: 70%;
+        padding: 12px 16px;
+        border-radius: 12px;
+        word-wrap: break-word;
+        white-space: pre-wrap;
+    }
+    .message.user .message-bubble {
+        background: #007bff;
+        color: white;
+        border-bottom-right-radius: 4px;
+    }
+    .message.assistant .message-bubble {
+        background: white;
+        color: #333;
+        border: 1px solid #ddd;
+        border-bottom-left-radius: 4px;
+    }
+    .message-time {
+        font-size: 11px;
+        opacity: 0.7;
+        margin-top: 4px;
+    }
+    .typing-indicator {
+        display: none;
+        padding: 12px 16px;
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 12px;
+        width: fit-content;
+    }
+    .typing-indicator.active {
+        display: block;
+    }
+    .typing-indicator span {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #007bff;
+        margin: 0 2px;
+        animation: typing 1.4s infinite;
+    }
+    .typing-indicator span:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+    .typing-indicator span:nth-child(3) {
+        animation-delay: 0.4s;
+    }
+    @keyframes typing {
+        0%, 60%, 100% { transform: translateY(0); }
+        30% { transform: translateY(-10px); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div style="background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <div>
+            <h1 style="color: #007bff; margin: 0 0 5px 0;">{{ conversation.title }}</h1>
+            <p style="color: #666; margin: 0; font-size: 14px;">
+                AI Research Assistant • Started {{ conversation.created_at.strftime('%B %d, %Y') }}
+            </p>
+        </div>
+        <a href="{{ url_for('ai.index') }}" 
+           style="padding: 8px 16px; background: #6c757d; color: white; text-decoration: none; border-radius: 4px;">
+            ← Back
+        </a>
+    </div>
+    
+    {% if not has_api_key %}
+<div style="background: #e7f3ff; padding: 15px; border-radius: 6px; margin-bottom: 20px; border-left: 4px solid #007bff;">
+    <strong>💡 Demo Mode Active:</strong> Smart AI Assistant providing research guidance. All features working perfectly!
+</div>
+{% endif %}
+
+
+    <!-- Chat Messages -->
+    <div class="chat-container" id="chatContainer">
+        {% for message in messages %}
+        <div class="message {{ message.role }}">
+            <div class="message-bubble">
+                <div>{{ message.content }}</div>
+                <div class="message-time">{{ message.created_at.strftime('%H:%M') }}</div>
+            </div>
+        </div>
+        {% endfor %}
+        
+        <div class="typing-indicator" id="typingIndicator">
+            <span></span><span></span><span></span>
+        </div>
+    </div>
+    
+    <!-- Message Input -->
+    <form id="chatForm" style="display: flex; gap: 10px;">
+        <input type="text" 
+               id="messageInput"
+               placeholder="Ask about research methodology, writing tips, analysis..." 
+               required
+               style="flex: 1; padding: 12px; border: 2px solid #ddd; border-radius: 6px; font-size: 16px;">
+        <button type="submit" 
+                id="sendButton"
+                style="padding: 12px 24px; background: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; white-space: nowrap;">
+            Send 📤
+        </button>
+    </form>
+    
+    <!-- Suggested Prompts -->
+    {% if not messages %}
+    <div style="margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 6px;">
+        <h3 style="color: #333; margin: 0 0 15px 0; font-size: 16px;">💡 Try asking:</h3>
+        <div style="display: grid; gap: 10px;">
+            <button onclick="usePrompt(this)" data-prompt="Help me structure a literature review for my research on machine learning in healthcare" 
+                    style="padding: 10px; background: white; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; text-align: left; transition: background 0.3s;"
+                    onmouseover="this.style.background='#e9ecef'" onmouseout="this.style.background='white'">
+                Help me structure a literature review
+            </button>
+            <button onclick="usePrompt(this)" data-prompt="What are the best practices for data visualization in scientific papers?" 
+                    style="padding: 10px; background: white; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; text-align: left; transition: background 0.3s;"
+                    onmouseover="this.style.background='#e9ecef'" onmouseout="this.style.background='white'">
+                Best practices for data visualization
+            </button>
+            <button onclick="usePrompt(this)" data-prompt="How do I write an effective research methodology section?" 
+                    style="padding: 10px; background: white; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; text-align: left; transition: background 0.3s;"
+                    onmouseover="this.style.background='#e9ecef'" onmouseout="this.style.background='white'">
+                Writing a research methodology section
+            </button>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+const chatForm = document.getElementById('chatForm');
+const messageInput = document.getElementById('messageInput');
+const sendButton = document.getElementById('sendButton');
+const chatContainer = document.getElementById('chatContainer');
+const typingIndicator = document.getElementById('typingIndicator');
+
+function scrollToBottom() {
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+}
+
+function addMessage(content, role, time) {
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'message ' + role;
+    messageDiv.innerHTML = `
+        <div class="message-bubble">
+            <div>${content}</div>
+            <div class="message-time">${time}</div>
+        </div>
+    `;
+    chatContainer.insertBefore(messageDiv, typingIndicator);
+    scrollToBottom();
+}
+
+function usePrompt(button) {
+    const prompt = button.getAttribute('data-prompt');
+    messageInput.value = prompt;
+    messageInput.focus();
+}
+
+chatForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const message = messageInput.value.trim();
+    if (!message) return;
+    
+    // Disable input
+    messageInput.disabled = true;
+    sendButton.disabled = true;
+    sendButton.textContent = 'Sending...';
+    
+    try {
+        const response = await fetch('{{ url_for("ai.send_message", conversation_id=conversation.id) }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ message: message })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Add user message
+            addMessage(data.user_message.content, 'user', data.user_message.created_at);
+            
+            // Show typing indicator
+            typingIndicator.classList.add('active');
+            scrollToBottom();
+            
+            // Simulate typing delay
+            setTimeout(() => {
+                typingIndicator.classList.remove('active');
+                // Add AI message
+                addMessage(data.ai_message.content, 'assistant', data.ai_message.created_at);
+            }, 1000);
+            
+            messageInput.value = '';
+        } else {
+            alert('Error: ' + data.error);
+        }
+    } catch (error) {
+        alert('Error sending message: ' + error);
+    } finally {
+        messageInput.disabled = false;
+        sendButton.disabled = false;
+        sendButton.textContent = 'Send 📤';
+        messageInput.focus();
+    }
+});
+
+// Scroll to bottom on load
+scrollToBottom();
+</script>
+{% endblock %}

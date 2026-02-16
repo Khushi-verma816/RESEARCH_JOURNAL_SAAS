@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Create Blog Post - Research Journal SaaS{% endblock %}
+
+{% block content %}
+<div style="max-width: 900px; margin: 0 auto;">
+    <div style="background: white; padding: 40px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+        <h1 style="color: #007bff; margin-bottom: 30px;">✍️ Write Blog Post</h1>
+        
+        <form method="POST">
+            <!-- Title -->
+            <div style="margin-bottom: 25px;">
+                <label style="display: block; margin-bottom: 8px; color: #333; font-weight: bold; font-size: 16px;">
+                    Title <span style="color: red;">*</span>
+                </label>
+                <input type="text" name="title" required
+                       placeholder="Enter an engaging title..."
+                       style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 6px; font-size: 18px; transition: border-color 0.3s;"
+                       onfocus="this.style.borderColor='#007bff'" onblur="this.style.borderColor='#ddd'">
+            </div>
+            
+            <!-- Excerpt -->
+            <div style="margin-bottom: 25px;">
+                <label style="display: block; margin-bottom: 8px; color: #333; font-weight: bold; font-size: 16px;">
+                    Excerpt <span style="color: #999; font-weight: normal; font-size: 14px;">(optional - auto-generated if empty)</span>
+                </label>
+                <textarea name="excerpt" rows="3"
+                          placeholder="Brief summary of your post (shown in listings)..."
+                          style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 6px; font-size: 16px; resize: vertical; transition: border-color 0.3s;"
+                          onfocus="this.style.borderColor='#007bff'" onblur="this.style.borderColor='#ddd'"></textarea>
+            </div>
+            
+            <!-- Content -->
+            <div style="margin-bottom: 25px;">
+                <label style="display: block; margin-bottom: 8px; color: #333; font-weight: bold; font-size: 16px;">
+                    Content <span style="color: red;">*</span>
+                </label>
+                <textarea name="content" rows="20" required
+                          placeholder="Write your content here... (Markdown supported in future versions)"
+                          style="width: 100%; padding: 15px; border: 2px solid #ddd; border-radius: 6px; font-size: 16px; line-height: 1.6; resize: vertical; font-family: 'Georgia', serif; transition: border-color 0.3s;"
+                          onfocus="this.style.borderColor='#007bff'" onblur="this.style.borderColor='#ddd'"></textarea>
+            </div>
+            
+            <!-- Buttons -->
+            <div style="display: flex; gap: 10px; justify-content: space-between;">
+                <div style="display: flex; gap: 10px;">
+                    <button type="submit" name="action" value="draft"
+                            style="padding: 12px 24px; background: #6c757d; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; transition: background 0.3s;"
+                            onmouseover="this.style.background='#5a6268'" onmouseout="this.style.background='#6c757d'">
+                        💾 Save as Draft
+                    </button>
+                    <button type="submit" name="action" value="publish"
+                            style="padding: 12px 24px; background: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; transition: background 0.3s;"
+                            onmouseover="this.style.background='#218838'" onmouseout="this.style.background='#28a745'">
+                        🚀 Publish Now
+                    </button>
+                </div>
+                <a href="{{ url_for('blog.my_posts') }}" 
+                   style="padding: 12px 24px; background: #e9ecef; color: #333; text-decoration: none; border-radius: 6px; font-size: 16px; display: inline-block;">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

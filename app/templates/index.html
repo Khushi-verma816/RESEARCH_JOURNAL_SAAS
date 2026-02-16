@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Research Journal SaaS{% endblock %}
+
+{% block content %}
+<div style="background: white; padding: 40px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+    <h1 style="color: #007bff; margin-bottom: 20px;">Welcome to Research Journal SaaS! 🎓</h1>
+    
+    {% if current_user.is_authenticated %}
+        <div style="background: #e7f3ff; padding: 20px; border-radius: 6px; margin: 20px 0;">
+            <h2 style="color: #0056b3; margin-bottom: 10px;">Hello, {{ current_user.first_name }}! 👋</h2>
+            <p style="color: #666; margin: 10px 0;">Email: {{ current_user.email }}</p>
+            <p style="color: #666; margin: 10px 0;">
+                <strong>Roles:</strong> 
+                {% if current_user.roles %}
+                    {% for role in current_user.roles %}
+                        <span style="background: #007bff; color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px; margin-right: 5px;">
+                            {{ role.name|upper }}
+                        </span>
+                    {% endfor %}
+                {% else %}
+                    <span style="color: #999;">No roles assigned</span>
+                {% endif %}
+            </p>
+            <p style="color: #666;">Member since: {{ current_user.created_at.strftime('%B %d, %Y') }}</p>
+        </div>
+
+        <div style="margin-top: 30px;">
+            <h3 style="color: #333; margin-bottom: 15px;">Quick Actions</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                {% if current_user.is_authenticated and (current_user.has_role('admin') or current_user.has_role('editor')) %}
+                <a href="{{ url_for('journal.create') }}" style="display: block; padding: 20px; background: #28a745; color: white; text-decoration: none; border-radius: 6px; text-align: center;">
+                    📝 Create Journal
+                </a>
+                {% else %}
+                <a href="{{ url_for('journal.index') }}" style="display: block; padding: 20px; background: #28a745; color: white; text-decoration: none; border-radius: 6px; text-align: center;">
+                    📚 Browse Journals
+                </a>
+                {% endif %}
+                
+                <a href="{{ url_for('journal.my_submissions') }}" style="display: block; padding: 20px; background: #17a2b8; color: white; text-decoration: none; border-radius: 6px; text-align: center;">
+                    📄 My Submissions
+                </a>
+                
+                <a href="{{ url_for('blog.create') }}" style="display: block; padding: 20px; background: #ffc107; color: #333; text-decoration: none; border-radius: 6px; text-align: center;">
+                    ✍️ Write Blog Post
+                </a>
+                
+                <a href="{{ url_for('blog.my_posts') }}" style="display: block; padding: 20px; background: #6f42c1; color: white; text-decoration: none; border-radius: 6px; text-align: center;">
+                    📝 My Posts
+                </a>
+                
+                <a href="{{ url_for('ai.index') }}" style="display: block; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 6px; text-align: center;">
+                    🤖 AI Assistant
+                </a>
+            </div>
+        </div>
+
+        <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 6px;">
+            <h3 style="color: #333; margin-bottom: 10px;">System Status</h3>
+            <p>✅ Application is running perfectly!</p>
+            <p>✅ Database connected</p>
+            <p>✅ Authentication working</p>
+            <p>✅ Blog system active</p>
+            <p>✅ Admin dashboard available</p>
+            <p>✅ AI Assistant ready</p>
+        </div>
+    {% else %}
+        <div style="text-align: center; padding: 40px;">
+            <p style="font-size: 18px; color: #666; margin-bottom: 30px;">
+                A comprehensive platform for academic journal management, peer review, and research collaboration.
+            </p>
+            
+            <div style="display: flex; gap: 15px; justify-content: center;">
+                <a href="{{ url_for('auth.register') }}" 
+                   style="display: inline-block; padding: 15px 30px; background: #28a745; color: white; text-decoration: none; border-radius: 6px; font-size: 16px;">
+                    Get Started - Register
+                </a>
+                <a href="{{ url_for('auth.login') }}" 
+                   style="display: inline-block; padding: 15px 30px; background: #007bff; color: white; text-decoration: none; border-radius: 6px; font-size: 16px;">
+                    Login
+                </a>
+            </div>
+        </div>
+
+        <div style="margin-top: 40px;">
+            <h3 style="color: #333; margin-bottom: 15px; text-align: center;">Features</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                <div style="padding: 20px; background: #f8f9fa; border-radius: 6px;">
+                    <h4 style="color: #007bff;">📚 Journal Management</h4>
+                    <p style="color: #666; margin-top: 10px;">Create and manage academic journals with ease</p>
+                </div>
+                <div style="padding: 20px; background: #f8f9fa; border-radius: 6px;">
+                    <h4 style="color: #007bff;">✍️ Peer Review</h4>
+                    <p style="color: #666; margin-top: 10px;">Streamlined peer review workflow</p>
+                </div>
+                <div style="padding: 20px; background: #f8f9fa; border-radius: 6px;">
+                    <h4 style="color: #007bff;">🤖 AI Assistance</h4>
+                    <p style="color: #666; margin-top: 10px;">AI-powered research tools</p>
+                </div>
+                <div style="padding: 20px; background: #f8f9fa; border-radius: 6px;">
+                    <h4 style="color: #007bff;">📝 Blogging</h4>
+                    <p style="color: #666; margin-top: 10px;">Share your research insights</p>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

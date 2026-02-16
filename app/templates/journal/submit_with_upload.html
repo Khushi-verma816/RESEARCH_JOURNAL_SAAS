@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+
+{% block title %}Submit to {{ journal.name }} - Research Journal SaaS{% endblock %}
+
+{% block content %}
+<div style="max-width: 800px; margin: 0 auto;">
+    <div style="background: white; padding: 40px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+        <h1 style="color: #007bff; margin-bottom: 10px;">📄 Submit Manuscript</h1>
+        <h3 style="color: #666; margin-bottom: 25px;">{{ journal.name }}</h3>
+        
+        <form method="POST" id="submissionForm">
+            <!-- Title -->
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; color: #333; font-weight: bold;">
+                    Manuscript Title <span style="color: red;">*</span>
+                </label>
+                <input type="text" name="title" id="title" required
+                       placeholder="Enter your manuscript title"
+                       style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 16px;">
+            </div>
+            
+            <!-- Abstract -->
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; color: #333; font-weight: bold;">
+                    Abstract <span style="color: red;">*</span>
+                </label>
+                <textarea name="abstract" id="abstract" rows="8" required
+                          placeholder="Enter your abstract here (250-300 words recommended)"
+                          style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 16px; resize: vertical;"></textarea>
+            </div>
+            
+            <!-- File Upload -->
+            <div style="margin-bottom: 25px;">
+                <label style="display: block; margin-bottom: 8px; color: #333; font-weight: bold;">
+                    Manuscript File <span style="color: red;">*</span>
+                </label>
+                <div style="border: 2px dashed #ddd; border-radius: 6px; padding: 30px; text-align: center; background: #f8f9fa;">
+                    <input type="file" id="fileInput" accept=".pdf,.docx,.doc,.txt" required
+                           style="display: none;" onchange="handleFileSelect(event)">
+                    <button type="button" onclick="document.getElementById('fileInput').click()"
+                            style="padding: 12px 24px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; margin-bottom: 10px;">
+                        📎 Choose File
+                    </button>
+                    <p style="color: #666; margin: 10px 0; font-size: 14px;">
+                        Accepted formats: PDF, DOCX, DOC, TXT (Max 16MB)
+                    </p>
+                    <div id="fileInfo" style="margin-top: 15px; padding: 10px; background: white; border-radius: 4px; display: none;">
+                        <p style="color: #333; margin: 0;"><strong>Selected:</strong> <span id="fileName"></span></p>
+                        <p style="color: #666; margin: 5px 0 0 0; font-size: 13px;"><span id="fileSize"></span></p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Buttons -->
+            <div style="display: flex; gap: 10px;">
+                <button type="submit" id="submitBtn"
+                        style="padding: 12px 24px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px;">
+                    Submit Manuscript
+                </button>
+                <a href="{{ url_for('journal.view', journal_id=journal.id) }}" 
+                   style="padding: 12px 24px; background: #6c757d; color: white; text-decoration: none; border-radius: 4px; font-size: 16px; display: inline-block;">
+                    Cancel
+                </a>
+            </div>
+            
+            <!-- Progress -->
+            <div id="uploadProgress" style="display: none; margin-top: 20px;">
+                <div style="background: #e9ecef; border-radius: 4px; height: 30px; overflow: hidden;">
+                    <div id="progressBar" style="background: #28a745; height: 100%; width: 0%; transition: width 0.3s; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">
+                        0%
+                    </div>
+                </div>
+                <p id="uploadStatus" style="text-align: center; color: #666; margin-top: 10px;"></p>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+let selectedFile = null;
+
+function handleFileSelect(event) {
+    selectedFile = event.target.files[0];
+    
+    if (selectedFile) {
+        // Display file info
+        document.getElementById('fileName').textContent = selectedFile.name;
+        document.getElementById('fileSize').textContent = formatFileSize(selectedFile.size);
+        document.getElementById('fileInfo').style.display = 'block';
+    }
+}
+
+function formatFileSize(bytes) {
+    if (bytes < 1024) return bytes + ' bytes';
+    else if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    else return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+}
+
+document.getElementById('submissionForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    if (!selectedFile) {
+        alert('Please select a file to upload');
+        return;
+    }
+    
+    const submitBtn = document.getElementById('submitBtn');
+    const progressDiv = document.getElementById('uploadProgress');
+    const progressBar = document.getElementById('progressBar');
+    const uploadStatus = document.getElementById('uploadStatus');
+    
+    // Disable button
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Submitting...';
+    progressDiv.style.display = 'block';
+    
+    try {
+        // Step 1: Create submission
+        uploadStatus.textContent = 'Creating submission...';
+        progressBar.style.width = '30%';
+        progressBar.textContent = '30%';
+        
+        const formData = new FormData();
+        formData.append('title', document.getElementById('title').value);
+        formData.append('abstract', document.getElementById('abstract').value);
+        
+        const submitResponse = await fetch(window.location.href, {
+            method: 'POST',
+            body: formData
+        });
+        
+        if (!submitResponse.ok) {
+            throw new Error('Failed to create submission');
+        }
+        
+        // Get submission ID from redirect URL or response
+        const submissionId = await submitResponse.text();
+        const submissionIdMatch = submissionId.match(/submission\/view\/(\d+)/);
+        
+        if (!submissionIdMatch) {
+            // Form submission successful, redirect
+            window.location.href = '{{ url_for("journal.my_submissions") }}';
+            return;
+        }
+        
+        // Step 2: Upload file
+        uploadStatus.textContent = 'Uploading manuscript...';
+        progressBar.style.width = '60%';
+        progressBar.textContent = '60%';
+        
+        const fileData = new FormData();
+        fileData.append('file', selectedFile);
+        
+        const uploadResponse = await fetch(`/upload/manuscript/${submissionIdMatch[1]}`, {
+            method: 'POST',
+            body: fileData
+        });
+        
+        const uploadResult = await uploadResponse.json();
+        
+        if (!uploadResult.success) {
+            throw new Error(uploadResult.error || 'Upload failed');
+        }
+        
+        // Success
+        progressBar.style.width = '100%';
+        progressBar.textContent = '100%';
+        uploadStatus.textContent = 'Success! Redirecting...';
+        
+        setTimeout(() => {
+            window.location.href = '{{ url_for("journal.my_submissions") }}';
+        }, 1000);
+        
+    } catch (error) {
+        alert('Error: ' + error.message);
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Submit Manuscript';
+        progressDiv.style.display = 'none';
+    }
+});
+</script>
+{% endblock %}

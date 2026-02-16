@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Create Journal{% endblock %}
+
+{% block content %}
+<div style="max-width: 800px; margin: 0 auto;">
+    <div style="background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+        <h1 style="color: #007bff; margin-bottom: 25px;">➕ Create New Journal</h1>
+        
+        <form method="POST">
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; color: #333; font-weight: bold;">
+                    Journal Name <span style="color: red;">*</span>
+                </label>
+                <input type="text" name="name" required
+                       placeholder="e.g., International Journal of Computer Science"
+                       style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 16px;">
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; color: #333; font-weight: bold;">
+                    Description
+                </label>
+                <textarea name="description" rows="5"
+                          placeholder="Describe the scope and focus of this journal..."
+                          style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 16px;"></textarea>
+            </div>
+            
+            <div style="display: flex; gap: 10px;">
+                <button type="submit" 
+                        style="padding: 12px 24px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px;">
+                    Create Journal
+                </button>
+                <a href="{{ url_for('journal.index') }}" 
+                   style="padding: 12px 24px; background: #6c757d; color: white; text-decoration: none; border-radius: 4px; font-size: 16px; display: inline-block;">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
