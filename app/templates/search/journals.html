@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block title %}Browse Journals{% endblock %}
+
+{% block content %}
+<div style="background: white; padding: 30px; border-radius: 8px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+    <h1 style="color: #007bff; margin-bottom: 25px;">📋 Browse Journals</h1>
+    
+    <!-- Filter Form -->
+    <form method="GET" style="background: #f8f9fa; padding: 20px; 
+                              border-radius: 8px; margin-bottom: 25px;
+                              display: flex; gap: 15px; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 200px;">
+            <label style="display: block; margin-bottom: 5px; 
+                          color: #666; font-size: 14px;">
+                Search by Name
+            </label>
+            <input type="text" name="name" value="{{ name_filter }}"
+                   placeholder="Journal name..."
+                   style="width: 100%; padding: 10px; border: 1px solid #ddd; 
+                          border-radius: 6px; font-size: 14px;">
+        </div>
+        <div style="min-width: 150px;">
+            <label style="display: block; margin-bottom: 5px; 
+                          color: #666; font-size: 14px;">
+                Status
+            </label>
+            <select name="status" 
+                    style="width: 100%; padding: 10px; border: 1px solid #ddd; 
+                           border-radius: 6px; font-size: 14px;">
+                <option value="all" {% if status_filter == 'all' %}selected{% endif %}>
+                    All Journals
+                </option>
+                <option value="accepting" {% if status_filter == 'accepting' %}selected{% endif %}>
+                    ✅ Accepting
+                </option>
+                <option value="closed" {% if status_filter == 'closed' %}selected{% endif %}>
+                    🔒 Closed
+                </option>
+            </select>
+        </div>
+        <div style="display: flex; align-items: flex-end; gap: 10px;">
+            <button type="submit" 
+                    style="padding: 10px 20px; background: #007bff; 
+                           color: white; border: none; border-radius: 6px; 
+                           cursor: pointer;">
+                🔍 Filter
+            </button>
+            <a href="{{ url_for('search.filter_journals') }}" 
+               style="padding: 10px 20px; background: #6c757d; color: white; 
+                      text-decoration: none; border-radius: 6px;">
+                Reset
+            </a>
+        </div>
+    </form>
+    
+    <!-- Results Count -->
+    <p style="color: #666; margin-bottom: 20px;">
+        Showing <strong>{{ journals|length }}</strong> journals
+        {% if name_filter %} matching "<strong>{{ name_filter }}</strong>"{% endif %}
+    </p>
+    
+    <!-- Journal Grid -->
+    {% if journals %}
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
+        {% for journal in journals %}
+        <div style="border: 1px solid #ddd; border-radius: 8px; 
+                    padding: 20px; transition: box-shadow 0.2s;"
+             onmouseover="this.style.boxShadow='0 5px 20px rgba(0,0,0,0.1)'"
+             onmouseout="this.style.boxShadow='none'">
+            <h3 style="color: #007bff; margin-bottom: 10px;">
+                <a href="{{ url_for('journal.view', journal_id=journal.id) }}"
+                   style="color: #007bff; text-decoration: none;">
+                    {{ journal.name }}
+                </a>
+            </h3>
+            <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
+                {{ journal.description[:100] if journal.description else 'No description' }}
+                {% if journal.description and journal.description|length > 100 %}...{% endif %}
+            </p>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="
+                    padding: 4px 10px; border-radius: 12px; font-size: 12px;
+                    background: {% if journal.is_accepting_submissions %}#28a745{% else %}#6c757d{% endif %};
+                    color: white;">
+                    {% if journal.is_accepting_submissions %}
+                        ✅ Accepting
+                    {% else %}
+                        🔒 Closed
+                    {% endif %}
+                </span>
+                <a href="{{ url_for('journal.view', journal_id=journal.id) }}"
+                   style="color: #007bff; font-size: 14px; text-decoration: none;">
+                    View →
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div style="text-align: center; padding: 40px; color: #666;">
+        <div style="font-size: 48px; margin-bottom: 15px;">📋</div>
+        <h3>No journals found</h3>
+        <p>Try different search terms</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

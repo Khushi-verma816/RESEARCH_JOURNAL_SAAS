@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{% block title %}My Profile - Research Journal SaaS{% endblock %}
+
+{% block content %}
+<div style="max-width: 900px; margin: 0 auto;">
+
+    <!-- Profile Header -->
+    <div style="background: linear-gradient(135deg, #007bff, #0056b3); 
+                padding: 40px; border-radius: 12px; color: white; 
+                margin-bottom: 25px; text-align: center;">
+        <div style="width: 80px; height: 80px; background: white; 
+                    border-radius: 50%; margin: 0 auto 15px; 
+                    display: flex; align-items: center; 
+                    justify-content: center; font-size: 32px;">
+            👤
+        </div>
+        <h1 style="margin: 0 0 5px 0; font-size: 28px;">
+            {{ current_user.first_name }} {{ current_user.last_name }}
+        </h1>
+        <p style="margin: 0; opacity: 0.9;">{{ current_user.email }}</p>
+        <div style="margin-top: 10px;">
+            {% for role in current_user.roles %}
+            <span style="background: rgba(255,255,255,0.2); 
+                         padding: 4px 12px; border-radius: 12px; 
+                         font-size: 13px; margin: 2px;">
+                {{ role.name|upper }}
+            </span>
+            {% endfor %}
+        </div>
+        <p style="margin: 10px 0 0 0; font-size: 13px; opacity: 0.8;">
+            Member since: {{ current_user.created_at.strftime('%B %d, %Y') }}
+        </p>
+    </div>
+
+    <!-- Stats Grid -->
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); 
+                gap: 15px; margin-bottom: 25px;">
+        <div style="background: white; padding: 20px; border-radius: 8px; 
+                    text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+            <div style="font-size: 32px; font-weight: bold; color: #007bff;">
+                {{ stats.submissions }}
+            </div>
+            <div style="color: #666; font-size: 14px;">Submissions</div>
+        </div>
+        <div style="background: white; padding: 20px; border-radius: 8px; 
+                    text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+            <div style="font-size: 32px; font-weight: bold; color: #28a745;">
+                {{ stats.accepted }}
+            </div>
+            <div style="color: #666; font-size: 14px;">Accepted</div>
+        </div>
+        <div style="background: white; padding: 20px; border-radius: 8px; 
+                    text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+            <div style="font-size: 32px; font-weight: bold; color: #fd7e14;">
+                {{ stats.blogs }}
+            </div>
+            <div style="color: #666; font-size: 14px;">Blog Posts</div>
+        </div>
+        <div style="background: white; padding: 20px; border-radius: 8px; 
+                    text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+            <div style="font-size: 32px; font-weight: bold; color: #6f42c1;">
+                {{ stats.ai_chats }}
+            </div>
+            <div style="color: #666; font-size: 14px;">AI Chats</div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div style="background: white; padding: 25px; border-radius: 8px; 
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 25px;">
+        <h3 style="margin: 0 0 15px 0;">⚙️ Account Settings</h3>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <a href="{{ url_for('profile.edit') }}" 
+               style="padding: 10px 20px; background: #007bff; color: white; 
+                      text-decoration: none; border-radius: 6px;">
+                ✏️ Edit Profile
+            </a>
+            <a href="{{ url_for('profile.change_password') }}" 
+               style="padding: 10px 20px; background: #6c757d; color: white; 
+                      text-decoration: none; border-radius: 6px;">
+                🔒 Change Password
+            </a>
+            <a href="{{ url_for('journal.my_submissions') }}" 
+               style="padding: 10px 20px; background: #28a745; color: white; 
+                      text-decoration: none; border-radius: 6px;">
+                📄 My Submissions
+            </a>
+            <a href="{{ url_for('blog.my_posts') }}" 
+               style="padding: 10px 20px; background: #fd7e14; color: white; 
+                      text-decoration: none; border-radius: 6px;">
+                📝 My Blog Posts
+            </a>
+        </div>
+    </div>
+
+    <!-- Recent Submissions -->
+    {% if recent_submissions %}
+    <div style="background: white; padding: 25px; border-radius: 8px; 
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+        <h3 style="margin: 0 0 20px 0;">📄 Recent Submissions</h3>
+        {% for sub in recent_submissions %}
+        <div style="padding: 15px; border: 1px solid #eee; 
+                    border-radius: 6px; margin-bottom: 10px;">
+            <div style="display: flex; justify-content: space-between; 
+                        align-items: center;">
+                <a href="{{ url_for('journal.view_submission', submission_id=sub.id) }}"
+                   style="color: #007bff; text-decoration: none; font-weight: bold;">
+                    {{ sub.title[:60] }}{% if sub.title|length > 60 %}...{% endif %}
+                </a>
+                {% if sub.status == 'submitted' %}
+                    <span style="background: #007bff; color: white; 
+                                 padding: 3px 10px; border-radius: 10px; font-size: 12px;">
+                        SUBMITTED
+                    </span>
+                {% elif sub.status == 'accepted' %}
+                    <span style="background: #28a745; color: white; 
+                                 padding: 3px 10px; border-radius: 10px; font-size: 12px;">
+                        ACCEPTED
+                    </span>
+                {% elif sub.status == 'rejected' %}
+                    <span style="background: #dc3545; color: white; 
+                                 padding: 3px 10px; border-radius: 10px; font-size: 12px;">
+                        REJECTED
+                    </span>
+                {% elif sub.status == 'under_review' %}
+                    <span style="background: #ffc107; color: #333; 
+                                 padding: 3px 10px; border-radius: 10px; font-size: 12px;">
+                        UNDER REVIEW
+                    </span>
+                {% endif %}
+            </div>
+            <p style="color: #666; font-size: 13px; margin: 5px 0 0 0;">
+                {{ sub.journal.name }} • 
+                {{ sub.submitted_at.strftime('%B %d, %Y') }}
+            </p>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -3,129 +3,515 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Research Journal SaaS{% endblock %}</title>
+    <title>{% block title %}ResearchHub Pro{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --primary: #1a1a2e;
+            --accent: #e94560;
+            --accent2: #0f3460;
+            --gold: #f5a623;
+            --light: #f8f9ff;
+            --white: #ffffff;
+            --gray: #6b7280;
+            --border: #e5e7eb;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            --shadow: 0 4px 24px rgba(26,26,46,0.08);
+            --shadow-lg: 0 8px 40px rgba(26,26,46,0.15);
+            --radius: 12px;
+            --radius-lg: 20px;
         }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
-            font-family: Arial, sans-serif;
-            background: #f5f5f5;
+            font-family: 'DM Sans', sans-serif;
+            background: #f0f2f8;
+            color: var(--primary);
+            min-height: 100vh;
         }
+
+        /* ══════════════════════════════════
+           NAVBAR
+        ══════════════════════════════════ */
         .navbar {
-            background: #007bff;
-            color: white;
-            padding: 15px 30px;
+            background: var(--primary);
+            padding: 0 40px;
+            height: 68px;
             display: flex;
+            align-items: center;
             justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.3);
         }
-        .navbar h1 {
-            font-size: 24px;
-        }
-        .navbar .nav-links {
+
+        .navbar-brand {
             display: flex;
-            gap: 20px;
             align-items: center;
-        }
-        .navbar a {
-            color: white;
+            gap: 10px;
             text-decoration: none;
-            padding: 8px 15px;
-            border-radius: 4px;
-            transition: background 0.3s;
         }
-        .navbar a:hover {
-            background: rgba(255,255,255,0.2);
-        }
-        .navbar .user-info {
+        .navbar-logo {
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, var(--accent), var(--gold));
+            border-radius: 10px;
             display: flex;
             align-items: center;
-            gap: 15px;
+            justify-content: center;
+            font-size: 18px;
         }
-        .navbar .logout-btn {
-            background: #dc3545;
-            padding: 8px 15px;
+        .navbar-brand-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 20px;
+            color: white;
+            letter-spacing: 0.3px;
+        }
+        .navbar-brand-text span {
+            color: var(--accent);
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .nav-link {
+            color: rgba(255,255,255,0.75);
+            text-decoration: none;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .nav-link:hover {
+            color: white;
+            background: rgba(255,255,255,0.1);
+        }
+        .nav-link.active {
+            color: white;
+            background: var(--accent);
+        }
+
+        /* Search Bar */
+        .nav-search {
+            display: flex;
+            align-items: center;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 0 10px;
+        }
+        .nav-search input {
+            background: transparent;
+            border: none;
+            padding: 8px 14px;
+            color: white;
+            font-size: 13px;
+            width: 180px;
+            outline: none;
+        }
+        .nav-search input::placeholder { color: rgba(255,255,255,0.4); }
+        .nav-search button {
+            background: var(--accent);
+            border: none;
+            padding: 8px 12px;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        /* Profile Dropdown */
+        .profile-dropdown { position: relative; }
+        .profile-trigger {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            border-radius: 30px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            cursor: pointer;
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .profile-trigger:hover { background: rgba(255,255,255,0.2); }
+        .profile-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), var(--gold));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 700;
+            color: white;
+        }
+
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: calc(100% + 10px);
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            min-width: 240px;
+            z-index: 2000;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+        .dropdown-menu.open { display: block; }
+
+        .dropdown-header {
+            padding: 16px 20px;
+            background: linear-gradient(135deg, var(--primary), var(--accent2));
+            color: white;
+        }
+        .dropdown-header .name {
+            font-weight: 600;
+            font-size: 15px;
+        }
+        .dropdown-header .email {
+            font-size: 12px;
+            opacity: 0.8;
+            margin-top: 2px;
+        }
+        .dropdown-header .role-badge {
+            display: inline-block;
+            margin-top: 6px;
+            padding: 2px 10px;
+            background: var(--accent);
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 11px 20px;
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 14px;
+            transition: background 0.15s;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        .dropdown-item:hover { background: #f8f9ff; }
+        .dropdown-item:last-child { border-bottom: none; }
+        .dropdown-item.danger { color: var(--danger); }
+        .dropdown-item.danger:hover { background: #fff5f5; }
+
+        /* Admin badge */
+        .admin-badge {
+            background: var(--gold);
+            color: var(--primary);
+            padding: 3px 8px;
             border-radius: 4px;
+            font-size: 11px;
+            font-weight: 700;
         }
-        .navbar .logout-btn:hover {
-            background: #c82333;
+
+        /* ══════════════════════════════════
+           LAYOUT
+        ══════════════════════════════════ */
+        .page-wrapper {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 30px 24px;
         }
-        .container {
-            max-width: 1200px;
-            margin: 30px auto;
-            padding: 20px;
+
+        /* ══════════════════════════════════
+           FLASH MESSAGES
+        ══════════════════════════════════ */
+        .flash-container { margin-bottom: 20px; }
+        .flash {
+            padding: 14px 20px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.3s ease;
         }
-        .message {
-            padding: 12px 20px;
-            margin: 15px 0;
-            border-radius: 4px;
+        .flash.success {
+            background: #d1fae5;
+            color: #065f46;
+            border-left: 4px solid var(--success);
         }
-        .success { 
-            background: #d4edda; 
-            color: #155724; 
-            border: 1px solid #c3e6cb;
+        .flash.danger {
+            background: #fee2e2;
+            color: #991b1b;
+            border-left: 4px solid var(--danger);
         }
-        .danger { 
-            background: #f8d7da; 
-            color: #721c24; 
-            border: 1px solid #f5c6cb;
+        .flash.info {
+            background: #dbeafe;
+            color: #1e40af;
+            border-left: 4px solid var(--info);
         }
-        .info { 
-            background: #d1ecf1; 
-            color: #0c5460; 
-            border: 1px solid #bee5eb;
+        .flash.warning {
+            background: #fef3c7;
+            color: #92400e;
+            border-left: 4px solid var(--warning);
         }
-        .warning { 
-            background: #fff3cd; 
-            color: #856404; 
-            border: 1px solid #ffeaa7;
+
+        /* ══════════════════════════════════
+           CARDS
+        ══════════════════════════════════ */
+        .card {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 25px;
+        }
+
+        /* ══════════════════════════════════
+           BUTTONS
+        ══════════════════════════════════ */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #c73652;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(233,69,96,0.4);
+        }
+        .btn-secondary {
+            background: var(--primary);
+            color: white;
+        }
+        .btn-secondary:hover { background: var(--accent2); }
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        .btn-outline {
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--border);
+        }
+        .btn-outline:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        /* ══════════════════════════════════
+           STATUS BADGES
+        ══════════════════════════════════ */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .badge-submitted { background: #dbeafe; color: #1e40af; }
+        .badge-under-review { background: #fef3c7; color: #92400e; }
+        .badge-accepted { background: #d1fae5; color: #065f46; }
+        .badge-rejected { background: #fee2e2; color: #991b1b; }
+
+        /* ══════════════════════════════════
+           FOOTER
+        ══════════════════════════════════ */
+        .footer {
+            background: var(--primary);
+            color: rgba(255,255,255,0.6);
+            text-align: center;
+            padding: 24px;
+            font-size: 13px;
+            margin-top: 60px;
+        }
+        .footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        /* ══════════════════════════════════
+           ANIMATIONS
+        ══════════════════════════════════ */
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* ══════════════════════════════════
+           RESPONSIVE
+        ══════════════════════════════════ */
+        @media (max-width: 768px) {
+            .navbar { padding: 0 16px; }
+            .nav-link span { display: none; }
+            .nav-search { display: none; }
+            .page-wrapper { padding: 16px; }
         }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <!-- Navigation Bar -->
-    <nav class="navbar">
-        <h1>📚 Research Journal SaaS</h1>
-        <div class="nav-links">
-            {% if current_user.is_authenticated %}
-                <a href="{{ url_for('index') }}">Home</a>
-                <a href="{{ url_for('blog.index') }}">Blog</a>
-                <a href="{{ url_for('ai.index') }}">🤖 AI Assistant</a>
-                {% if current_user.has_role('admin') or current_user.has_role('editor') %}
-                <a href="{{ url_for('admin.dashboard') }}">Admin</a>
-                {% endif %}
-                <div class="user-info">
-                    <span>👤 {{ current_user.first_name }} {{ current_user.last_name }}</span>
-                    <a href="{{ url_for('auth.logout') }}" class="logout-btn">Logout</a>
+
+<!-- ═══════════════════════ NAVBAR ═══════════════════════ -->
+<nav class="navbar">
+    <a href="{{ url_for('index') }}" class="navbar-brand">
+        <div class="navbar-logo">📚</div>
+        <span class="navbar-brand-text">Research<span>Hub</span></span>
+    </a>
+
+    <div class="nav-links">
+        {% if current_user.is_authenticated %}
+
+            <a href="{{ url_for('index') }}" class="nav-link">🏠 <span>Home</span></a>
+            <a href="{{ url_for('journal.index') }}" class="nav-link">📋 <span>Journals</span></a>
+            <a href="{{ url_for('blog.index') }}" class="nav-link">📝 <span>Blog</span></a>
+            <a href="{{ url_for('ai.index') }}" class="nav-link">🤖 <span>AI</span></a>
+            <a href="{{ url_for('analytics.index') }}" class="nav-link">📊 <span>Analytics</span></a>
+
+            {% if current_user.has_role('admin') or current_user.has_role('editor') %}
+            <a href="{{ url_for('admin.dashboard') }}" class="nav-link">
+                <span class="admin-badge">ADMIN</span>
+            </a>
+            {% endif %}
+
+            <!-- Search -->
+            <form action="{{ url_for('search.index') }}" method="GET" class="nav-search">
+                <input type="text" name="q" placeholder="Search...">
+                <button type="submit">🔍</button>
+            </form>
+
+            <!-- Profile Dropdown -->
+            <div class="profile-dropdown">
+                <div class="profile-trigger" onclick="toggleDropdown()">
+                    <div class="profile-avatar">
+                        {{ current_user.first_name[0] }}{{ current_user.last_name[0] }}
+                    </div>
+                    <span>{{ current_user.first_name }}</span>
+                    <span style="font-size: 10px; opacity: 0.7;">▾</span>
                 </div>
-            {% else %}
-                <a href="{{ url_for('index') }}">Home</a>
-                <a href="{{ url_for('blog.index') }}">Blog</a>
-                <a href="{{ url_for('auth.login') }}">Login</a>
-                <a href="{{ url_for('auth.register') }}">Register</a>
-            {% endif %}
-        </div>
-    </nav>
 
+                <div class="dropdown-menu" id="profileDropdown">
+                    <div class="dropdown-header">
+                        <div class="name">
+                            {{ current_user.first_name }} {{ current_user.last_name }}
+                        </div>
+                        <div class="email">{{ current_user.email }}</div>
+                        <span class="role-badge">
+                            {% if current_user.roles %}
+                                {{ current_user.roles[0].name|upper }}
+                            {% else %}
+                                USER
+                            {% endif %}
+                        </span>
+                    </div>
+
+                    <a href="{{ url_for('profile.index') }}" class="dropdown-item">
+                        👤 My Profile
+                    </a>
+                    <a href="{{ url_for('profile.edit') }}" class="dropdown-item">
+                        ✏️ Edit Profile
+                    </a>
+                    <a href="{{ url_for('profile.change_password') }}" class="dropdown-item">
+                        🔒 Change Password
+                    </a>
+                    <a href="{{ url_for('journal.my_submissions') }}" class="dropdown-item">
+                        📄 My Submissions
+                    </a>
+                    <a href="{{ url_for('analytics.index') }}" class="dropdown-item">
+                        📊 My Analytics
+                    </a>
+                    <a href="{{ url_for('blog.my_posts') }}" class="dropdown-item">
+                        📝 My Blog Posts
+                    </a>
+                    <a href="{{ url_for('auth.logout') }}" class="dropdown-item danger">
+                        🚪 Sign Out
+                    </a>
+                </div>
+            </div>
+
+        {% else %}
+            <a href="{{ url_for('blog.index') }}" class="nav-link">📝 Blog</a>
+            <a href="{{ url_for('auth.login') }}" class="nav-link">Sign In</a>
+            <a href="{{ url_for('auth.register') }}" 
+               class="btn btn-primary" style="margin-left: 5px;">
+                Get Started →
+            </a>
+        {% endif %}
+    </div>
+</nav>
+
+<!-- ═══════════════════════ CONTENT ═══════════════════════ -->
+<div class="page-wrapper">
     <!-- Flash Messages -->
-    <div class="container">
+    <div class="flash-container">
         {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="message {{ category }}">{{ message }}</div>
-                {% endfor %}
-            {% endif %}
+            {% for category, message in messages %}
+                <div class="flash {{ category }}">
+                    {% if category == 'success' %}✅{% elif category == 'danger' %}❌
+                    {% elif category == 'warning' %}⚠️{% else %}ℹ️{% endif %}
+                    {{ message }}
+                </div>
+            {% endfor %}
         {% endwith %}
-
-        <!-- Page Content -->
-        {% block content %}{% endblock %}
     </div>
 
-    {% block extra_js %}{% endblock %}
+    {% block content %}{% endblock %}
+</div>
+
+<!-- ═══════════════════════ FOOTER ═══════════════════════ -->
+<footer class="footer">
+    <p>
+        © 2026 <strong style="color: white;">ResearchHub Pro</strong> — 
+        Built for researchers, by researchers. 
+        <a href="{{ url_for('blog.index') }}">Blog</a> · 
+        <a href="{{ url_for('ai.index') }}">AI Assistant</a>
+    </p>
+</footer>
+
+<script>
+function toggleDropdown() {
+    document.getElementById('profileDropdown').classList.toggle('open');
+}
+window.addEventListener('click', function(e) {
+    if (!e.target.closest('.profile-dropdown')) {
+        const menu = document.getElementById('profileDropdown');
+        if (menu) menu.classList.remove('open');
+    }
+});
+</script>
+
+{% block extra_js %}{% endblock %}
 </body>
 </html>

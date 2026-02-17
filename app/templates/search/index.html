@@ -1,0 +1,322 @@
+{% extends "base.html" %}
+{% block title %}Search - Research Journal SaaS{% endblock %}
+
+{% block extra_css %}
+<style>
+    .search-hero {
+        background: linear-gradient(135deg, #007bff, #0056b3);
+        padding: 40px;
+        border-radius: 12px;
+        margin-bottom: 30px;
+        text-align: center;
+        color: white;
+    }
+    .search-box {
+        display: flex;
+        gap: 10px;
+        max-width: 600px;
+        margin: 20px auto 0;
+    }
+    .search-box input {
+        flex: 1;
+        padding: 15px 20px;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        outline: none;
+    }
+    .search-box button {
+        padding: 15px 25px;
+        background: #28a745;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+        white-space: nowrap;
+    }
+    .search-box button:hover { background: #218838; }
+    .filters {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+    .filter-btn {
+        padding: 8px 16px;
+        border: 2px solid #ddd;
+        border-radius: 20px;
+        background: white;
+        cursor: pointer;
+        font-size: 14px;
+        text-decoration: none;
+        color: #333;
+        transition: all 0.2s;
+    }
+    .filter-btn:hover, .filter-btn.active {
+        background: #007bff;
+        color: white;
+        border-color: #007bff;
+    }
+    .result-section {
+        background: white;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+    .result-section-header {
+        background: #f8f9fa;
+        padding: 15px 20px;
+        border-bottom: 1px solid #eee;
+        font-weight: bold;
+        color: #333;
+    }
+    .result-item {
+        padding: 15px 20px;
+        border-bottom: 1px solid #f0f0f0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .result-item:last-child { border-bottom: none; }
+    .result-item:hover { background: #f8f9fa; }
+    .result-title {
+        color: #007bff;
+        text-decoration: none;
+        font-weight: bold;
+        display: block;
+        margin-bottom: 4px;
+    }
+    .result-title:hover { text-decoration: underline; }
+    .result-meta { color: #666; font-size: 13px; }
+    .badge {
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: bold;
+    }
+    .no-results {
+        text-align: center;
+        padding: 60px 20px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Search Hero -->
+<div class="search-hero">
+    <h1 style="font-size: 28px; margin-bottom: 10px;">🔍 Search</h1>
+    <p style="opacity: 0.9;">Search across journals, submissions, and blog posts</p>
+    
+    <form method="GET" class="search-box">
+        <input type="text" 
+               name="q" 
+               value="{{ query }}"
+               placeholder="Search journals, submissions, blogs..."
+               autofocus>
+        <input type="hidden" name="type" value="{{ filter_type }}">
+        <button type="submit">🔍 Search</button>
+    </form>
+</div>
+
+<!-- Filters -->
+{% if query %}
+<div class="filters">
+    <span style="color: #666; font-weight: bold;">Filter by:</span>
+    
+    <a href="{{ url_for('search.index', q=query, type='all') }}" 
+       class="filter-btn {% if filter_type == 'all' %}active{% endif %}">
+        All ({{ results.total }})
+    </a>
+    <a href="{{ url_for('search.index', q=query, type='journals') }}" 
+       class="filter-btn {% if filter_type == 'journals' %}active{% endif %}">
+        📋 Journals ({{ results.journals|length }})
+    </a>
+    <a href="{{ url_for('search.index', q=query, type='submissions') }}" 
+       class="filter-btn {% if filter_type == 'submissions' %}active{% endif %}">
+        📄 Submissions ({{ results.submissions|length }})
+    </a>
+    <a href="{{ url_for('search.index', q=query, type='blogs') }}" 
+       class="filter-btn {% if filter_type == 'blogs' %}active{% endif %}">
+        📝 Blogs ({{ results.blogs|length }})
+    </a>
+    
+    {% if filter_type == 'submissions' %}
+    <span style="margin-left: 15px; color: #666;">Status:</span>
+    <a href="{{ url_for('search.index', q=query, type='submissions', status='all') }}" 
+       class="filter-btn {% if status_filter == 'all' %}active{% endif %}">All</a>
+    <a href="{{ url_for('search.index', q=query, type='submissions', status='submitted') }}" 
+       class="filter-btn {% if status_filter == 'submitted' %}active{% endif %}">Submitted</a>
+    <a href="{{ url_for('search.index', q=query, type='submissions', status='accepted') }}" 
+       class="filter-btn {% if status_filter == 'accepted' %}active{% endif %}">Accepted</a>
+    <a href="{{ url_for('search.index', q=query, type='submissions', status='rejected') }}" 
+       class="filter-btn {% if status_filter == 'rejected' %}active{% endif %}">Rejected</a>
+    {% endif %}
+</div>
+
+<!-- Results Summary -->
+<p style="color: #666; margin-bottom: 15px;">
+    Found <strong>{{ results.total }}</strong> results for 
+    "<strong>{{ query }}</strong>"
+</p>
+
+{% if results.total == 0 %}
+<div class="no-results">
+    <div style="font-size: 48px; margin-bottom: 15px;">🔍</div>
+    <h2 style="color: #333; margin-bottom: 10px;">No results found</h2>
+    <p style="color: #666;">
+        Try different keywords or check your spelling
+    </p>
+</div>
+
+{% else %}
+
+<!-- Journal Results -->
+{% if results.journals and filter_type in ['all', 'journals'] %}
+<div class="result-section">
+    <div class="result-section-header">
+        📋 Journals ({{ results.journals|length }})
+    </div>
+    {% for journal in results.journals %}
+    <div class="result-item">
+        <div>
+            <a href="{{ url_for('journal.view', journal_id=journal.id) }}" 
+               class="result-title">
+                {{ journal.name }}
+            </a>
+            <span class="result-meta">
+                {% if journal.description %}
+                    {{ journal.description[:100] }}...
+                {% endif %}
+            </span>
+        </div>
+        <span class="badge" style="
+            background: {% if journal.is_accepting_submissions %}#28a745{% else %}#6c757d{% endif %};
+            color: white;">
+            {% if journal.is_accepting_submissions %}
+                ✅ Open
+            {% else %}
+                🔒 Closed
+            {% endif %}
+        </span>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<!-- Submission Results -->
+{% if results.submissions and filter_type in ['all', 'submissions'] %}
+<div class="result-section">
+    <div class="result-section-header">
+        📄 Submissions ({{ results.submissions|length }})
+    </div>
+    {% for sub in results.submissions %}
+    <div class="result-item">
+        <div>
+            <a href="{{ url_for('journal.view_submission', submission_id=sub.id) }}" 
+               class="result-title">
+                {{ sub.title }}
+            </a>
+            <span class="result-meta">
+                {{ sub.journal.name }} • 
+                {{ sub.submitted_at.strftime('%B %d, %Y') }}
+            </span>
+        </div>
+        <span class="badge" style="
+            background: {% if sub.status == 'accepted' %}#28a745
+                       {% elif sub.status == 'rejected' %}#dc3545
+                       {% elif sub.status == 'under_review' %}#ffc107
+                       {% else %}#007bff{% endif %};
+            color: {% if sub.status == 'under_review' %}#333{% else %}white{% endif %};">
+            {{ sub.status|upper }}
+        </span>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<!-- Blog Results -->
+{% if results.blogs and filter_type in ['all', 'blogs'] %}
+<div class="result-section">
+    <div class="result-section-header">
+        📝 Blog Posts ({{ results.blogs|length }})
+    </div>
+    {% for blog in results.blogs %}
+    <div class="result-item">
+        <div>
+            <a href="{{ url_for('blog.view', post_id=blog.id) }}" 
+               class="result-title">
+                {{ blog.title }}
+            </a>
+            <span class="result-meta">
+                By {{ blog.author.full_name }} • 
+                {{ blog.created_at.strftime('%B %d, %Y') }}
+                {% if blog.views_count %}
+                    • {{ blog.views_count }} views
+                {% endif %}
+            </span>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% endif %}
+{% endif %}
+
+<!-- Quick Links (when no search) -->
+{% if not query %}
+<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+    <a href="{{ url_for('search.filter_journals') }}" 
+       style="background: white; padding: 30px; border-radius: 8px; 
+              text-decoration: none; color: #333; text-align: center;
+              box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+              transition: transform 0.2s;"
+       onmouseover="this.style.transform='translateY(-3px)'"
+       onmouseout="this.style.transform='translateY(0)'">
+        <div style="font-size: 36px; margin-bottom: 10px;">📋</div>
+        <h3>Browse Journals</h3>
+        <p style="color: #666; font-size: 14px; margin-top: 5px;">
+            Filter and search journals
+        </p>
+    </a>
+    <a href="{{ url_for('search.filter_submissions') }}" 
+       style="background: white; padding: 30px; border-radius: 8px; 
+              text-decoration: none; color: #333; text-align: center;
+              box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+              transition: transform 0.2s;"
+       onmouseover="this.style.transform='translateY(-3px)'"
+       onmouseout="this.style.transform='translateY(0)'">
+        <div style="font-size: 36px; margin-bottom: 10px;">📄</div>
+        <h3>Filter Submissions</h3>
+        <p style="color: #666; font-size: 14px; margin-top: 5px;">
+            Filter by status, journal
+        </p>
+    </a>
+    <a href="{{ url_for('search.index', q='research') }}" 
+       style="background: white; padding: 30px; border-radius: 8px; 
+              text-decoration: none; color: #333; text-align: center;
+              box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+              transition: transform 0.2s;"
+       onmouseover="this.style.transform='translateY(-3px)'"
+       onmouseout="this.style.transform='translateY(0)'">
+        <div style="font-size: 36px; margin-bottom: 10px;">🔍</div>
+        <h3>Quick Search</h3>
+        <p style="color: #666; font-size: 14px; margin-top: 5px;">
+            Search everything at once
+        </p>
+    </a>
+</div>
+{% endif %}
+
+{% endblock %}

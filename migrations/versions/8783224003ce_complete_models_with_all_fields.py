@@ -1,8 +1,8 @@
-"""Complete schema with all models
+"""Complete models with all fields
 
-Revision ID: ca1f3e4678ad
+Revision ID: 8783224003ce
 Revises: 
-Create Date: 2026-02-14 12:05:38.978137
+Create Date: 2026-02-16 17:11:03.460411
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'ca1f3e4678ad'
+revision = '8783224003ce'
 down_revision = None
 branch_labels = None
 depends_on = None

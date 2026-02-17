@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% block title %}Filter Submissions{% endblock %}
+
+{% block content %}
+<div style="background: white; padding: 30px; border-radius: 8px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+    <h1 style="color: #007bff; margin-bottom: 25px;">📄 Filter Submissions</h1>
+    
+    <!-- Filter Form -->
+    <form method="GET" style="background: #f8f9fa; padding: 20px; 
+                              border-radius: 8px; margin-bottom: 25px;
+                              display: flex; gap: 15px; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 200px;">
+            <label style="display: block; margin-bottom: 5px; color: #666; font-size: 14px;">
+                Search Title
+            </label>
+            <input type="text" name="title" value="{{ title_filter }}"
+                   placeholder="Submission title..."
+                   style="width: 100%; padding: 10px; border: 1px solid #ddd; 
+                          border-radius: 6px; font-size: 14px;">
+        </div>
+        <div style="min-width: 150px;">
+            <label style="display: block; margin-bottom: 5px; color: #666; font-size: 14px;">
+                Status
+            </label>
+            <select name="status" 
+                    style="width: 100%; padding: 10px; border: 1px solid #ddd; 
+                           border-radius: 6px; font-size: 14px;">
+                <option value="all" {% if status_filter == 'all' %}selected{% endif %}>
+                    All Status
+                </option>
+                <option value="submitted" {% if status_filter == 'submitted' %}selected{% endif %}>
+                    📬 Submitted
+                </option>
+                <option value="under_review" {% if status_filter == 'under_review' %}selected{% endif %}>
+                    🔍 Under Review
+                </option>
+                <option value="accepted" {% if status_filter == 'accepted' %}selected{% endif %}>
+                    ✅ Accepted
+                </option>
+                <option value="rejected" {% if status_filter == 'rejected' %}selected{% endif %}>
+                    ❌ Rejected
+                </option>
+            </select>
+        </div>
+        <div style="min-width: 150px;">
+            <label style="display: block; margin-bottom: 5px; color: #666; font-size: 14px;">
+                Journal
+            </label>
+            <select name="journal" 
+                    style="width: 100%; padding: 10px; border: 1px solid #ddd; 
+                           border-radius: 6px; font-size: 14px;">
+                <option value="all">All Journals</option>
+                {% for journal in journals %}
+                <option value="{{ journal.id }}" 
+                    {% if journal_filter == journal.id|string %}selected{% endif %}>
+                    {{ journal.name }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div style="display: flex; align-items: flex-end; gap: 10px;">
+            <button type="submit" 
+                    style="padding: 10px 20px; background: #007bff; 
+                           color: white; border: none; border-radius: 6px; cursor: pointer;">
+                🔍 Filter
+            </button>
+            <a href="{{ url_for('search.filter_submissions') }}" 
+               style="padding: 10px 20px; background: #6c757d; color: white; 
+                      text-decoration: none; border-radius: 6px;">
+                Reset
+            </a>
+        </div>
+    </form>
+    
+    <!-- Results -->
+    <p style="color: #666; margin-bottom: 20px;">
+        Found <strong>{{ submissions|length }}</strong> submissions
+    </p>
+    
+    {% if submissions %}
+    <div style="display: grid; gap: 15px;">
+        {% for sub in submissions %}
+        <div style="border: 1px solid #ddd; border-radius: 8px; padding: 20px;
+                    display: flex; justify-content: space-between; align-items: center;">
+            <div style="flex: 1;">
+                <a href="{{ url_for('journal.view_submission', submission_id=sub.id) }}"
+                   style="color: #007bff; text-decoration: none; font-weight: bold; 
+                          font-size: 16px;">
+                    {{ sub.title }}
+                </a>
+                <p style="color: #666; font-size: 13px; margin-top: 5px;">
+                    📋 {{ sub.journal.name }} • 
+                    📅 {{ sub.submitted_at.strftime('%B %d, %Y') }}
+                </p>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <span style="padding: 5px 12px; border-radius: 12px; font-size: 12px; font-weight: bold;
+                    background: {% if sub.status == 'accepted' %}#28a745
+                               {% elif sub.status == 'rejected' %}#dc3545
+                               {% elif sub.status == 'under_review' %}#ffc107
+                               {% else %}#007bff{% endif %};
+                    color: {% if sub.status == 'under_review' %}#333{% else %}white{% endif %};">
+                    {{ sub.status|upper|replace('_', ' ') }}
+                </span>
+                <a href="{{ url_for('journal.view_submission', submission_id=sub.id) }}"
+                   style="padding: 6px 14px; background: #007bff; color: white; 
+                          text-decoration: none; border-radius: 4px; font-size: 13px;">
+                    View
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div style="text-align: center; padding: 40px; color: #666;">
+        <div style="font-size: 48px; margin-bottom: 15px;">📄</div>
+        <h3>No submissions found</h3>
+        <p>Try different filters</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

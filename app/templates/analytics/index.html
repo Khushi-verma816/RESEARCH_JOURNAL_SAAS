@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <h2 class="mb-4">Analytics Dashboard</h2>
+
+    <div class="row">
+
+        <!-- Total Submissions -->
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <h5>Total Submissions</h5>
+                    <h2>{{ total_submissions }}</h2>
+                </div>
+            </div>
+        </div>
+
+        <!-- Accepted -->
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm border-success">
+                <div class="card-body text-center">
+                    <h5>Accepted</h5>
+                    <h2 class="text-success">{{ accepted }}</h2>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rejected -->
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm border-danger">
+                <div class="card-body text-center">
+                    <h5>Rejected</h5>
+                    <h2 class="text-danger">{{ rejected }}</h2>
+                </div>
+            </div>
+        </div>
+
+        <!-- Under Review -->
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm border-warning">
+                <div class="card-body text-center">
+                    <h5>Under Review</h5>
+                    <h2 class="text-warning">{{ under_review }}</h2>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="row mt-3">
+
+        <!-- Blog Count -->
+        <div class="col-md-6 mb-3">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <h5>Your Blog Posts</h5>
+                    <h2>{{ blog_count }}</h2>
+                </div>
+            </div>
+        </div>
+
+        <!-- Acceptance Rate -->
+        <div class="col-md-6 mb-3">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <h5>Acceptance Rate</h5>
+                    <h2>{{ acceptance_rate }}%</h2>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    {% if total_submissions == 0 %}
+        <div class="alert alert-info mt-3">
+            No submissions yet.
+        </div>
+    {% endif %}
+
+</div>
+{% endblock %}
