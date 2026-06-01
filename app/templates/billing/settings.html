@@ -1,0 +1,198 @@
+﻿{% extends "base.html" %}
+{% block title %}Billing Settings – Research Hub{% endblock %}
+{% block extra_css %}
+<style>
+.app{
+  display:flex;
+  min-height:100vh;
+  background:
+    radial-gradient(1100px 540px at 92% -5%, rgba(56,173,248,0.18), transparent 65%),
+    radial-gradient(960px 520px at -8% 10%, rgba(2,91,160,0.16), transparent 60%),
+    linear-gradient(160deg, #ecf4ff 0%, #f3f8ff 50%, #eaf3ff 100%)
+}
+html[data-theme="dark"] .app{
+  background:
+    radial-gradient(1100px 540px at 92% -5%, rgba(56,173,248,0.16), transparent 65%),
+    radial-gradient(960px 520px at -8% 10%, rgba(2,91,160,0.22), transparent 60%),
+    linear-gradient(160deg, #0c1017 0%, #101722 52%, #141e2c 100%)
+}
+.sidebar{width:252px;flex-shrink:0;background:linear-gradient(180deg,#0b3d6a 0%,#025ba0 48%,#0272c6 100%);border-right:1px solid rgba(255,255,255,0.22);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;overflow-y:auto;z-index:50;box-shadow:12px 0 36px rgba(2,91,160,0.20)}
+html[data-theme="dark"] .sidebar{background:linear-gradient(180deg,#10161f 0%,#141c28 52%,#192536 100%);border-right-color:rgba(124,200,251,0.24);box-shadow:14px 0 42px rgba(0,0,0,0.42)}
+.sidebar-brand{display:flex;align-items:center;gap:10px;padding:20px 20px 16px;border-bottom:1px solid rgba(255,255,255,0.22)}
+.sb-icon{width:34px;height:34px;border-radius:10px;background:linear-gradient(140deg,#7cc8fb,#38adf8);display:flex;align-items:center;justify-content:center;font-size:15px;color:#0b3d6a;box-shadow:0 8px 20px rgba(0,0,0,0.2)}
+.sb-name{font-family:var(--font-serif);font-size:1.08rem;color:#f5fbff}
+.sb-nav-section{padding:18px 12px 4px}
+.sb-section-title{font-size:.68rem;font-weight:700;color:rgba(218,238,255,0.78);text-transform:uppercase;letter-spacing:.09em;padding:0 8px;margin-bottom:6px}
+.sb-nav{display:flex;flex-direction:column;gap:3px}
+.sidebar-link{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--r);font-size:.87rem;font-weight:500;color:rgba(230,245,255,0.9);transition:all .18s;text-decoration:none}
+.sidebar-link:hover{background:rgba(255,255,255,0.12);color:#fff}
+.sidebar-link.active{background:linear-gradient(135deg,rgba(56,173,248,0.32),rgba(124,200,251,0.24));color:#fff;box-shadow:inset 0 0 0 1px rgba(255,255,255,0.28)}
+.sl-icon{width:30px;height:30px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;background:rgba(255,255,255,0.08)}
+.sidebar-link.active .sl-icon{background:rgba(255,255,255,0.24)}
+.sb-user{padding:14px 16px;margin:10px 12px 6px;border:1px solid rgba(255,255,255,0.24);border-radius:12px;background:rgba(255,255,255,0.08)}
+.sb-user-inner{display:flex;align-items:center;gap:10px}
+.sb-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#7cc8fb,#38adf8);color:#0b3d6a;font-size:.78rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-user-name{font-size:.84rem;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-user-role{font-size:.74rem;color:rgba(220,240,255,0.82);text-transform:capitalize}
+.sb-footer{margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,0.22)}
+.sb-logout-btn{width:100%;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.28);background:rgba(0,0,0,0.20);color:#f8fbff;font-size:.84rem;font-weight:600;text-decoration:none;transition:all .18s}
+.sb-logout-btn:hover{background:rgba(239,68,68,0.22);border-color:rgba(252,165,165,0.55)}
+.main{margin-left:252px;flex:1;display:flex;flex-direction:column;min-width:0}
+.topbar{height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 32px;background:var(--white);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:40}
+.topbar-title{font-size:.95rem;font-weight:600;color:var(--text-1)}
+.topbar-subtitle{font-size:.75rem;color:var(--text-3)}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.tb-theme-btn{width:34px;height:34px;border-radius:var(--r);border:1.5px solid var(--border-md);background:var(--surface-muted);color:var(--text-2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px}
+.tb-theme-btn .t-moon{display:block}.tb-theme-btn .t-sun{display:none}
+html[data-theme="dark"] .tb-theme-btn .t-moon{display:none}
+html[data-theme="dark"] .tb-theme-btn .t-sun{display:block}
+.page-body{padding:20px 32px 28px;flex:1}
+.settings-wrap{width:100%;max-width:980px;margin:0 auto}
+.page-title{font-family:var(--font-serif);font-size:1.4rem;color:var(--text-1);margin-bottom:4px}
+.page-sub{font-size:.82rem;color:var(--text-3);margin-bottom:28px}
+.settings-section{background:var(--white);border:1px solid var(--border);border-radius:var(--r-xl);padding:24px 26px;margin-bottom:20px}
+.section-header{margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid var(--border)}
+.section-title{font-size:.92rem;font-weight:600;color:var(--text-1)}
+.section-desc{font-size:.82rem;color:var(--text-3);margin-top:3px}
+.field-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border)}
+.field-row:last-child{border-bottom:none;padding-bottom:0}
+.field-label{font-size:.855rem;font-weight:500;color:var(--text-1)}
+.field-hint{font-size:.78rem;color:var(--text-4);margin-top:2px}
+.field-control{display:flex;align-items:center;gap:10px}
+select.field-input,input.field-input{padding:8px 12px;border-radius:var(--r);border:1.5px solid var(--border-md);background:var(--white);color:var(--text-1);font-size:.855rem;font-family:var(--font-sans)}
+select.field-input:focus,input.field-input:focus{outline:none;border-color:var(--sky-400)}
+.btn-save{padding:8px 18px;border-radius:var(--r);background:var(--sky-600);color:#fff;border:none;font-size:.855rem;font-weight:500;cursor:pointer;font-family:var(--font-sans)}
+.btn-save:hover{background:var(--sky-700)}
+.info-row{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--border);font-size:.855rem}
+.info-row:last-child{border-bottom:none}
+.info-label{color:var(--text-3)}
+.info-value{color:var(--text-1);font-weight:500}
+.plan-chip{padding:4px 12px;border-radius:var(--r-pill);font-size:.75rem;font-weight:600;background:var(--sky-50);color:var(--sky-700);border:1px solid var(--sky-200)}
+.danger-section{border-color:rgba(220,38,38,.25)}
+.danger-title{color:var(--red)!important}
+@media(max-width:860px) and (pointer:coarse){.sidebar{transform:translateX(-100%)}.main{margin-left:0}.topbar,.page-body{padding-left:20px;padding-right:20px}}
+@media(max-width:640px){.page-body{padding:16px}.settings-section{padding:20px 18px}}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="app">
+      {% include "includes/app_sidebar.html" %}
+
+  <div class="main">
+    <header class="topbar">
+      <div><div class="topbar-title">Billing Settings</div><div class="topbar-subtitle">Manage billing preferences for {{ tenant.name }}</div></div>
+      <div class="topbar-right"><button class="tb-theme-btn" onclick="toggleTheme()"><span class="t-moon">&#9790;</span><span class="t-sun">&#9728;</span></button></div>
+    </header>
+
+    <div class="page-body">
+      <div class="settings-wrap">
+      <div class="page-title">Billing Settings</div>
+      <div class="page-sub">Control how you're billed for {{ tenant.name }}.</div>
+
+      <!-- Current Plan -->
+      <div class="settings-section">
+        <div class="section-header">
+          <div class="section-title">Current Subscription</div>
+          <div class="section-desc">Your active plan and key details</div>
+        </div>
+        <div class="info-row"><span class="info-label">Plan</span><span class="info-value"><span class="plan-chip">{{ sub.plan.title() }}</span></span></div>
+        <div class="info-row"><span class="info-label">Status</span><span class="info-value">{{ sub.status.title() }}</span></div>
+        <div class="info-row"><span class="info-label">Amount</span><span class="info-value">₹{{ sub.amount }} / {{ 'year' if sub.billing_cycle == 'annual' else 'month' }} (INR)</span></div>
+        {% if sub.expires_at %}<div class="info-row"><span class="info-label">Renews</span><span class="info-value">{{ sub.expires_at.strftime('%d %b %Y') }}</span></div>{% endif %}
+        <div class="info-row"><span class="info-label">Member since</span><span class="info-value">{{ sub.started_at.strftime('%d %b %Y') }}</span></div>
+        <div style="margin-top:14px"><a href="{{ url_for('billing.dashboard') }}" style="font-size:.84rem;color:var(--sky-600);text-decoration:none">View all plans &#8594;</a></div>
+      </div>
+
+      <!-- Billing Cycle -->
+      <div class="settings-section">
+        <div class="section-header">
+          <div class="section-title">Billing Cycle</div>
+          <div class="section-desc">Annual billing saves ~17%</div>
+        </div>
+        <form method="POST" action="{{ url_for('billing.settings') }}">
+          <input type="hidden" name="action" value="update_billing_cycle">
+          <div class="field-row">
+            <div><div class="field-label">Billing frequency</div><div class="field-hint">Choose monthly or annual</div></div>
+            <div class="field-control">
+              <select name="billing_cycle" class="field-input">
+                <option value="monthly" {% if sub.billing_cycle=='monthly' %}selected{% endif %}>Monthly</option>
+                <option value="annual"  {% if sub.billing_cycle=='annual'  %}selected{% endif %}>Annual (save 17%)</option>
+              </select>
+              <button type="submit" class="btn-save">Save</button>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!-- Currency -->
+      <div class="settings-section">
+        <div class="section-header">
+          <div class="section-title">Currency</div>
+          <div class="section-desc">Billing currency is fixed to INR for all accounts</div>
+        </div>
+        <form method="POST" action="{{ url_for('billing.settings') }}">
+          <input type="hidden" name="action" value="update_currency">
+          <div class="field-row">
+            <div><div class="field-label">Currency</div><div class="field-hint">Used on invoices and receipts</div></div>
+            <div class="field-control">
+              <select name="currency" class="field-input">
+                <option value="INR" selected>INR – Indian Rupee</option>
+              </select>
+              <button type="submit" class="btn-save">Save</button>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!-- Email Reminders -->
+      <div class="settings-section">
+        <div class="section-header">
+          <div class="section-title">Email Reminders</div>
+          <div class="section-desc">Manually trigger a renewal reminder</div>
+        </div>
+        <div class="field-row">
+          <div><div class="field-label">Send renewal reminder</div><div class="field-hint">Sends to {{ user.email }}</div></div>
+          <div class="field-control">
+            <form method="POST" action="{{ url_for('billing.send_renewal_email') }}">
+              <button type="submit" class="btn-save">Send Now</button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Offline Payments -->
+      <div class="settings-section">
+        <div class="section-header">
+          <div class="section-title">Offline Payments</div>
+          <div class="section-desc">Pay via bank transfer, cash, cheque, or UPI</div>
+        </div>
+        <div class="field-row">
+          <div><div class="field-label">Submit an offline payment</div><div class="field-hint">Reviewed within 24–48 hours</div></div>
+          <div class="field-control">
+            <a href="{{ url_for('billing.offline_payments') }}" class="btn-save" style="text-decoration:none;display:inline-block">Go &#8594;</a>
+          </div>
+        </div>
+      </div>
+
+      {% if sub.plan != 'free' %}
+      <div class="settings-section danger-section">
+        <div class="section-header">
+          <div class="section-title danger-title">&#9888; Cancel Subscription</div>
+          <div class="section-desc">You will be downgraded to the Free plan immediately.</div>
+        </div>
+        <form method="POST" action="{{ url_for('billing.cancel') }}">
+          <button type="submit" onclick="return confirm('Cancel subscription and downgrade to Free?')"
+            style="padding:9px 20px;border-radius:var(--r);background:transparent;color:var(--red);border:1.5px solid rgba(220,38,38,.3);font-size:.855rem;font-weight:500;cursor:pointer;font-family:var(--font-sans)">
+            Cancel Subscription
+          </button>
+        </form>
+      </div>
+      {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+

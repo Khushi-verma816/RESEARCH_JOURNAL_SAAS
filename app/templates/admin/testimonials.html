@@ -1,0 +1,263 @@
+{% extends "base.html" %}
+{% block title %}Testimonials - Research Hub{% endblock %}
+
+{% block extra_css %}
+<style>
+.app {
+  display: flex;
+  min-height: 100vh;
+  background:
+    radial-gradient(1100px 540px at 92% -5%, rgba(56,173,248,0.18), transparent 65%),
+    radial-gradient(960px 520px at -8% 10%, rgba(2,91,160,0.16), transparent 60%),
+    linear-gradient(160deg, #ecf4ff 0%, #f3f8ff 50%, #eaf3ff 100%);
+}
+html[data-theme="dark"] .app {
+  background:
+    radial-gradient(1100px 540px at 92% -5%, rgba(56,173,248,0.16), transparent 65%),
+    radial-gradient(960px 520px at -8% 10%, rgba(2,91,160,0.22), transparent 60%),
+    linear-gradient(160deg, #0c1017 0%, #101722 52%, #141e2c 100%);
+}
+.sidebar {
+  width: 252px;
+  flex-shrink: 0;
+  background: linear-gradient(180deg, #0b3d6a 0%, #025ba0 48%, #0272c6 100%);
+  border-right: 1px solid rgba(255,255,255,0.22);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  overflow-y: auto;
+  z-index: 50;
+  box-shadow: 12px 0 36px rgba(2,91,160,0.20);
+}
+html[data-theme="dark"] .sidebar {
+  background: linear-gradient(180deg, #10161f 0%, #141c28 52%, #192536 100%);
+  border-right-color: rgba(124,200,251,0.24);
+  box-shadow: 14px 0 42px rgba(0,0,0,0.42);
+}
+.sidebar-brand { display: flex; align-items: center; gap: 10px; padding: 20px 20px 16px; border-bottom: 1px solid rgba(255,255,255,0.22); }
+.sb-icon { width: 34px; height: 34px; border-radius: 10px; background: linear-gradient(140deg, #7cc8fb, #38adf8); display: flex; align-items: center; justify-content: center; font-size: 15px; color: #0b3d6a; box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
+.sb-name { font-family: var(--font-serif); font-size: 1.08rem; color: #f5fbff; }
+.sb-nav-section { padding: 18px 12px 4px; }
+.sb-section-title { font-size: 0.68rem; font-weight: 700; color: rgba(218,238,255,0.78); text-transform: uppercase; letter-spacing: 0.09em; padding: 0 8px; margin-bottom: 6px; }
+.sb-nav { display: flex; flex-direction: column; gap: 3px; }
+.sidebar-link { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: var(--r); font-size: 0.87rem; font-weight: 500; color: rgba(230,245,255,0.9); transition: all 0.18s; text-decoration: none; }
+.sidebar-link:hover { background: rgba(255,255,255,0.12); color: #ffffff; }
+.sidebar-link.active { background: linear-gradient(135deg, rgba(56,173,248,0.32), rgba(124,200,251,0.24)); color: #ffffff; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.28); }
+.sl-icon { width: 30px; height: 30px; border-radius: var(--r-sm); display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; background: rgba(255,255,255,0.08); }
+.sidebar-link.active .sl-icon { background: rgba(255,255,255,0.24); }
+.sb-user { padding: 14px 16px; margin: 10px 12px 6px; border: 1px solid rgba(255,255,255,0.24); border-radius: 12px; background: rgba(255,255,255,0.08); }
+.sb-user-inner { display: flex; align-items: center; gap: 10px; }
+.sb-avatar { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, #7cc8fb, #38adf8); color: #0b3d6a; font-size: 0.78rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.sb-user-name { font-size: 0.84rem; font-weight: 600; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sb-user-role { font-size: 0.74rem; color: rgba(220,240,255,0.82); text-transform: capitalize; }
+.sb-footer { margin-top: auto; padding: 12px; border-top: 1px solid rgba(255,255,255,0.22); }
+.sb-logout-btn { width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.28); background: rgba(0,0,0,0.20); color: #f8fbff; font-size: 0.84rem; font-weight: 600; text-decoration: none; transition: all 0.18s; }
+.sb-logout-btn:hover { background: rgba(239,68,68,0.22); border-color: rgba(252,165,165,0.55); }
+.main { margin-left: 252px; flex: 1; display: flex; flex-direction: column; min-width: 0; transition: margin-left 0.3s; }
+.topbar {
+  height: 60px; display: flex; align-items: center; justify-content: space-between;
+  padding: 0 28px; background: var(--white); border-bottom: 1px solid var(--border);
+  transition: background 0.25s, border-color 0.25s;
+}
+.topbar-title { font-size: 0.95rem; font-weight: 600; color: var(--text-1); }
+.topbar-subtitle { font-size: 0.76rem; color: var(--text-3); margin-top: 2px; }
+.page-body { padding: 24px 28px; display: grid; grid-template-columns: 420px 1fr; gap: 20px; }
+.panel {
+  background: var(--white); border: 1px solid var(--border); border-radius: var(--r-lg);
+  box-shadow: var(--shadow-xs); transition: background 0.25s, border-color 0.25s;
+}
+.panel-head { padding: 16px 18px; border-bottom: 1px solid var(--border); }
+.panel-title { font-size: 1rem; font-weight: 700; color: var(--text-1); }
+.panel-sub { font-size: 0.78rem; color: var(--text-3); margin-top: 3px; }
+.panel-body { padding: 16px 18px; }
+.form-grid { display: grid; gap: 12px; }
+.check-row { display: flex; align-items: center; gap: 8px; font-size: 0.82rem; color: var(--text-2); }
+.actions { display: flex; gap: 8px; padding-top: 4px; }
+.table-wrap { overflow: auto; }
+table { width: 100%; border-collapse: collapse; }
+th, td { padding: 10px 12px; border-bottom: 1px solid var(--border); text-align: left; }
+th { font-size: 0.72rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-3); background: var(--surface-muted); }
+td { font-size: 0.84rem; color: var(--text-2); vertical-align: middle; }
+.name-cell { display: flex; align-items: center; gap: 9px; }
+.avatar {
+  width: 34px; height: 34px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.78rem; font-weight: 700; color: #fff; background: #0e91e8; flex-shrink: 0;
+}
+.avatar img { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; }
+.rating { color: #f59e0b; letter-spacing: 1px; }
+.muted { color: var(--text-3); font-size: 0.78rem; }
+.mini-form { display: inline; }
+.btn-mini {
+  border: 1px solid var(--border-md); background: var(--white); color: var(--text-2);
+  padding: 5px 9px; border-radius: var(--r-sm); font-size: 0.75rem; font-weight: 600;
+  cursor: pointer; transition: all 0.2s;
+}
+.btn-mini:hover { border-color: var(--sky-400); color: var(--sky-700); }
+.btn-mini.danger:hover { border-color: var(--red); color: var(--red); }
+@media (max-width: 1080px) {
+  .page-body { grid-template-columns: 1fr; }
+}
+@media (max-width: 860px) {
+  .main { margin-left: 0; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="app">
+  {% include "includes/app_sidebar.html" %}
+
+  <div class="main">
+    <header class="topbar">
+      <div>
+        <div class="topbar-title">Testimonials</div>
+        <div class="topbar-subtitle">Homepage testimonial content from backend</div>
+      </div>
+      <button class="theme-toggle" onclick="toggleTheme()" title="Toggle dark / light mode">
+        <span class="t-moon">&#127769;</span>
+        <span class="t-sun">&#9728;</span>
+      </button>
+    </header>
+
+    <div class="page-body">
+      <div class="panel">
+        <div class="panel-head">
+          <div class="panel-title">Add Testimonial</div>
+          <div class="panel-sub">Fill the required data for research project homepage.</div>
+        </div>
+        <div class="panel-body">
+          <form method="POST" action="{{ url_for('admin.testimonials') }}" enctype="multipart/form-data">
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label">Customer Name</label>
+                <input class="form-input" type="text" name="name" required placeholder="Dr. Rajesh Mehta">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Location / Role</label>
+                <input class="form-input" type="text" name="location_role" required placeholder="Editor-in-Chief, IIT Delhi Journal">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Rating</label>
+                <select class="form-input" name="rating" required>
+                  <option value="5">5 - Excellent</option>
+                  <option value="4">4 - Very Good</option>
+                  <option value="3">3 - Good</option>
+                  <option value="2">2 - Fair</option>
+                  <option value="1">1 - Poor</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Testimonial Message</label>
+                <textarea class="form-input" name="message" rows="4" required placeholder="Research Hub transformed our editorial workflow..."></textarea>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Customer Photo (optional)</label>
+                <input class="form-input" type="file" name="photo" accept=".jpg,.jpeg,.png,.webp,.gif">
+                <div class="form-hint">If photo not uploaded, initials avatar will show.</div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Photo URL (optional)</label>
+                <input class="form-input" type="url" name="image_url" placeholder="https://example.com/photo.jpg">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Avatar Color (fallback)</label>
+                <input class="form-input" type="text" name="avatar_bg" value="#0e91e8" placeholder="#0e91e8">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Sort Order</label>
+                <input class="form-input" type="number" name="sort_order" value="0" min="0">
+              </div>
+
+              <label class="check-row">
+                <input type="checkbox" name="is_active" checked>
+                <span>Show on homepage</span>
+              </label>
+
+              <div class="actions">
+                <button type="submit" class="btn btn-primary">Save Testimonial</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <div class="panel-title">Saved Testimonials</div>
+          <div class="panel-sub">{{ testimonials|length }} total records</div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Customer</th>
+                <th>Rating</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for t in testimonials %}
+              <tr>
+                <td>
+                  <div class="name-cell">
+                    <div class="avatar" style="background: {{ t.avatar_bg or '#0e91e8' }};">
+                      {% if t.image_url %}
+                        <img src="{{ t.image_url }}" alt="{{ t.name }}">
+                      {% else %}
+                        {{ t.initials }}
+                      {% endif %}
+                    </div>
+                    <div>
+                      <div style="font-weight:600;color:var(--text-1)">{{ t.name }}</div>
+                      <div class="muted">{{ t.role_line }}</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="rating">
+                  {% for _ in range(1, 6) %}
+                    {% if loop.index <= t.rating %}&#9733;{% else %}&#9734;{% endif %}
+                  {% endfor %}
+                </td>
+                <td>
+                  {% if t.is_active %}
+                    <span class="badge badge-success">Active</span>
+                  {% else %}
+                    <span class="badge badge-neutral">Hidden</span>
+                  {% endif %}
+                </td>
+                <td>
+                  <form method="POST" class="mini-form" action="{{ url_for('admin.toggle_testimonial_active', testimonial_id=t.id) }}">
+                    <button class="btn-mini" type="submit">{{ 'Hide' if t.is_active else 'Show' }}</button>
+                  </form>
+                  <form method="POST" class="mini-form" action="{{ url_for('admin.delete_testimonial', testimonial_id=t.id) }}">
+                    <button class="btn-mini danger" type="submit">Delete</button>
+                  </form>
+                </td>
+              </tr>
+              {% else %}
+              <tr>
+                <td colspan="4" style="text-align:center;padding:18px;color:var(--text-3)">
+                  No testimonials added yet.
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

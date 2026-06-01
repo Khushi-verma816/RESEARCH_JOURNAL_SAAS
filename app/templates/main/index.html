@@ -1,0 +1,1269 @@
+{% extends "base.html" %}
+{% block title %}Research Hub — AI-Powered Academic Publishing Platform{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ═══════════════════════════════════════
+   LAYOUT CONTAINER
+═══════════════════════════════════════ */
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+/* ═══════════════════════════════════════
+   NAVBAR
+═══════════════════════════════════════ */
+.nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    height: 66px;
+    background: transparent;
+    transition: background 0.3s var(--ease), border-color 0.3s, box-shadow 0.3s;
+    border-bottom: 1px solid transparent;
+}
+.nav-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+    height: 100%;
+    display: flex; align-items: center; justify-content: space-between;
+}
+.nav.scrolled {
+    background: rgba(245,248,252,0.94);
+    backdrop-filter: blur(20px) saturate(180%);
+    border-color: var(--border);
+    box-shadow: var(--shadow-sm);
+}
+html[data-theme="dark"] .nav.scrolled {
+    background: rgba(10,14,26,0.94);
+}
+.nav-brand { display: flex; align-items: center; gap: 11px; }
+/* nav-inner already handles layout */
+.nav-icon {
+    width: 34px; height: 34px; border-radius: 9px;
+    background: linear-gradient(135deg, var(--sky-700), var(--sky-400));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; box-shadow: var(--shadow-blue);
+}
+.nav-name { font-family: var(--font-serif); font-size: 1.2rem; color: var(--text-1); }
+.nav-links { display: flex; align-items: center; gap: 32px; }
+.nav-link {
+    font-size: 0.875rem; font-weight: 500; color: var(--text-2);
+    transition: color 0.18s; position: relative;
+}
+.nav-link::after {
+    content: ''; position: absolute; bottom: -3px; left: 0; right: 0; height: 1.5px;
+    background: var(--sky-500); border-radius: 1px;
+    transform: scaleX(0); transform-origin: center; transition: transform 0.2s var(--ease);
+}
+.nav-link:hover { color: var(--text-1); }
+.nav-link:hover::after { transform: scaleX(1); }
+.nav-cta { display: flex; align-items: center; gap: 10px; }
+.btn-nav-signin {
+    padding: 7px 18px; border-radius: var(--r); font-size: 0.855rem; font-weight: 500;
+    color: var(--text-2); border: 1px solid var(--border-md); background: transparent;
+    transition: all 0.18s; cursor: pointer; font-family: var(--font-sans);
+}
+.btn-nav-signin:hover { color: var(--text-1); border-color: var(--sky-300); background: var(--sky-50); }
+.btn-nav-primary {
+    padding: 7px 20px; border-radius: var(--r); font-size: 0.855rem; font-weight: 600;
+    color: #fff; background: var(--sky-600); border: 1px solid var(--sky-600);
+    box-shadow: var(--shadow-blue); transition: all 0.2s; cursor: pointer; font-family: var(--font-sans);
+}
+.btn-nav-primary:hover { background: var(--sky-700); transform: translateY(-1px); box-shadow: var(--shadow-blue-lg); }
+
+/* ═══════════════════════════════════════
+   HERO — PREMIUM
+═══════════════════════════════════════ */
+.hero {
+    min-height: 100vh;
+    width: 100%;
+    display: flex; align-items: center; justify-content: center;
+    padding: 130px 40px 100px;
+    position: relative; overflow: hidden; text-align: center;
+    box-sizing: border-box;
+    background: radial-gradient(ellipse 120% 80% at 50% -10%, rgba(14,145,232,0.18) 0%, transparent 60%),
+                radial-gradient(ellipse 80% 60% at 80% 60%, rgba(124,58,237,0.08) 0%, transparent 50%),
+                radial-gradient(ellipse 60% 50% at 20% 80%, rgba(5,150,105,0.06) 0%, transparent 50%);
+}
+.hero-bg { position: absolute; inset: 0; pointer-events: none; }
+#hero-canvas {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    pointer-events: none; opacity: 0.5;
+}
+.hero-grid {
+    position: absolute; inset: 0;
+    background-image:
+        linear-gradient(rgba(14,145,232,0.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(14,145,232,0.07) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse 90% 85% at 50% 40%, black 0%, transparent 100%);
+    animation: gridDrift 20s ease-in-out infinite alternate;
+}
+@keyframes gridDrift { from{background-position:0 0} to{background-position:30px 30px} }
+html[data-theme="dark"] .hero-grid {
+    background-image:
+        linear-gradient(rgba(56,173,248,0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(56,173,248,0.06) 1px, transparent 1px);
+}
+.hero-orb {
+    position: absolute; border-radius: 50%;
+    filter: blur(60px); pointer-events: none;
+}
+.hero-orb-1 {
+    width: 600px; height: 600px; top: -200px; left: 50%; transform: translateX(-50%);
+    background: radial-gradient(circle, rgba(14,145,232,0.22) 0%, transparent 65%);
+    animation: orbFloat1 10s ease-in-out infinite;
+}
+.hero-orb-2 {
+    width: 400px; height: 400px; top: 30%; left: -8%;
+    background: radial-gradient(circle, rgba(124,58,237,0.12) 0%, transparent 65%);
+    animation: orbFloat2 13s ease-in-out infinite;
+}
+.hero-orb-3 {
+    width: 350px; height: 350px; top: 20%; right: -6%;
+    background: radial-gradient(circle, rgba(14,145,232,0.1) 0%, transparent 65%);
+    animation: orbFloat2 15s ease-in-out infinite reverse;
+}
+@keyframes orbFloat1 { 0%,100%{transform:translateX(-50%) translateY(0)} 50%{transform:translateX(-50%) translateY(-30px)} }
+@keyframes orbFloat2 { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-20px)} }
+.hero-content {
+    position: relative; z-index: 2;
+    width: 100%;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0;
+}
+.hero-visual { display: none; }
+.hero-eyebrow {
+    display: inline-flex; align-items: center; gap: 9px;
+    padding: 6px 18px 6px 10px; border-radius: var(--r-pill);
+    background: rgba(14,145,232,0.08);
+    border: 1px solid rgba(14,145,232,0.25);
+    backdrop-filter: blur(12px);
+    font-size: 0.8rem; font-weight: 600; color: var(--sky-500);
+    margin-bottom: 32px; letter-spacing: 0.02em;
+    animation: fadeUp 0.8s var(--ease) 0.1s both;
+    box-shadow: 0 0 20px rgba(14,145,232,0.12), inset 0 1px 0 rgba(255,255,255,0.1);
+}
+.eyebrow-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--sky-400);
+    box-shadow: 0 0 8px rgba(14,145,232,0.8);
+    animation: pulse 2s ease infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1);box-shadow:0 0 8px rgba(14,145,232,0.8)} 50%{opacity:0.7;transform:scale(1.4);box-shadow:0 0 16px rgba(14,145,232,1)} }
+.hero h1 {
+    font-size: clamp(3rem, 7.5vw, 6rem); font-weight: 700; line-height: 1.05;
+    color: var(--text-1); margin-bottom: 28px;
+    word-break: break-word; overflow-wrap: break-word;
+    letter-spacing: -0.02em;
+    animation: fadeUp 0.8s var(--ease) 0.2s both;
+}
+.hero h1 em {
+    font-style: italic; font-weight: 400;
+    background: linear-gradient(135deg, #38adf8 0%, #818cf8 40%, #a78bfa 70%, #38adf8 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: gradientShift 4s linear infinite;
+}
+@keyframes gradientShift { 0%{background-position:0% center} 100%{background-position:200% center} }
+.hero-sub {
+    font-size: clamp(1.05rem, 2.2vw, 1.25rem); color: var(--text-2);
+    line-height: 1.85; max-width: 700px; margin: 0 auto 48px;
+    animation: fadeUp 0.8s var(--ease) 0.35s both;
+}
+.hero-cta {
+    display: flex; align-items: center; justify-content: center;
+    gap: 16px; flex-wrap: wrap; margin-bottom: 56px;
+    animation: fadeUp 0.8s var(--ease) 0.45s both;
+}
+.btn-hero-primary {
+    padding: 15px 34px; border-radius: 14px;
+    background: linear-gradient(135deg, #0ea5e9, #6366f1);
+    color: #fff; font-size: 1rem; font-weight: 700; font-family: var(--font-sans);
+    box-shadow: 0 8px 30px rgba(14,145,232,0.4), 0 0 0 1px rgba(255,255,255,0.1) inset;
+    border: none; cursor: pointer; transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    display: inline-flex; align-items: center; gap: 10px;
+    position: relative; overflow: hidden;
+}
+.btn-hero-primary::before {
+    content:''; position:absolute; inset:0;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.2) 50%, transparent 100%);
+    transform: translateX(-100%); transition: transform 0.6s ease;
+}
+.btn-hero-primary:hover { transform: translateY(-3px) scale(1.03); box-shadow: 0 16px 48px rgba(14,145,232,0.5); }
+.btn-hero-primary:hover::before { transform: translateX(100%); }
+.btn-hero-outline {
+    padding: 15px 32px; border-radius: 14px;
+    border: 1.5px solid rgba(14,145,232,0.3);
+    background: rgba(14,145,232,0.05);
+    backdrop-filter: blur(8px);
+    color: var(--text-2); font-size: 1rem; font-weight: 600;
+    font-family: var(--font-sans); cursor: pointer; transition: all 0.25s var(--ease);
+    display: inline-flex; align-items: center; gap: 10px;
+}
+.btn-hero-outline:hover { border-color: var(--sky-400); color: var(--sky-500); background: rgba(14,145,232,0.1); transform: translateY(-2px); }
+.hero-social-proof {
+    display: flex; align-items: center; justify-content: center; gap: 14px;
+    animation: fadeUp 0.8s var(--ease) 0.6s both;
+}
+.avatar-stack { display: flex; }
+.avatar-item {
+    width: 36px; height: 36px; border-radius: 50%;
+    border: 2.5px solid var(--white);
+    margin-left: -10px; font-size: 11px; font-weight: 800;
+    display: flex; align-items: center; justify-content: center; color: #fff;
+    background: var(--sky-600);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    transition: transform 0.2s; cursor: default;
+}
+.avatar-item:first-child { margin-left: 0; }
+.avatar-item:hover { transform: translateY(-3px) scale(1.1); z-index: 10; }
+.avatar-item:nth-child(2) { background: linear-gradient(135deg,#7c3aed,#a78bfa); }
+.avatar-item:nth-child(3) { background: linear-gradient(135deg,#059669,#34d399); }
+.avatar-item:nth-child(4) { background: linear-gradient(135deg,#d97706,#fbbf24); }
+.proof-text { font-size: 0.85rem; color: var(--text-3); }
+.proof-text strong { color: var(--text-1); }
+.stars { color: #f59e0b; letter-spacing: 2px; font-size: 0.95rem; }
+
+@keyframes fadeUp { from{transform:translateY(32px);opacity:0} to{transform:translateY(0);opacity:1} }
+
+/* ═══════════════════════════════════════
+   STATS STRIP
+═══════════════════════════════════════ */
+.stats-strip {
+    background: var(--white); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+    padding: 32px 24px;
+    transition: background 0.25s;
+}
+.stats-strip-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; text-align: center;
+}
+.stat-num {
+    font-family: var(--font-serif); font-size: 2.1rem; color: var(--text-1); margin-bottom: 4px;
+}
+.stat-label { font-size: 0.8rem; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.6px; }
+
+/* ═══════════════════════════════════════
+   SECTIONS
+═══════════════════════════════════════ */
+.section { padding: 96px 24px; }
+.section-alt { background: var(--white); transition: background 0.25s; }
+.section-inner { max-width: 1200px; margin: 0 auto; }
+.section-header { margin-bottom: 60px; }
+.section-header.center { text-align: center; }
+.eyebrow-sm {
+    display: inline-flex; align-items: center; gap: 7px;
+    font-size: 0.75rem; font-weight: 600; color: var(--sky-600);
+    text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 14px;
+}
+.eyebrow-line { width: 20px; height: 1.5px; background: var(--sky-400); border-radius: 1px; }
+.section-header h2 { font-size: clamp(1.8rem,4vw,2.6rem); color: var(--text-1); margin-bottom: 14px; }
+.section-header p { font-size: 1rem; color: var(--text-2); line-height: 1.75; max-width: 520px; }
+.section-header.center p { margin: 0 auto; }
+
+/* Features */
+.features-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 22px; }
+.feature-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 18px; padding: 30px;
+    transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    position: relative; overflow: hidden;
+}
+.feature-card::before {
+    content:''; position:absolute; inset:0; border-radius:18px;
+    background: linear-gradient(135deg, rgba(14,145,232,0.04), transparent);
+    opacity:0; transition: opacity 0.3s;
+}
+.feature-card:hover { box-shadow: 0 20px 60px rgba(14,145,232,0.12); transform: translateY(-6px); border-color: rgba(14,145,232,0.25); }
+.feature-card:hover::before { opacity:1; }
+.feature-icon {
+    width: 52px; height: 52px; border-radius: 14px;
+    background: linear-gradient(135deg, rgba(14,145,232,0.12), rgba(99,102,241,0.08));
+    border: 1px solid rgba(14,145,232,0.15);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; margin-bottom: 20px;
+    transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+}
+.feature-card:hover .feature-icon { transform: scale(1.12) rotate(-4deg); }
+.feature-card h3 { font-size: 1.08rem; font-weight: 700; color: var(--text-1); margin-bottom: 10px; }
+.feature-card p  { font-size: 0.875rem; color: var(--text-2); line-height: 1.75; }
+
+/* How it works */
+.steps-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 24px; position: relative; }
+.steps-grid::before {
+    content: ''; position: absolute; top: 28px; left: 10%; right: 10%; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--sky-200), var(--sky-200), transparent);
+    z-index: 0;
+}
+html[data-theme="dark"] .steps-grid::before { background: linear-gradient(90deg, transparent, var(--border-md), var(--border-md), transparent); }
+.step-card {
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: var(--r-lg); padding: 28px 22px; text-align: center;
+    position: relative; z-index: 1; transition: all 0.25s;
+}
+.step-card:hover { box-shadow: var(--shadow-md); border-color: var(--sky-200); transform: translateY(-3px); }
+.step-num {
+    width: 48px; height: 48px; border-radius: 50%;
+    background: var(--sky-600); color: #fff;
+    font-size: 1rem; font-weight: 600;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 18px; box-shadow: var(--shadow-blue);
+}
+.step-card h3 { font-size: 1rem; color: var(--text-1); margin-bottom: 9px; }
+.step-card p  { font-size: 0.85rem; color: var(--text-2); line-height: 1.65; }
+
+/* Testimonials - Slider */
+.testi-slider-wrapper { 
+    position: relative; 
+    overflow: hidden; 
+    margin: 0 auto;
+    max-width: 100%;
+}
+.testi-slider {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-behavior: smooth;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 10px 0 30px 0;
+}
+.testi-slider::-webkit-scrollbar { display: none; }
+.testi-card {
+    background: var(--white); 
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg); 
+    padding: 24px;
+    min-width: 340px; 
+    max-width: 380px;
+    flex-shrink: 0;
+    scroll-snap-align: start;
+    transition: all 0.3s var(--ease);
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+}
+.testi-card:hover { 
+    box-shadow: var(--shadow-lg); 
+    transform: translateY(-4px); 
+    border-color: var(--sky-200); 
+}
+.testi-card-header {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+.testi-stars { 
+    color: #f59e0b; 
+    font-size: 1rem; 
+    letter-spacing: 4px;
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+}
+.testi-text { font-size: 0.875rem; color: var(--text-2); line-height: 1.8; margin-bottom: 18px; font-style: italic; flex-grow: 1; }
+.testi-author { display: flex; align-items: center; gap: 11px; }
+.testi-avatar {
+    width: 80px; height: 80px; border-radius: 50%;
+    background: var(--sky-600); color: #fff;
+    font-size: 1.4rem; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 0 0 3px rgba(14,145,232,0.25), 0 6px 20px rgba(0,0,0,0.14);
+}
+.testi-avatar-img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: center top;
+    border: 3px solid transparent;
+    background-clip: padding-box;
+    box-shadow: 0 0 0 3px rgba(14,145,232,0.3), 0 6px 24px rgba(0,0,0,0.15);
+    flex-shrink: 0;
+    transition: transform 0.25s var(--ease), box-shadow 0.25s;
+}
+.testi-card:hover .testi-avatar-img {
+    transform: scale(1.06);
+    box-shadow: 0 0 0 4px rgba(14,145,232,0.45), 0 8px 28px rgba(0,0,0,0.18);
+}
+.testi-name { font-size: 0.95rem; font-weight: 700; color: var(--text-1); }
+.testi-role { font-size: 0.8rem; color: var(--text-3); margin-top: 2px; }
+.testi-empty {
+    text-align: center;
+    color: var(--text-3);
+    padding: 40px;
+}
+/* Slider controls */
+.testi-controls {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 32px;
+}
+.testi-btn {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border-md);
+    background: var(--white);
+    color: var(--text-2);
+    font-size: 18px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s var(--ease);
+    box-shadow: var(--shadow-xs);
+}
+.testi-btn:hover {
+    border-color: var(--sky-400);
+    background: var(--sky-50);
+    color: var(--sky-600);
+    transform: scale(1.08);
+}
+.testi-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+.testi-btn:disabled:hover {
+    transform: none;
+    border-color: var(--border-md);
+    background: var(--white);
+}
+
+/* Pricing */
+.pricing-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; max-width: 900px; margin: 0 auto; }
+.plan-card {
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: var(--r-xl); padding: 32px 26px; position: relative; transition: all 0.25s;
+}
+.plan-card.popular {
+    border-color: var(--sky-400);
+    box-shadow: 0 8px 40px rgba(14,145,232,0.14), 0 0 0 1px rgba(14,145,232,0.2);
+}
+html[data-theme="dark"] .plan-card.popular { box-shadow: 0 8px 40px rgba(56,173,248,0.10), 0 0 0 1px rgba(56,173,248,0.2); }
+.plan-badge {
+    position: absolute; top: -13px; left: 50%; transform: translateX(-50%);
+    background: var(--sky-600); color: #fff;
+    font-size: 0.72rem; font-weight: 700; padding: 4px 14px;
+    border-radius: var(--r-pill); white-space: nowrap;
+}
+.plan-name { font-size: 0.8rem; font-weight: 600; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 10px; }
+.plan-price { font-family: var(--font-serif); font-size: 2.8rem; color: var(--text-1); margin-bottom: 4px; }
+.plan-price sub { font-size: 1rem; font-family: var(--font-sans); color: var(--text-3); }
+.plan-desc { font-size: 0.85rem; color: var(--text-3); margin-bottom: 24px; }
+.plan-divider { height: 1px; background: var(--border); margin-bottom: 24px; }
+.plan-features { list-style: none; display: flex; flex-direction: column; gap: 11px; margin-bottom: 28px; }
+.plan-features li { font-size: 0.865rem; color: var(--text-2); display: flex; align-items: center; gap: 9px; }
+.plan-features li::before { content: '✓'; color: var(--sky-600); font-weight: 700; font-size: 0.8rem; flex-shrink: 0; }
+.btn-plan-outline {
+    width: 100%; padding: 11px; border-radius: var(--r); font-weight: 600; font-size: 0.875rem;
+    border: 1.5px solid var(--border-md); background: transparent; color: var(--text-2);
+    cursor: pointer; font-family: var(--font-sans); transition: all 0.2s;
+}
+.btn-plan-outline:hover { border-color: var(--sky-400); color: var(--text-1); background: var(--sky-50); }
+.btn-plan-primary {
+    width: 100%; padding: 11px; border-radius: var(--r); font-weight: 600; font-size: 0.875rem;
+    background: var(--sky-600); color: #fff; border: none;
+    cursor: pointer; font-family: var(--font-sans); box-shadow: var(--shadow-blue); transition: all 0.2s;
+}
+.btn-plan-primary:hover { background: var(--sky-700); transform: translateY(-1px); box-shadow: var(--shadow-blue-lg); }
+
+/* CTA */
+.cta-section {
+    background: linear-gradient(135deg, var(--sky-700) 0%, var(--sky-500) 100%);
+    padding: 80px 24px; text-align: center; position: relative; overflow: hidden;
+}
+.cta-section h2 { font-size: clamp(1.8rem,4vw,2.8rem); color: #fff; margin-bottom: 14px; }
+.cta-section p { color: rgba(255,255,255,0.8); font-size: 1rem; margin-bottom: 36px; }
+.cta-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.btn-cta-white { background: #fff; color: var(--sky-700); padding: 13px 28px; border-radius: var(--r-lg); font-weight: 600; font-size: 0.95rem; font-family: var(--font-sans); border: none; cursor: pointer; transition: all 0.2s; }
+.btn-cta-white:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
+.btn-cta-ghost { background: rgba(255,255,255,0.1); color: #fff; padding: 13px 28px; border-radius: var(--r-lg); font-weight: 500; font-size: 0.95rem; font-family: var(--font-sans); border: 1.5px solid rgba(255,255,255,0.25); cursor: pointer; transition: all 0.2s; }
+.btn-cta-ghost:hover { background: rgba(255,255,255,0.18); }
+
+/* Footer */
+footer { background: var(--white); border-top: 1px solid var(--border); padding: 64px 24px 32px; transition: background 0.25s; }
+.footer-top { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; gap: 40px; margin-bottom: 48px; }
+.footer-brand-icon { width: 34px; height: 34px; border-radius: 9px; background: linear-gradient(135deg, var(--sky-700), var(--sky-400)); display: flex; align-items: center; justify-content: center; font-size: 16px; margin-bottom: 12px; }
+.footer-brand-name { font-family: var(--font-serif); font-size: 1.1rem; color: var(--text-1); margin-bottom: 10px; }
+.footer-brand-desc { font-size: 0.85rem; color: var(--text-3); line-height: 1.7; }
+.footer-col-title { font-size: 0.775rem; font-weight: 700; color: var(--text-2); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 16px; }
+.footer-col-link { display: block; font-size: 0.855rem; color: var(--text-3); margin-bottom: 10px; transition: color 0.15s; }
+.footer-col-link:hover { color: var(--sky-600); }
+.footer-bottom { max-width: 1200px; margin: 0 auto; border-top: 1px solid var(--border); padding-top: 24px; display: flex; justify-content: space-between; align-items: center; }
+.footer-copy { font-size: 0.8rem; color: var(--text-4); }
+
+/* ═══════════════════════════════════════
+   SCROLL ANIMATIONS
+═══════════════════════════════════════ */
+.reveal {
+    opacity: 0;
+    transform: translateY(36px);
+    transition: opacity 0.65s var(--ease), transform 0.65s var(--ease);
+}
+.reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+.reveal-left {
+    opacity: 0;
+    transform: translateX(-40px);
+    transition: opacity 0.65s var(--ease), transform 0.65s var(--ease);
+}
+.reveal-left.visible {
+    opacity: 1;
+    transform: translateX(0);
+}
+.reveal-right {
+    opacity: 0;
+    transform: translateX(40px);
+    transition: opacity 0.65s var(--ease), transform 0.65s var(--ease);
+}
+.reveal-right.visible {
+    opacity: 1;
+    transform: translateX(0);
+}
+.reveal-scale {
+    opacity: 0;
+    transform: scale(0.92);
+    transition: opacity 0.6s var(--ease), transform 0.6s var(--ease);
+}
+.reveal-scale.visible {
+    opacity: 1;
+    transform: scale(1);
+}
+/* Stagger delays for grid children */
+.stagger > *:nth-child(1) { transition-delay: 0s; }
+.stagger > *:nth-child(2) { transition-delay: 0.08s; }
+.stagger > *:nth-child(3) { transition-delay: 0.16s; }
+.stagger > *:nth-child(4) { transition-delay: 0.24s; }
+.stagger > *:nth-child(5) { transition-delay: 0.32s; }
+.stagger > *:nth-child(6) { transition-delay: 0.40s; }
+
+/* Counter animation */
+.stat-num { transition: color 0.3s; font-weight: 700; }
+.stats-strip {
+    background: var(--white); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+    padding: 36px 24px; transition: background 0.25s;
+}
+.stats-strip-inner {
+    max-width: 1200px; margin: 0 auto;
+    display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; text-align: center;
+}
+.stat-num {
+    font-family: var(--font-serif); font-size: 2.4rem;
+    background: linear-gradient(135deg, var(--sky-600), #6366f1);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 6px;
+}
+.stat-label { font-size: 0.8rem; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.8px; font-weight: 600; }
+
+/* CTA premium */
+.cta-section {
+    background: linear-gradient(135deg, #0369a1 0%, #4f46e5 60%, #7c3aed 100%);
+    background-size: 200% 200%;
+    animation: ctaGrad 8s ease infinite;
+    padding: 100px 24px; text-align: center; position: relative; overflow: hidden;
+}
+.cta-section::before {
+    content: ''; position: absolute; inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+@keyframes ctaGrad { 0%,100%{background-position:0% 50%} 50%{background-position:100% 50%} }
+.cta-section h2 { font-size: clamp(2rem,4.5vw,3.2rem); color: #fff; margin-bottom: 16px; font-weight: 700; letter-spacing: -0.02em; }
+.cta-section p { color: rgba(255,255,255,0.85); font-size: 1.1rem; margin-bottom: 40px; line-height: 1.7; }
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .features-grid { grid-template-columns: repeat(2,1fr); }
+    .nav-links { display: none; }
+    .footer-top { grid-template-columns: 1fr 1fr; gap: 32px; }
+}
+@media (max-width: 768px) {
+    .pricing-grid { grid-template-columns: 1fr; }
+    .steps-grid { grid-template-columns: 1fr 1fr; }
+    .steps-grid::before { display: none; }
+    .footer-top { grid-template-columns: 1fr; gap: 28px; }
+    .footer-bottom { flex-direction: column; gap: 12px; text-align: center; }
+    .stats-strip-inner { grid-template-columns: repeat(2,1fr); }
+    .testi-card { min-width: 280px; max-width: 320px; }
+}
+@media (max-width: 480px) {
+    .steps-grid { grid-template-columns: 1fr; }
+    .hero-cta { flex-direction: column; }
+    .btn-hero-primary, .btn-hero-outline { width: 100%; justify-content: center; }
+    .features-grid { grid-template-columns: 1fr; }
+}
+</style>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/animations.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<!-- SCROLL PROGRESS -->
+<div id="scroll-progress"></div>
+
+<!-- CURSOR GLOW -->
+<div id="cursor-glow"></div>
+
+<!-- PAGE LOADER -->
+<div id="page-loader">
+    <div class="loader-logo">🔬</div>
+    <div class="loader-bar"><div class="loader-bar-fill"></div></div>
+</div>
+
+<!-- NAVBAR -->
+<nav class="nav" id="mainNav">
+    <div class="nav-inner">
+        <div class="nav-brand">
+            <div class="nav-icon">🔬</div>
+            <span class="nav-name">Research Hub</span>
+        </div>
+        <div class="nav-links">
+            <a href="#features"      class="nav-link">Features</a>
+            <a href="#how-it-works"  class="nav-link">How It Works</a>
+            <a href="#testimonials"  class="nav-link">Testimonials</a>
+            <a href="#pricing"       class="nav-link">Pricing</a>
+        </div>
+        <div class="nav-cta">
+            <!-- 🌙 THEME TOGGLE BUTTON -->
+            <button class="theme-toggle" onclick="toggleTheme()" title="Toggle dark / light mode">
+                <span class="t-moon">🌙</span>
+                <span class="t-sun">☀️</span>
+            </button>
+            <a href="{{ url_for('auth.login') }}"    class="btn-nav-signin">Sign in</a>
+            <a href="{{ url_for('auth.register') }}" class="btn-nav-primary">Get Started Free</a>
+        </div>
+    </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+    <div class="hero-bg">
+        <canvas id="hero-canvas"></canvas>
+        <div class="hero-grid"></div>
+        <div class="hero-orb hero-orb-1"></div>
+        <div class="hero-orb hero-orb-2"></div>
+        <div class="hero-orb hero-orb-3"></div>
+    </div>
+    <div class="hero-content">
+        <div class="hero-text">
+            <div class="hero-eyebrow">
+                <span class="eyebrow-dot"></span>
+                AI-Powered Academic Publishing
+            </div>
+            <h1>Publish Better Research,<br><em id="hero-typed-word">Faster</em> Than Ever</h1>
+            <p class="hero-sub">
+                Research Hub is the all-in-one platform for academic journals — with peer review workflows,
+                AI writing assistance, live collaboration, and custom journal branding.
+            </p>
+            <div class="hero-chips" data-delay="0.4">
+                <span class="chip chip-blue">🤖 AI Writing Assistant</span>
+                <span class="chip chip-purple">🔍 Peer Review Workflow</span>
+                <span class="chip chip-green">📊 Real-time Analytics</span>
+                <span class="chip chip-blue">🎥 Live Video Rooms</span>
+                <span class="chip chip-purple">📋 DOI &amp; Citations</span>
+                <span class="chip chip-green">🏢 Multi-Tenant SaaS</span>
+            </div>
+            <div class="hero-cta">
+                <button class="btn-hero-primary" onclick="location.href='{{ url_for('auth.register') }}'">
+                    🚀 Start Publishing Free
+                </button>
+                <button class="btn-hero-outline" onclick="location.href='#features'">
+                    See all features →
+                </button>
+            </div>
+            <div class="hero-social-proof">
+                <div class="avatar-stack">
+                    <div class="avatar-item">DR</div>
+                    <div class="avatar-item">SC</div>
+                    <div class="avatar-item">AK</div>
+                    <div class="avatar-item">PV</div>
+                </div>
+                <div class="proof-text">
+                    <div class="stars">★★★★★</div>
+                    Trusted by <strong>10,000+</strong> researchers in 120 countries
+                </div>
+            </div>
+        </div>
+        <div class="hero-visual" aria-hidden="true"></div>
+    </div>
+</section>
+
+<!-- MARQUEE TRUST STRIP -->
+<div class="marquee-section">
+    <div class="marquee-track">
+        <div class="marquee-item"><span class="marquee-icon">🎓</span> Harvard University</div>
+        <div class="marquee-item"><span class="marquee-icon">🔬</span> MIT Research Labs</div>
+        <div class="marquee-item"><span class="marquee-icon">🌍</span> Oxford Journals</div>
+        <div class="marquee-item"><span class="marquee-icon">⚗️</span> Stanford Press</div>
+        <div class="marquee-item"><span class="marquee-icon">📚</span> Nature Publishing</div>
+        <div class="marquee-item"><span class="marquee-icon">🏛️</span> IEEE Transactions</div>
+        <div class="marquee-item"><span class="marquee-icon">🧬</span> Cell Press</div>
+        <div class="marquee-item"><span class="marquee-icon">🌐</span> Springer Science</div>
+        <!-- Duplicate for seamless loop -->
+        <div class="marquee-item"><span class="marquee-icon">🎓</span> Harvard University</div>
+        <div class="marquee-item"><span class="marquee-icon">🔬</span> MIT Research Labs</div>
+        <div class="marquee-item"><span class="marquee-icon">🌍</span> Oxford Journals</div>
+        <div class="marquee-item"><span class="marquee-icon">⚗️</span> Stanford Press</div>
+        <div class="marquee-item"><span class="marquee-icon">📚</span> Nature Publishing</div>
+        <div class="marquee-item"><span class="marquee-icon">🏛️</span> IEEE Transactions</div>
+        <div class="marquee-item"><span class="marquee-icon">🧬</span> Cell Press</div>
+        <div class="marquee-item"><span class="marquee-icon">🌐</span> Springer Science</div>
+    </div>
+</div>
+
+<!-- STATS -->
+<div class="stats-strip">
+    <div class="stats-strip-inner">
+        <div class="stat-item reveal" data-delay="0"><div class="stat-num" data-count="50000">50K+</div><div class="stat-label">Articles Published</div></div>
+        <div class="stat-item reveal" data-delay="0.1"><div class="stat-num" data-count="1200">1,200+</div><div class="stat-label">Journals Hosted</div></div>
+        <div class="stat-item reveal" data-delay="0.2"><div class="stat-num">98.9%</div><div class="stat-label">Uptime SLA</div></div>
+        <div class="stat-item reveal" data-delay="0.3"><div class="stat-num" data-count="120">120+</div><div class="stat-label">Countries</div></div>
+    </div>
+</div>
+
+<!-- FEATURES -->
+<section class="section" id="features">
+    <div class="section-inner">
+        <div class="section-header reveal">
+            <div class="eyebrow-sm"><div class="eyebrow-line"></div>Features</div>
+            <h2>Everything a world-class journal needs</h2>
+            <p>One platform combining every tool academic publishers and researchers require.</p>
+        </div>
+        <div class="features-grid stagger">
+            <div class="feature-card reveal">
+                <div class="feature-icon">🤖</div>
+                <h3>AI Writing Assistant</h3>
+                <p>Generate abstracts, format citations, detect plagiarism, and get grammar suggestions powered by GPT-4.</p>
+            </div>
+            <div class="feature-card reveal">
+                <div class="feature-icon">🏢</div>
+                <h3>Multi-Tenant Platform</h3>
+                <p>Each journal gets its own branded subdomain, custom domain, and full white-label experience.</p>
+            </div>
+            <div class="feature-card reveal">
+                <div class="feature-icon">🔍</div>
+                <h3>Peer Review Workflow</h3>
+                <p>Streamlined Author → Editor → Reviewer → Publish pipeline with automated email notifications.</p>
+            </div>
+            <div class="feature-card reveal">
+                <div class="feature-icon">🎥</div>
+                <h3>Live Video Rooms</h3>
+                <p>Host webinars, peer review meetings, and research presentations with built-in WebRTC video.</p>
+            </div>
+            <div class="feature-card reveal">
+                <div class="feature-icon">📊</div>
+                <h3>Analytics Dashboard</h3>
+                <p>Real-time article views, download stats, citation tracking, and revenue metrics at a glance.</p>
+            </div>
+            <div class="feature-card reveal">
+                <div class="feature-icon">📋</div>
+                <h3>DOI & Citation Export</h3>
+                <p>Automatic DOI generation and one-click export in APA, MLA, Chicago, and BibTeX formats.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section section-alt" id="how-it-works">
+    <div class="section-inner">
+        <div class="section-header center reveal">
+            <div class="eyebrow-sm" style="justify-content:center"><div class="eyebrow-line"></div>How It Works</div>
+            <h2>Up and running in minutes</h2>
+            <p>Four simple steps to launch your world-class research journal.</p>
+        </div>
+        <div class="steps-grid stagger">
+            <div class="step-card reveal">
+                <div class="step-num">1</div>
+                <h3>Create Your Account</h3>
+                <p>Sign up free and set up your journal profile in under 2 minutes.</p>
+            </div>
+            <div class="step-card reveal">
+                <div class="step-num">2</div>
+                <h3>Customize Your Journal</h3>
+                <p>Set your branding, custom domain, editorial board, and submission guidelines.</p>
+            </div>
+            <div class="step-card reveal">
+                <div class="step-num">3</div>
+                <h3>Invite Your Team</h3>
+                <p>Add editors, reviewers, and authors with fine-grained role-based access control.</p>
+            </div>
+            <div class="step-card reveal">
+                <div class="step-num">4</div>
+                <h3>Publish & Grow</h3>
+                <p>Receive submissions, manage the review process, and publish world-class research.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="section" id="testimonials">
+    <div class="section-inner">
+        <div class="section-header center reveal">
+            <div class="eyebrow-sm" style="justify-content:center"><div class="eyebrow-line"></div>Testimonials</div>
+            <h2>Loved by researchers globally</h2>
+        </div>
+        <div class="testi-slider-wrapper reveal">
+            <div class="testi-slider" id="testiSlider">
+                {% if testimonials %}
+                    {% for t in testimonials %}
+                        {% set safe_rating = t.rating if t.rating and t.rating > 0 else 5 %}
+                        <div class="testi-card">
+                            <div class="testi-card-header">
+                                {% if t.image_url %}
+                                    <img src="{{ t.image_url }}" alt="{{ t.name }}" class="testi-avatar-img">
+                                {% else %}
+                                    <div class="testi-avatar" style="background:{{ t.avatar_bg or '#0e91e8' }}">{{ t.initials }}</div>
+                                {% endif %}
+                            </div>
+                            <p class="testi-text">{{ t.message }}</p>
+                            <div class="testi-author" style="gap:10px">
+                                <div>
+                                    <div class="testi-name">{{ t.name }}</div>
+                                    <div class="testi-role">{{ t.role_line }}</div>
+                                </div>
+                            </div>
+                            <div class="testi-stars">
+                                {% for _ in range(1, 6) %}
+                                    {% if loop.index <= safe_rating %}&#9733;{% else %}&#9734;{% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <!-- Default testimonials with images -->
+                    <div class="testi-card">
+                        <div class="testi-card-header">
+                            <img src="https://i.pravatar.cc/150?img=12" alt="Dr. Sarah Chen" class="testi-avatar-img">
+                        </div>
+                        <p class="testi-text">Research Hub transformed how we manage peer reviews. The AI writing assistant alone saved us hundreds of hours.</p>
+                        <div class="testi-author">
+                            <div>
+                                <div class="testi-name">Dr. Sarah Chen</div>
+                                <div class="testi-role">Editor-in-Chief, Journal of AI Research</div>
+                            </div>
+                        </div>
+                        <div class="testi-stars">★★★★★</div>
+                    </div>
+                    <div class="testi-card">
+                        <div class="testi-card-header">
+                            <img src="https://i.pravatar.cc/150?img=33" alt="Prof. Michael Rodriguez" class="testi-avatar-img">
+                        </div>
+                        <p class="testi-text">The multi-tenant architecture is brilliant. Each of our 15 journals has its own branded experience while we manage everything from one dashboard.</p>
+                        <div class="testi-author">
+                            <div>
+                                <div class="testi-name">Prof. Michael Rodriguez</div>
+                                <div class="testi-role">Publishing Director, Stanford University</div>
+                            </div>
+                        </div>
+                        <div class="testi-stars">★★★★★</div>
+                    </div>
+                    <div class="testi-card">
+                        <div class="testi-card-header">
+                            <img src="https://i.pravatar.cc/150?img=47" alt="Dr. Aisha Patel" class="testi-avatar-img">
+                        </div>
+                        <p class="testi-text">Best investment we made this year. The analytics dashboard gives us insights we never had before, and authors love the collaboration features.</p>
+                        <div class="testi-author">
+                            <div>
+                                <div class="testi-name">Dr. Aisha Patel</div>
+                                <div class="testi-role">Managing Editor, Nature Sciences Quarterly</div>
+                            </div>
+                        </div>
+                        <div class="testi-stars">★★★★★</div>
+                    </div>
+                    <div class="testi-card">
+                        <div class="testi-card-header">
+                            <img src="https://i.pravatar.cc/150?img=68" alt="Prof. James Wilson" class="testi-avatar-img">
+                        </div>
+                        <p class="testi-text">Seamless migration from our old system. The support team was incredible, and our reviewers adapted to the new workflow within days.</p>
+                        <div class="testi-author">
+                            <div>
+                                <div class="testi-name">Prof. James Wilson</div>
+                                <div class="testi-role">Chief Editor, Medical Research Today</div>
+                            </div>
+                        </div>
+                        <div class="testi-stars">★★★★★</div>
+                    </div>
+                    <div class="testi-card">
+                        <div class="testi-card-header">
+                            <img src="https://i.pravatar.cc/150?img=20" alt="Dr. Elena Volkov" class="testi-avatar-img">
+                        </div>
+                        <p class="testi-text">The video conferencing feature is a game-changer for our international editorial board meetings. Crystal clear quality and no third-party tools needed.</p>
+                        <div class="testi-author">
+                            <div>
+                                <div class="testi-name">Dr. Elena Volkov</div>
+                                <div class="testi-role">Senior Editor, European Physics Journal</div>
+                            </div>
+                        </div>
+                        <div class="testi-stars">★★★★★</div>
+                    </div>
+                    <div class="testi-card">
+                        <div class="testi-card-header">
+                            <img src="https://i.pravatar.cc/150?img=59" alt="Dr. Kenji Tanaka" class="testi-avatar-img">
+                        </div>
+                        <p class="testi-text">Finally, a platform that understands academic publishing. The DOI integration and citation export features are exactly what we needed.</p>
+                        <div class="testi-author">
+                            <div>
+                                <div class="testi-name">Dr. Kenji Tanaka</div>
+                                <div class="testi-role">Director, Tokyo Institute of Technology Press</div>
+                            </div>
+                        </div>
+                        <div class="testi-stars">★★★★★</div>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="testi-controls">
+                <button class="testi-btn" id="testiPrev" aria-label="Previous testimonial">←</button>
+                <button class="testi-btn" id="testiNext" aria-label="Next testimonial">→</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- PRICING -->
+<section class="section section-alt" id="pricing">
+    <div class="section-inner">
+        <div class="section-header center reveal">
+            <div class="eyebrow-sm" style="justify-content:center"><div class="eyebrow-line"></div>Pricing</div>
+            <h2>Simple, transparent pricing</h2>
+            <p>Start free. Scale as your journal grows. No hidden fees ever.</p>
+        </div>
+        <div class="pricing-grid stagger">
+            <div class="plan-card reveal">
+                <div class="plan-name">Starter</div>
+                <div class="plan-price">&#8377;0 <sub>/month</sub></div>
+                <div class="plan-desc">Perfect for independent researchers</div>
+                <div class="plan-divider"></div>
+                <ul class="plan-features">
+                    <li>1 Journal</li>
+                    <li>Up to 50 articles</li>
+                    <li>Basic AI tools</li>
+                    <li>Subdomain only</li>
+                </ul>
+                <button class="btn-plan-outline" onclick="location.href='{{ url_for('auth.register') }}'">Get Started Free</button>
+            </div>
+            <div class="plan-card popular reveal">
+                <div class="plan-badge">Most Popular</div>
+                <div class="plan-name">Pro</div>
+                <div class="plan-price">&#8377;3,999 <sub>/month</sub></div>
+                <div class="plan-desc">For serious academic publishers</div>
+                <div class="plan-divider"></div>
+                <ul class="plan-features">
+                    <li>Unlimited journals</li>
+                    <li>Unlimited articles</li>
+                    <li>Full AI suite</li>
+                    <li>Custom domain</li>
+                    <li>Video conferencing</li>
+                    <li>Priority support</li>
+                </ul>
+                <button class="btn-plan-primary" onclick="location.href='{{ url_for('auth.register') }}'">Start 14-Day Trial</button>
+            </div>
+            <div class="plan-card reveal">
+                <div class="plan-name">Enterprise</div>
+                <div class="plan-price">Custom</div>
+                <div class="plan-desc">For universities &amp; institutions</div>
+                <div class="plan-divider"></div>
+                <ul class="plan-features">
+                    <li>Everything in Pro</li>
+                    <li>SSO / LDAP login</li>
+                    <li>Dedicated server</li>
+                    <li>SLA guarantee</li>
+                </ul>
+                <button class="btn-plan-outline">Contact Sales</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+    <div class="reveal-scale">
+        <h2>Ready to publish better research?</h2>
+        <p>Join 10,000+ researchers and institutions already using Research Hub.</p>
+        <div class="cta-actions">
+            <button class="btn-cta-white" onclick="location.href='{{ url_for('auth.register') }}'">🚀 Get Started Free</button>
+            <button class="btn-cta-ghost" onclick="location.href='{{ url_for('auth.login') }}'">Sign in to Dashboard</button>
+        </div>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+    <div class="footer-top">
+        <div>
+            <div class="footer-brand-icon">🔬</div>
+            <div class="footer-brand-name">Research Hub</div>
+            <div class="footer-brand-desc">The all-in-one AI-powered platform for academic research journals and scholarly publishing.</div>
+        </div>
+        <div>
+            <div class="footer-col-title">Product</div>
+            <a href="#features"  class="footer-col-link">Features</a>
+            <a href="#pricing"   class="footer-col-link">Pricing</a>
+            <a href="#"          class="footer-col-link">Changelog</a>
+            <a href="#"          class="footer-col-link">Roadmap</a>
+        </div>
+        <div>
+            <div class="footer-col-title">Resources</div>
+            <a href="#" class="footer-col-link">Documentation</a>
+            <a href="#" class="footer-col-link">API Reference</a>
+            <a href="#" class="footer-col-link">Blog</a>
+            <a href="#" class="footer-col-link">Support</a>
+        </div>
+        <div>
+            <div class="footer-col-title">Company</div>
+            <a href="#" class="footer-col-link">About</a>
+            <a href="#" class="footer-col-link">Careers</a>
+            <a href="#" class="footer-col-link">Privacy Policy</a>
+            <a href="#" class="footer-col-link">Terms of Service</a>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <span class="footer-copy">© 2025 Research Hub. All rights reserved.</span>
+        <span class="footer-copy">Built with ♥ for researchers everywhere</span>
+    </div>
+</footer>
+
+<script>
+// Navbar scroll effect
+window.addEventListener('scroll', function(){
+    document.getElementById('mainNav').classList.toggle('scrolled', window.scrollY > 50);
+});
+
+// ── Scroll reveal (IntersectionObserver) ──────────────────────────────────
+(function() {
+    var selectors = '.reveal, .reveal-left, .reveal-right, .reveal-scale';
+    var els = document.querySelectorAll(selectors);
+
+    if (!('IntersectionObserver' in window)) {
+        // Fallback: just show everything
+        els.forEach(function(el) { el.classList.add('visible'); });
+        return;
+    }
+
+    var observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+    els.forEach(function(el) { observer.observe(el); });
+})();
+
+// ── Animated number counters ─────────────────────────────────────────────
+(function() {
+    function animateCount(el, target, suffix) {
+        var start = 0;
+        var duration = 1800;
+        var startTime = null;
+        function step(ts) {
+            if (!startTime) startTime = ts;
+            var progress = Math.min((ts - startTime) / duration, 1);
+            var ease = 1 - Math.pow(1 - progress, 3); // ease-out cubic
+            var val = Math.floor(ease * target);
+            if (target >= 1000) {
+                el.textContent = (val >= 1000 ? (val/1000).toFixed(val % 1000 === 0 ? 0 : 1) + 'K' : val) + suffix;
+            } else {
+                el.textContent = val + suffix;
+            }
+            if (progress < 1) requestAnimationFrame(step);
+        }
+        requestAnimationFrame(step);
+    }
+
+    var counters = document.querySelectorAll('.stat-num[data-count]');
+    if (!counters.length) return;
+
+    var counterObserver = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+            if (entry.isIntersecting) {
+                var el = entry.target;
+                var target = parseInt(el.getAttribute('data-count'));
+                var suffix = el.textContent.replace(/[\d,KkMm\.]/g, '').trim();
+                animateCount(el, target, suffix);
+                counterObserver.unobserve(el);
+            }
+        });
+    }, { threshold: 0.5 });
+
+    counters.forEach(function(el) { counterObserver.observe(el); });
+})();
+
+// ── Testimonial slider ───────────────────────────────────────────────────
+(function() {
+    // Wait for DOM to be ready
+    function initSlider() {
+        var slider = document.getElementById('testiSlider');
+        var prevBtn = document.getElementById('testiPrev');
+        var nextBtn = document.getElementById('testiNext');
+        
+        if (!slider || !prevBtn || !nextBtn) {
+            console.log('Slider elements not found');
+            return;
+        }
+        
+        var autoSlideInterval;
+        var isUserInteracting = false;
+        
+        function getCardWidth() {
+            var card = slider.querySelector('.testi-card');
+            if (!card) return 360;
+            return card.offsetWidth + 20; // card width + gap
+        }
+        
+        function updateButtons() {
+            var atStart = slider.scrollLeft <= 10;
+            var atEnd = slider.scrollLeft >= slider.scrollWidth - slider.clientWidth - 10;
+            prevBtn.disabled = atStart;
+            nextBtn.disabled = atEnd;
+        }
+        
+        function scrollNext() {
+            var cardWidth = getCardWidth();
+            var maxScroll = slider.scrollWidth - slider.clientWidth;
+            
+            if (slider.scrollLeft >= maxScroll - 10) {
+                // Loop back to start
+                slider.scrollTo({ left: 0, behavior: 'smooth' });
+            } else {
+                slider.scrollBy({ left: cardWidth, behavior: 'smooth' });
+            }
+            setTimeout(updateButtons, 400);
+        }
+        
+        function scrollPrev() {
+            var cardWidth = getCardWidth();
+            slider.scrollBy({ left: -cardWidth, behavior: 'smooth' });
+            setTimeout(updateButtons, 400);
+        }
+        
+        prevBtn.addEventListener('click', function() {
+            isUserInteracting = true;
+            scrollPrev();
+            stopAutoSlide();
+            setTimeout(function() { 
+                isUserInteracting = false;
+                startAutoSlide();
+            }, 3000);
+        });
+        
+        nextBtn.addEventListener('click', function() {
+            isUserInteracting = true;
+            scrollNext();
+            stopAutoSlide();
+            setTimeout(function() { 
+                isUserInteracting = false;
+                startAutoSlide();
+            }, 3000);
+        });
+        
+        slider.addEventListener('scroll', updateButtons);
+        
+        // Auto-slide functionality
+        function startAutoSlide() {
+            stopAutoSlide();
+            autoSlideInterval = setInterval(function() {
+                if (!isUserInteracting) {
+                    scrollNext();
+                }
+            }, 4000);
+        }
+        
+        function stopAutoSlide() {
+            if (autoSlideInterval) {
+                clearInterval(autoSlideInterval);
+                autoSlideInterval = null;
+            }
+        }
+        
+        // Pause on hover
+        slider.addEventListener('mouseenter', function() {
+            isUserInteracting = true;
+            stopAutoSlide();
+        });
+        
+        slider.addEventListener('mouseleave', function() {
+            isUserInteracting = false;
+            startAutoSlide();
+        });
+        
+        // Touch events for mobile
+        var touchStartX = 0;
+        slider.addEventListener('touchstart', function(e) {
+            touchStartX = e.touches[0].clientX;
+            isUserInteracting = true;
+            stopAutoSlide();
+        });
+        
+        slider.addEventListener('touchend', function() {
+            setTimeout(function() {
+                isUserInteracting = false;
+                startAutoSlide();
+            }, 3000);
+        });
+        
+        // Initialize
+        updateButtons();
+        startAutoSlide();
+        
+        console.log('Testimonial slider initialized');
+    }
+    
+    // Run when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initSlider);
+    } else {
+        initSlider();
+    }
+})();
+
+// ── Hero particle canvas ─────────────────────────────────────────────────
+(function(){
+    var canvas = document.getElementById('hero-canvas');
+    if(!canvas) return;
+    var ctx = canvas.getContext('2d');
+    var particles = [];
+    var count = 55;
+    function resize(){ canvas.width=canvas.offsetWidth; canvas.height=canvas.offsetHeight; }
+    resize(); window.addEventListener('resize', resize);
+    for(var i=0;i<count;i++){
+        particles.push({
+            x: Math.random()*canvas.width, y: Math.random()*canvas.height,
+            r: Math.random()*1.8+0.4,
+            dx: (Math.random()-0.5)*0.3, dy: (Math.random()-0.5)*0.3,
+            o: Math.random()*0.4+0.1
+        });
+    }
+    function draw(){
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        particles.forEach(function(p){
+            ctx.beginPath();
+            ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+            ctx.fillStyle='rgba(56,173,248,'+p.o+')';
+            ctx.fill();
+            p.x+=p.dx; p.y+=p.dy;
+            if(p.x<0||p.x>canvas.width) p.dx*=-1;
+            if(p.y<0||p.y>canvas.height) p.dy*=-1;
+        });
+        requestAnimationFrame(draw);
+    }
+    draw();
+})();
+</script>
+<script src="{{ url_for('static', filename='js/animations.js') }}"></script>
+{% endblock %}

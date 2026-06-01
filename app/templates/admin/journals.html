@@ -1,0 +1,200 @@
+﻿{% extends "base.html" %}
+{% block title %}Journals – Research Hub{% endblock %}
+
+{% block extra_css %}
+<style>
+.app {
+  display: flex;
+  min-height: 100vh;
+  background:
+    radial-gradient(1100px 540px at 92% -5%, rgba(56,173,248,0.18), transparent 65%),
+    radial-gradient(960px 520px at -8% 10%, rgba(2,91,160,0.16), transparent 60%),
+    linear-gradient(160deg, #ecf4ff 0%, #f3f8ff 50%, #eaf3ff 100%);
+}
+html[data-theme="dark"] .app {
+  background:
+    radial-gradient(1100px 540px at 92% -5%, rgba(56,173,248,0.16), transparent 65%),
+    radial-gradient(960px 520px at -8% 10%, rgba(2,91,160,0.22), transparent 60%),
+    linear-gradient(160deg, #0c1017 0%, #101722 52%, #141e2c 100%);
+}
+.sidebar {
+  width: 252px;
+  flex-shrink: 0;
+  background: linear-gradient(180deg, #0b3d6a 0%, #025ba0 48%, #0272c6 100%);
+  border-right: 1px solid rgba(255,255,255,0.22);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  overflow-y: auto;
+  z-index: 50;
+  box-shadow: 12px 0 36px rgba(2,91,160,0.20);
+}
+html[data-theme="dark"] .sidebar {
+  background: linear-gradient(180deg, #10161f 0%, #141c28 52%, #192536 100%);
+  border-right-color: rgba(124,200,251,0.24);
+  box-shadow: 14px 0 42px rgba(0,0,0,0.42);
+}
+.sidebar-brand { display: flex; align-items: center; gap: 10px; padding: 20px 20px 16px; border-bottom: 1px solid rgba(255,255,255,0.22); }
+.sb-icon { width: 34px; height: 34px; border-radius: 10px; background: linear-gradient(140deg, #7cc8fb, #38adf8); display: flex; align-items: center; justify-content: center; font-size: 15px; color: #0b3d6a; box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
+.sb-name { font-family: var(--font-serif); font-size: 1.08rem; color: #f5fbff; }
+.sb-nav-section { padding: 18px 12px 4px; }
+.sb-section-title { font-size: 0.68rem; font-weight: 700; color: rgba(218,238,255,0.78); text-transform: uppercase; letter-spacing: 0.09em; padding: 0 8px; margin-bottom: 6px; }
+.sb-nav { display: flex; flex-direction: column; gap: 3px; }
+.sidebar-link { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: var(--r); font-size: 0.87rem; font-weight: 500; color: rgba(230,245,255,0.9); transition: all 0.18s; text-decoration: none; }
+.sidebar-link:hover { background: rgba(255,255,255,0.12); color: #ffffff; }
+.sidebar-link.active { background: linear-gradient(135deg, rgba(56,173,248,0.32), rgba(124,200,251,0.24)); color: #ffffff; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.28); }
+.sl-icon { width: 30px; height: 30px; border-radius: var(--r-sm); display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; background: rgba(255,255,255,0.08); }
+.sidebar-link.active .sl-icon { background: rgba(255,255,255,0.24); }
+.sb-user { padding: 14px 16px; margin: 10px 12px 6px; border: 1px solid rgba(255,255,255,0.24); border-radius: 12px; background: rgba(255,255,255,0.08); }
+.sb-user-inner { display: flex; align-items: center; gap: 10px; }
+.sb-avatar { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, #7cc8fb, #38adf8); color: #0b3d6a; font-size: 0.78rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.sb-user-name { font-size: 0.84rem; font-weight: 600; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sb-user-role { font-size: 0.74rem; color: rgba(220,240,255,0.82); text-transform: capitalize; }
+.sb-footer { margin-top: auto; padding: 12px; border-top: 1px solid rgba(255,255,255,0.22); }
+.sb-logout-btn { width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.28); background: rgba(0,0,0,0.20); color: #f8fbff; font-size: 0.84rem; font-weight: 600; text-decoration: none; transition: all 0.18s; }
+.sb-logout-btn:hover { background: rgba(239,68,68,0.22); border-color: rgba(252,165,165,0.55); }
+.main { margin-left: 252px; flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.topbar { height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 32px; background: var(--white); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 40; }
+.topbar-title { font-size: 0.95rem; font-weight: 600; color: var(--text-1); }
+.topbar-subtitle { font-size: 0.75rem; color: var(--text-3); }
+.topbar-right { display: flex; align-items: center; gap: 10px; }
+.tb-theme-btn { width: 34px; height: 34px; border-radius: var(--r); border: 1.5px solid var(--border-md); background: var(--surface-muted); color: var(--text-2); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; }
+.tb-theme-btn .t-moon { display: block; } .tb-theme-btn .t-sun { display: none; }
+html[data-theme="dark"] .tb-theme-btn .t-moon { display: none; }
+html[data-theme="dark"] .tb-theme-btn .t-sun  { display: block; }
+.page-body { padding: 28px 32px; flex: 1; }
+.page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; }
+.page-title { font-family: var(--font-serif); font-size: 1.4rem; color: var(--text-1); }
+.page-sub { font-size: 0.82rem; color: var(--text-3); margin-top: 2px; }
+.filters-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; flex-wrap: wrap; }
+.filter-input { padding: 8px 14px; border-radius: var(--r); border: 1px solid var(--border-md); background: var(--white); color: var(--text-1); font-size: 0.83rem; font-family: var(--font-sans); outline: none; min-width: 220px; transition: border-color 0.2s; }
+.filter-input:focus { border-color: var(--sky-400); }
+.filter-select { padding: 8px 12px; border-radius: var(--r); border: 1px solid var(--border-md); background: var(--white); color: var(--text-1); font-size: 0.83rem; font-family: var(--font-sans); cursor: pointer; outline: none; }
+.filter-btn { padding: 8px 16px; border-radius: var(--r); border: 1.5px solid var(--sky-600); background: var(--sky-600); color: #fff; font-size: 0.83rem; font-weight: 600; cursor: pointer; font-family: var(--font-sans); }
+.action-btn { padding: 5px 10px; border-radius: var(--r-sm); border: 1px solid var(--border-md); background: var(--surface-muted); color: var(--text-2); font-size: 0.77rem; font-weight: 600; cursor: pointer; font-family: var(--font-sans); transition: all 0.15s; text-decoration: none; display: inline-block; }
+.action-btn:hover { border-color: var(--sky-400); color: var(--sky-600); }
+.action-btn.danger:hover { border-color: var(--red); color: var(--red); }
+.badge { display: inline-flex; align-items: center; padding: 3px 9px; border-radius: var(--r-pill); font-size: 0.72rem; font-weight: 600; }
+.badge-sky     { background: var(--sky-50);  color: var(--sky-700); }
+.badge-green   { background: #ecfdf5; color: #15803d; }
+.badge-amber   { background: #fffbeb; color: #b45309; }
+.badge-red     { background: #fef2f2; color: #b91c1c; }
+.badge-neutral { background: var(--surface-muted); color: var(--text-3); }
+.badge-purple  { background: #f5f3ff; color: #6d28d9; }
+.journals-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+.journal-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 20px; transition: all 0.22s; }
+.journal-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); border-color: var(--sky-200); }
+.jc-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+.jc-icon { width: 40px; height: 40px; border-radius: var(--r); background: linear-gradient(135deg, var(--sky-50), var(--sky-100)); border: 1px solid var(--sky-200); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+.jc-name { font-size: 0.95rem; font-weight: 600; color: var(--text-1); margin-bottom: 2px; }
+.jc-subdomain { font-size: 0.77rem; color: var(--text-3); }
+.jc-body { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+.jc-row { display: flex; align-items: center; justify-content: space-between; font-size: 0.82rem; }
+.jc-label { color: var(--text-3); }
+.jc-value { color: var(--text-1); font-weight: 500; }
+.jc-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 14px; border-top: 1px solid var(--border); }
+.empty-state { text-align: center; padding: 56px 20px; background: var(--white); border: 1px solid var(--border); border-radius: var(--r-lg); }
+.empty-icon { font-size: 2.5rem; margin-bottom: 12px; }
+.empty-text { font-size: 0.88rem; color: var(--text-3); }
+.pagination { display: flex; align-items: center; justify-content: space-between; padding: 18px 0 0; }
+.pag-info { font-size: 0.8rem; color: var(--text-3); }
+.pag-links { display: flex; gap: 4px; }
+.pag-btn { padding: 6px 12px; border-radius: var(--r-sm); border: 1px solid var(--border-md); background: var(--white); color: var(--text-2); font-size: 0.8rem; text-decoration: none; }
+.pag-btn:hover, .pag-btn.active { background: var(--sky-600); color: #fff; border-color: var(--sky-600); }
+@media (max-width: 860px) and (pointer: coarse) { .sidebar { transform: translateX(-100%); } .main { margin-left: 0; } .topbar, .page-body { padding-left: 20px; padding-right: 20px; } }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="app">
+    {% include "includes/app_sidebar.html" %}
+
+  <div class="main">
+    <header class="topbar">
+      <div>
+        <div class="topbar-title">Journal Management</div>
+        <div class="topbar-subtitle">All journals on the platform</div>
+      </div>
+      <div class="topbar-right">
+        <button class="tb-theme-btn" onclick="toggleTheme()"><span class="t-moon">🌙</span><span class="t-sun">☀️</span></button>
+      </div>
+    </header>
+
+    <div class="page-body">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Journals</div>
+          <div class="page-sub">{{ journals.total }} journal{{ 's' if journals.total != 1 else '' }} registered</div>
+        </div>
+      </div>
+
+      <form method="GET" action="{{ url_for('admin.journals') }}">
+        <div class="filters-bar">
+          <input type="text" name="q" value="{{ search }}" placeholder="Search journal name or subdomain…" class="filter-input">
+          <select name="plan" class="filter-select">
+            <option value="">All Plans</option>
+            <option value="free"       {% if plan_filter=='free'       %}selected{% endif %}>Free</option>
+            <option value="pro"        {% if plan_filter=='pro'        %}selected{% endif %}>Pro</option>
+            <option value="enterprise" {% if plan_filter=='enterprise' %}selected{% endif %}>Enterprise</option>
+          </select>
+          <button type="submit" class="filter-btn">Search</button>
+          {% if search or plan_filter %}<a href="{{ url_for('admin.journals') }}" class="action-btn">Clear</a>{% endif %}
+        </div>
+      </form>
+
+      {% if journals.items %}
+      <div class="journals-grid">
+        {% for j in journals.items %}
+        <div class="journal-card">
+          <div class="jc-head">
+            <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0">
+              <div class="jc-icon">📚</div>
+              <div style="min-width:0">
+                <div class="jc-name">{{ j.name }}</div>
+                <div class="jc-subdomain">{{ j.subdomain }}.localhost:5000</div>
+              </div>
+            </div>
+            {% if j.is_active %}<span class="badge badge-green">Active</span>{% else %}<span class="badge badge-red">Inactive</span>{% endif %}
+          </div>
+          <div class="jc-body">
+            <div class="jc-row">
+              <span class="jc-label">Plan</span>
+              <span class="badge {% if j.plan=='enterprise' %}badge-purple{% elif j.plan=='pro' %}badge-sky{% else %}badge-neutral{% endif %}">{{ j.plan.title() }}</span>
+            </div>
+            <div class="jc-row"><span class="jc-label">Members</span><span class="jc-value">{{ j.member_count }}</span></div>
+            <div class="jc-row"><span class="jc-label">Articles</span><span class="jc-value">{{ j.articles | length }}</span></div>
+            <div class="jc-row"><span class="jc-label">Created</span><span class="jc-value">{{ j.created_at.strftime('%d %b %Y') }}</span></div>
+          </div>
+          <div class="jc-footer">
+            <a href="{{ j.full_url }}" target="_blank" class="action-btn">Visit →</a>
+            <form method="POST" action="{{ url_for('admin.toggle_journal_active', journal_id=j.id) }}">
+              <button type="submit" class="action-btn {% if j.is_active %}danger{% endif %}">{{ 'Deactivate' if j.is_active else 'Activate' }}</button>
+            </form>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% if journals.pages > 1 %}
+      <div class="pagination">
+        <div class="pag-info">Page {{ journals.page }} of {{ journals.pages }}</div>
+        <div class="pag-links">
+          {% if journals.has_prev %}<a href="{{ url_for('admin.journals', page=journals.prev_num, q=search, plan=plan_filter) }}" class="pag-btn">← Prev</a>{% endif %}
+          {% for p in journals.iter_pages() %}{% if p %}<a href="{{ url_for('admin.journals', page=p, q=search, plan=plan_filter) }}" class="pag-btn {% if p==journals.page %}active{% endif %}">{{ p }}</a>{% endif %}{% endfor %}
+          {% if journals.has_next %}<a href="{{ url_for('admin.journals', page=journals.next_num, q=search, plan=plan_filter) }}" class="pag-btn">Next →</a>{% endif %}
+        </div>
+      </div>
+      {% endif %}
+      {% else %}
+      <div class="empty-state">
+        <div class="empty-icon">📚</div>
+        <div class="empty-text">No journals found.</div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+

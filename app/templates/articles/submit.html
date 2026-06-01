@@ -1,0 +1,350 @@
+﻿{% extends "base.html" %}
+{% block title %}Submit Article - Research Hub{% endblock %}
+
+{% block extra_css %}
+<style>
+.app {
+  display: flex;
+  min-height: 100vh;
+  background:
+    radial-gradient(1100px 540px at 92% -5%, rgba(56,173,248,0.18), transparent 65%),
+    radial-gradient(960px 520px at -8% 10%, rgba(2,91,160,0.16), transparent 60%),
+    linear-gradient(160deg, #ecf4ff 0%, #f3f8ff 50%, #eaf3ff 100%);
+}
+html[data-theme="dark"] .app {
+  background:
+    radial-gradient(1100px 540px at 92% -5%, rgba(56,173,248,0.16), transparent 65%),
+    radial-gradient(960px 520px at -8% 10%, rgba(2,91,160,0.22), transparent 60%),
+    linear-gradient(160deg, #0c1017 0%, #101722 52%, #141e2c 100%);
+}
+
+.sidebar {
+  width: 252px;
+  flex-shrink: 0;
+  background: linear-gradient(180deg, #0b3d6a 0%, #025ba0 48%, #0272c6 100%);
+  border-right: 1px solid rgba(255,255,255,0.22);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  overflow-y: auto;
+  z-index: 50;
+  box-shadow: 12px 0 36px rgba(2,91,160,0.20);
+}
+html[data-theme="dark"] .sidebar {
+  background: linear-gradient(180deg, #10161f 0%, #141c28 52%, #192536 100%);
+  border-right-color: rgba(124,200,251,0.24);
+  box-shadow: 14px 0 42px rgba(0,0,0,0.42);
+}
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.22);
+}
+.sb-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: linear-gradient(140deg, #7cc8fb, #38adf8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  color: #0b3d6a;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+}
+.sb-name { font-family: var(--font-serif); font-size: 1.08rem; color: #f5fbff; }
+
+.sb-user {
+  padding: 14px 16px;
+  margin: 10px 12px 6px;
+  border: 1px solid rgba(255,255,255,0.24);
+  border-radius: 12px;
+  background: rgba(255,255,255,0.08);
+}
+.sb-user-inner { display: flex; align-items: center; gap: 10px; }
+.sb-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #7cc8fb, #38adf8);
+  color: #0b3d6a;
+  font-size: 0.78rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.sb-user-name { font-size: 0.84rem; font-weight: 600; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sb-user-role { font-size: 0.74rem; color: rgba(220,240,255,0.82); text-transform: capitalize; }
+
+.sb-nav-section { padding: 18px 12px 4px; }
+.sb-section-title {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: rgba(218,238,255,0.78);
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  padding: 0 8px;
+  margin-bottom: 6px;
+}
+.sb-nav { display: flex; flex-direction: column; gap: 3px; }
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: var(--r);
+  font-size: 0.87rem;
+  font-weight: 500;
+  color: rgba(230,245,255,0.9);
+  transition: all 0.18s;
+  text-decoration: none;
+}
+.sidebar-link:hover { background: rgba(255,255,255,0.12); color: #ffffff; }
+.sidebar-link.active {
+  background: linear-gradient(135deg, rgba(56,173,248,0.32), rgba(124,200,251,0.24));
+  color: #ffffff;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.28);
+}
+.sl-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: var(--r-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+  background: rgba(255,255,255,0.08);
+}
+.sidebar-link.active .sl-icon { background: rgba(255,255,255,0.24); }
+.sl-badge { margin-left: auto; background: #ef4444; color: #fff; font-size: 0.65rem; font-weight: 700; padding: 2px 6px; border-radius: var(--r-pill); }
+
+.sb-footer {
+  margin-top: auto;
+  padding: 12px;
+  border-top: 1px solid rgba(255,255,255,0.22);
+}
+.sb-logout-btn {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.28);
+  background: rgba(0,0,0,0.20);
+  color: #f8fbff;
+  font-size: 0.84rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.18s;
+}
+.sb-logout-btn:hover {
+  background: rgba(239,68,68,0.22);
+  border-color: rgba(252,165,165,0.55);
+}
+
+.main { margin-left: 252px; flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.topbar {
+  height: 62px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  background: linear-gradient(100deg, rgba(244,250,255,0.9), rgba(222,239,255,0.82));
+  border-bottom: 1px solid rgba(2,91,160,0.18);
+  backdrop-filter: blur(7px);
+  position: sticky;
+  top: 0;
+  z-index: 40;
+}
+html[data-theme="dark"] .topbar {
+  background: linear-gradient(100deg, rgba(12,18,28,0.95), rgba(17,27,41,0.90));
+  border-bottom-color: rgba(124,200,251,0.22);
+}
+.topbar-title { font-size: 1.02rem; font-weight: 700; color: var(--text-1); display: flex; align-items: center; gap: 8px; }
+.topbar-right { display: flex; align-items: center; gap: 10px; }
+.tb-theme-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--r);
+  border: 1.5px solid var(--border-md);
+  background: var(--surface-muted);
+  color: var(--text-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 14px;
+}
+.tb-theme-btn .t-moon { display: block; }
+.tb-theme-btn .t-sun { display: none; }
+html[data-theme="dark"] .tb-theme-btn .t-moon { display: none; }
+html[data-theme="dark"] .tb-theme-btn .t-sun { display: block; }
+
+.page-body { padding: 20px 32px 28px; flex: 1; }
+.form-wrap { width: 100%; max-width: 920px; margin: 0 auto; }
+.back-link { display: inline-flex; align-items: center; gap: 6px; font-size: 0.855rem; color: var(--text-3); margin-bottom: 16px; transition: color 0.15s; text-decoration: none; }
+.back-link:hover { color: var(--sky-600); }
+.form-card {
+  background: rgba(255,255,255,0.88);
+  border: 1px solid rgba(2,91,160,0.14);
+  border-radius: var(--r-xl);
+  padding: 32px;
+  box-shadow: 0 12px 28px rgba(2,91,160,0.12);
+  backdrop-filter: blur(6px);
+}
+html[data-theme="dark"] .form-card {
+  background: rgba(14,21,32,0.92);
+  border-color: rgba(56,173,248,0.20);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.36);
+}
+.form-card-title { font-size: 1.75rem; color: var(--text-1); margin-bottom: 6px; }
+.form-card-sub { font-size: 0.875rem; color: var(--text-3); margin-bottom: 32px; }
+.field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 22px; }
+.field-label { font-size: 0.8rem; font-weight: 600; color: var(--text-2); display: flex; justify-content: space-between; }
+.field-label span { font-weight: 400; color: var(--text-3); }
+textarea.form-input { resize: vertical; min-height: 100px; line-height: 1.6; }
+textarea.form-input.tall { min-height: 200px; }
+select.form-input { cursor: pointer; }
+.char-count { font-size: 0.72rem; color: var(--text-4); text-align: right; margin-top: 2px; }
+.form-divider { height: 1px; background: var(--border); margin: 28px 0; }
+.form-section-title { font-size: 0.8rem; font-weight: 700; color: var(--text-2); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 18px; }
+.btn-row { display: flex; gap: 12px; margin-top: 8px; }
+.btn-submit { flex: 1; padding: 13px; border-radius: var(--r-lg); background: var(--sky-600); color: #fff; border: none; font-size: 0.95rem; font-weight: 600; font-family: var(--font-sans); cursor: pointer; box-shadow: var(--shadow-blue); transition: all 0.22s; }
+.btn-submit:hover { background: var(--sky-700); transform: translateY(-1px); }
+.btn-draft { padding: 13px 24px; border-radius: var(--r-lg); border: 1.5px solid var(--border-md); background: var(--white); color: var(--text-2); font-size: 0.9rem; font-weight: 600; font-family: var(--font-sans); cursor: pointer; transition: all 0.22s; }
+.btn-draft:hover { border-color: var(--sky-400); color: var(--sky-600); }
+.tips-box { background: var(--sky-50); border: 1px solid var(--sky-200); border-radius: var(--r-lg); padding: 16px 18px; margin-bottom: 28px; }
+html[data-theme="dark"] .tips-box { background: rgba(56,173,248,0.06); border-color: rgba(56,173,248,0.18); }
+.tips-title { font-size: 0.8rem; font-weight: 700; color: var(--sky-700); margin-bottom: 8px; }
+.tips-list { list-style: none; display: flex; flex-direction: column; gap: 5px; }
+.tips-list li { font-size: 0.8rem; color: var(--sky-700); display: flex; align-items: flex-start; gap: 6px; }
+.tips-list li::before { content: '\\2713'; flex-shrink: 0; font-weight: 700; }
+
+@media (max-width: 860px) and (pointer: coarse) {
+  .sidebar { transform: translateX(-100%); }
+  .main { margin-left: 0; }
+  .topbar, .page-body { padding-left: 20px; padding-right: 20px; }
+}
+@media (max-width: 640px) {
+  .page-body { padding: 16px; }
+  .form-card { padding: 22px; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="app">
+      {% include "includes/app_sidebar.html" %}
+
+    <div class="main">
+        <header class="topbar">
+            <div class="topbar-title"><span>&#9997;</span><span>Submit Article</span></div>
+            <div class="topbar-right">
+              <button class="tb-theme-btn" onclick="toggleTheme()">
+                <span class="t-moon">&#127769;</span><span class="t-sun">&#9728;</span>
+              </button>
+            </div>
+        </header>
+
+        <div class="page-body">
+            <div class="form-wrap">
+                <a href="{{ url_for('articles.my_articles') }}" class="back-link">&larr; Back to My Articles</a>
+
+                <div class="form-card">
+                    <h2 class="form-card-title">{% if article is defined %}Edit Article{% else %}Submit Article{% endif %}</h2>
+                    <p class="form-card-sub">{% if article is defined %}Update your article details below.{% else %}Fill in your research article details. All fields marked * are required.{% endif %}</p>
+
+                    <div class="tips-box">
+                        <div class="tips-title">Submission Tips</div>
+                        <ul class="tips-list">
+                            <li>Write a clear, descriptive title that reflects your research</li>
+                            <li>Abstract should be 150-300 words summarizing your key findings</li>
+                            <li>Add 3-6 relevant keywords to help readers find your article</li>
+                            <li>You can save as draft and come back to finish later</li>
+                        </ul>
+                    </div>
+
+                    <form method="POST">
+                        {{ form.hidden_tag() }}
+
+                        <div class="form-section-title">Basic Information</div>
+
+                        <div class="field">
+                            <label class="field-label">Article Title *</label>
+                            {{ form.title(class="form-input", id="titleInput") }}
+                            {% if form.title.errors %}<span class="form-error">{{ form.title.errors[0] }}</span>{% endif %}
+                            <div class="char-count" id="titleCount">0 / 500</div>
+                        </div>
+
+                        <div class="field">
+                            <label class="field-label">Research Category *</label>
+                            {{ form.category(class="form-input") }}
+                            {% if form.category.errors %}<span class="form-error">{{ form.category.errors[0] }}</span>{% endif %}
+                        </div>
+
+                        <div class="field">
+                            <label class="field-label">Co-Authors <span>(optional)</span></label>
+                            {{ form.co_authors(class="form-input") }}
+                        </div>
+
+                        <div class="form-divider"></div>
+                        <div class="form-section-title">Abstract & Keywords</div>
+
+                        <div class="field">
+                            <label class="field-label">Abstract * <span>100-3000 characters</span></label>
+                            {{ form.abstract(class="form-input tall", id="abstractInput") }}
+                            {% if form.abstract.errors %}<span class="form-error">{{ form.abstract.errors[0] }}</span>{% endif %}
+                            <div class="char-count" id="abstractCount">0 / 3000</div>
+                        </div>
+
+                        <div class="field">
+                            <label class="field-label">Keywords <span>comma separated</span></label>
+                            {{ form.keywords(class="form-input") }}
+                            {% if form.keywords.errors %}<span class="form-error">{{ form.keywords.errors[0] }}</span>{% endif %}
+                        </div>
+
+                        <div class="form-divider"></div>
+                        <div class="form-section-title">Full Content (Optional)</div>
+
+                        <div class="field">
+                            <label class="field-label">Article Content <span>optional if uploading PDF later</span></label>
+                            {{ form.content(class="form-input", rows="12", style="min-height:240px;resize:vertical") }}
+                        </div>
+
+                        <div class="btn-row">
+                            {{ form.submit(class="btn-submit") }}
+                            {{ form.save_draft(class="btn-draft") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function countChars(inputId, countId, max) {
+  var el = document.getElementById(inputId);
+  var ct = document.getElementById(countId);
+  if (!el || !ct) return;
+  function update() {
+    ct.textContent = el.value.length + ' / ' + max;
+    ct.style.color = el.value.length > max * 0.9 ? 'var(--amber)' : 'var(--text-4)';
+  }
+  el.addEventListener('input', update);
+  update();
+}
+countChars('titleInput', 'titleCount', 500);
+countChars('abstractInput', 'abstractCount', 3000);
+</script>
+{% endblock %}

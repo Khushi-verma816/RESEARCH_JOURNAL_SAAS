@@ -1,0 +1,82 @@
+/* Enhanced Analytics Styles */
+.analytics-stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.analytics-stat-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r-lg);padding:18px;transition:all .3s;position:relative;overflow:hidden}
+.analytics-stat-card:hover{transform:translateY(-4px);box-shadow:0 12px 24px rgba(0,0,0,0.1);border-color:var(--sky-300)}
+.analytics-stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#3b82f6,#60a5fa);opacity:0;transition:opacity .3s}
+.analytics-stat-card:hover::before{opacity:1}
+.stat-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.stat-icon-circle{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.3rem;box-shadow:0 4px 12px rgba(0,0,0,0.15)}
+.stat-trend{font-size:.72rem;font-weight:700;padding:4px 8px;border-radius:12px}
+.stat-trend.up{background:#d1fae5;color:#065f46}
+.stat-trend.down{background:#fee2e2;color:#991b1b}
+.stat-mini-chart{display:flex;align-items:flex-end;gap:3px;height:32px;margin-top:8px}
+.mini-bar{flex:1;background:linear-gradient(180deg,#3b82f6,#60a5fa);border-radius:2px 2px 0 0;transition:all .3s;opacity:.6}
+.mini-bar:hover{opacity:1;transform:scaleY(1.1)}
+
+/* Line Chart */
+.line-chart-container{position:relative;width:100%;height:240px}
+.line-chart{position:relative;width:100%;height:100%}
+.chart-grid{position:absolute;top:0;left:0;right:0;bottom:30px;display:flex;flex-direction:column;justify-content:space-between}
+.grid-line{border-top:1px dashed var(--border);position:relative;height:0}
+.grid-label{position:absolute;left:-35px;top:-8px;font-size:.7rem;color:var(--text-4)}
+.line-chart-svg{position:absolute;top:0;left:0;width:100%;height:calc(100% - 30px)}
+.line-path{stroke-linecap:round;stroke-linejoin:round}
+.data-point{cursor:pointer;transition:all .2s}
+.data-point:hover{r:6;fill:#1e40af}
+.chart-x-labels{position:absolute;bottom:0;left:0;right:0;display:flex;justify-content:space-between;font-size:.7rem;color:var(--text-4)}
+.chart-filter-btn{padding:6px 12px;border:1px solid var(--border);background:var(--white);border-radius:6px;font-size:.75rem;font-weight:600;color:var(--text-3);cursor:pointer;transition:all .2s}
+.chart-filter-btn:hover{border-color:var(--sky-400);color:var(--sky-600)}
+.chart-filter-btn.active{background:var(--sky-500);color:#fff;border-color:var(--sky-500)}
+
+/* Donut Chart */
+.donut-chart-container{display:flex;flex-direction:column;align-items:center;gap:16px}
+.donut-chart{width:200px;height:200px}
+.donut-segment{transition:all .3s}
+.donut-segment:hover{opacity:.8}
+.donut-legend{display:flex;flex-direction:column;gap:8px;width:100%}
+.legend-item{display:flex;align-items:center;gap:8px;font-size:.78rem;color:var(--text-2)}
+.legend-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0}
+
+/* Enhanced Bar Chart */
+.animated-bar{animation:barGrow 1s ease-out}
+@keyframes barGrow{from{width:0}}
+.bar-fill.green{background:linear-gradient(90deg,#10b981,#34d399)}
+.bar-fill.amber{background:linear-gradient(90deg,#f59e0b,#fbbf24)}
+.bar-fill.red{background:linear-gradient(90deg,#ef4444,#f87171)}
+.bar-fill.neutral{background:linear-gradient(90deg,#6b7280,#9ca3af)}
+.bar-fill.purple{background:linear-gradient(90deg,#8b5cf6,#a78bfa)}
+
+/* Enhanced Monthly Chart */
+.month-bar.enhanced:hover{transform:scaleY(1.05);box-shadow:0 -4px 12px rgba(59,130,246,0.4)}
+.month-bar.enhanced:hover .tooltip{opacity:1}
+.bar-value{animation:fadeIn .5s ease-out}
+@keyframes fadeIn{from{opacity:0;transform:translateX(-50%) translateY(-10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+
+/* Enhanced Article List */
+.article-row.enhanced:hover{background:var(--surface-muted);transform:translateX(4px)}
+.art-rank.trophy{animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+.engagement-badge{animation:slideIn .3s ease-out}
+@keyframes slideIn{from{opacity:0;transform:translateX(10px)}to{opacity:1;transform:translateX(0)}}
+
+/* Metric Selector */
+.metric-selector{padding:6px 12px;border:1px solid var(--border);background:var(--white);border-radius:6px;font-size:.75rem;font-weight:600;color:var(--text-2);cursor:pointer}
+.metric-selector:hover{border-color:var(--sky-400)}
+
+/* Team Stats Enhanced */
+.team-stat.enhanced:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,0.1)}
+
+/* Category List */
+.category-item:hover{background:var(--surface-muted);border-radius:8px;padding:8px;margin:-8px;transition:all .2s}
+.category-icon{animation:rotate 3s linear infinite}
+@keyframes rotate{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.category-item:hover .category-icon{animation-play-state:paused}
+
+/* Responsive */
+@media(max-width:1200px){
+.analytics-stats-grid{grid-template-columns:repeat(2,1fr)}
+.charts-row{grid-template-columns:1fr!important}
+}
+@media(max-width:768px){
+.analytics-stats-grid{grid-template-columns:1fr}
+}

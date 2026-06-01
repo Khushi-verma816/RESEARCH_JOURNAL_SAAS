@@ -1,0 +1,214 @@
+﻿{% extends "base.html" %}
+{% block title %}Submissions – Research Hub{% endblock %}
+
+{% block extra_css %}
+<style>
+.app {
+  display: flex;
+  min-height: 100vh;
+  background:
+    radial-gradient(1100px 540px at 92% -5%, rgba(56,173,248,0.18), transparent 65%),
+    radial-gradient(960px 520px at -8% 10%, rgba(2,91,160,0.16), transparent 60%),
+    linear-gradient(160deg, #ecf4ff 0%, #f3f8ff 50%, #eaf3ff 100%);
+}
+html[data-theme="dark"] .app {
+  background:
+    radial-gradient(1100px 540px at 92% -5%, rgba(56,173,248,0.16), transparent 65%),
+    radial-gradient(960px 520px at -8% 10%, rgba(2,91,160,0.22), transparent 60%),
+    linear-gradient(160deg, #0c1017 0%, #101722 52%, #141e2c 100%);
+}
+.sidebar {
+  width: 252px;
+  flex-shrink: 0;
+  background: linear-gradient(180deg, #0b3d6a 0%, #025ba0 48%, #0272c6 100%);
+  border-right: 1px solid rgba(255,255,255,0.22);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  overflow-y: auto;
+  z-index: 50;
+  box-shadow: 12px 0 36px rgba(2,91,160,0.20);
+}
+html[data-theme="dark"] .sidebar {
+  background: linear-gradient(180deg, #10161f 0%, #141c28 52%, #192536 100%);
+  border-right-color: rgba(124,200,251,0.24);
+  box-shadow: 14px 0 42px rgba(0,0,0,0.42);
+}
+.sidebar-brand { display: flex; align-items: center; gap: 10px; padding: 20px 20px 16px; border-bottom: 1px solid rgba(255,255,255,0.22); }
+.sb-icon { width: 34px; height: 34px; border-radius: 10px; background: linear-gradient(140deg, #7cc8fb, #38adf8); display: flex; align-items: center; justify-content: center; font-size: 15px; color: #0b3d6a; box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
+.sb-name { font-family: var(--font-serif); font-size: 1.08rem; color: #f5fbff; }
+.sb-nav-section { padding: 18px 12px 4px; }
+.sb-section-title { font-size: 0.68rem; font-weight: 700; color: rgba(218,238,255,0.78); text-transform: uppercase; letter-spacing: 0.09em; padding: 0 8px; margin-bottom: 6px; }
+.sb-nav { display: flex; flex-direction: column; gap: 3px; }
+.sidebar-link { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: var(--r); font-size: 0.87rem; font-weight: 500; color: rgba(230,245,255,0.9); transition: all 0.18s; text-decoration: none; }
+.sidebar-link:hover { background: rgba(255,255,255,0.12); color: #ffffff; }
+.sidebar-link.active { background: linear-gradient(135deg, rgba(56,173,248,0.32), rgba(124,200,251,0.24)); color: #ffffff; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.28); }
+.sl-icon { width: 30px; height: 30px; border-radius: var(--r-sm); display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; background: rgba(255,255,255,0.08); }
+.sidebar-link.active .sl-icon { background: rgba(255,255,255,0.24); }
+.sb-user { padding: 14px 16px; margin: 10px 12px 6px; border: 1px solid rgba(255,255,255,0.24); border-radius: 12px; background: rgba(255,255,255,0.08); }
+.sb-user-inner { display: flex; align-items: center; gap: 10px; }
+.sb-avatar { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, #7cc8fb, #38adf8); color: #0b3d6a; font-size: 0.78rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.sb-user-name { font-size: 0.84rem; font-weight: 600; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sb-user-role { font-size: 0.74rem; color: rgba(220,240,255,0.82); text-transform: capitalize; }
+.sb-footer { margin-top: auto; padding: 12px; border-top: 1px solid rgba(255,255,255,0.22); }
+.sb-logout-btn { width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.28); background: rgba(0,0,0,0.20); color: #f8fbff; font-size: 0.84rem; font-weight: 600; text-decoration: none; transition: all 0.18s; }
+.sb-logout-btn:hover { background: rgba(239,68,68,0.22); border-color: rgba(252,165,165,0.55); }
+.main { margin-left: 252px; flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.topbar { height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 32px; background: var(--white); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 40; }
+.topbar-title { font-size: 0.95rem; font-weight: 600; color: var(--text-1); }
+.topbar-subtitle { font-size: 0.75rem; color: var(--text-3); }
+.topbar-right { display: flex; align-items: center; gap: 10px; }
+.tb-theme-btn { width: 34px; height: 34px; border-radius: var(--r); border: 1.5px solid var(--border-md); background: var(--surface-muted); color: var(--text-2); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; }
+.tb-theme-btn .t-moon { display: block; } .tb-theme-btn .t-sun { display: none; }
+html[data-theme="dark"] .tb-theme-btn .t-moon { display: none; }
+html[data-theme="dark"] .tb-theme-btn .t-sun  { display: block; }
+.page-body { padding: 28px 32px; flex: 1; }
+.page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; }
+.page-title { font-family: var(--font-serif); font-size: 1.4rem; color: var(--text-1); }
+.page-sub { font-size: 0.82rem; color: var(--text-3); margin-top: 2px; }
+.status-tabs { display: flex; gap: 6px; margin-bottom: 18px; flex-wrap: wrap; }
+.status-tab { padding: 6px 14px; border-radius: var(--r-pill); border: 1px solid var(--border-md); background: var(--white); color: var(--text-3); font-size: 0.8rem; font-weight: 500; text-decoration: none; transition: all 0.15s; }
+.status-tab:hover { border-color: var(--sky-300); color: var(--sky-600); }
+.status-tab.active { background: var(--sky-600); color: #fff; border-color: var(--sky-600); }
+.filters-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; flex-wrap: wrap; }
+.filter-input { padding: 8px 14px; border-radius: var(--r); border: 1px solid var(--border-md); background: var(--white); color: var(--text-1); font-size: 0.83rem; font-family: var(--font-sans); outline: none; min-width: 220px; transition: border-color 0.2s; }
+.filter-input:focus { border-color: var(--sky-400); }
+.filter-btn { padding: 8px 16px; border-radius: var(--r); border: 1.5px solid var(--sky-600); background: var(--sky-600); color: #fff; font-size: 0.83rem; font-weight: 600; cursor: pointer; font-family: var(--font-sans); }
+.action-btn { padding: 5px 10px; border-radius: var(--r-sm); border: 1px solid var(--border-md); background: var(--surface-muted); color: var(--text-2); font-size: 0.77rem; font-weight: 600; cursor: pointer; font-family: var(--font-sans); transition: all 0.15s; text-decoration: none; display: inline-block; }
+.action-btn:hover { border-color: var(--sky-400); color: var(--sky-600); }
+.card { background: var(--white); border: 1px solid var(--border); border-radius: var(--r-lg); overflow: hidden; }
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; }
+thead th { padding: 11px 16px; font-size: 0.72rem; font-weight: 700; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.07em; background: var(--surface-muted); border-bottom: 1px solid var(--border); text-align: left; white-space: nowrap; }
+tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s; }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: var(--surface-muted); }
+tbody td { padding: 13px 16px; font-size: 0.845rem; color: var(--text-2); vertical-align: middle; }
+.article-title-cell { max-width: 280px; }
+.art-title { font-size: 0.875rem; font-weight: 600; color: var(--text-1); margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.art-meta { font-size: 0.77rem; color: var(--text-3); }
+.art-keywords { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 4px; }
+.kw-tag { padding: 2px 7px; border-radius: var(--r-pill); background: var(--surface-muted); color: var(--text-3); font-size: 0.68rem; }
+.badge { display: inline-flex; align-items: center; padding: 3px 9px; border-radius: var(--r-pill); font-size: 0.72rem; font-weight: 600; }
+.badge-sky     { background: var(--sky-50);  color: var(--sky-700); }
+.badge-green   { background: #ecfdf5; color: #15803d; }
+.badge-amber   { background: #fffbeb; color: #b45309; }
+.badge-red     { background: #fef2f2; color: #b91c1c; }
+.badge-neutral { background: var(--surface-muted); color: var(--text-3); }
+.badge-info    { background: #eff6ff; color: #1d4ed8; }
+.status-form { display: flex; align-items: center; gap: 5px; }
+.status-select { padding: 5px 8px; border-radius: var(--r-sm); border: 1px solid var(--border-md); background: var(--white); color: var(--text-1); font-size: 0.79rem; font-family: var(--font-sans); cursor: pointer; }
+.save-btn { padding: 5px 10px; border-radius: var(--r-sm); border: 1.5px solid var(--sky-600); background: var(--sky-600); color: #fff; font-size: 0.77rem; font-weight: 600; cursor: pointer; font-family: var(--font-sans); }
+.empty-state { text-align: center; padding: 56px 20px; }
+.empty-icon { font-size: 2.5rem; margin-bottom: 12px; }
+.empty-text { font-size: 0.88rem; color: var(--text-3); }
+.pagination { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; border-top: 1px solid var(--border); }
+.pag-info { font-size: 0.8rem; color: var(--text-3); }
+.pag-links { display: flex; gap: 4px; }
+.pag-btn { padding: 6px 12px; border-radius: var(--r-sm); border: 1px solid var(--border-md); background: var(--white); color: var(--text-2); font-size: 0.8rem; text-decoration: none; }
+.pag-btn:hover, .pag-btn.active { background: var(--sky-600); color: #fff; border-color: var(--sky-600); }
+@media (max-width: 860px) and (pointer: coarse) { .sidebar { transform: translateX(-100%); } .main { margin-left: 0; } .topbar, .page-body { padding-left: 20px; padding-right: 20px; } }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="app">
+    {% include "includes/app_sidebar.html" %}
+
+  <div class="main">
+    <header class="topbar">
+      <div>
+        <div class="topbar-title">Submissions</div>
+        <div class="topbar-subtitle">All article submissions across journals</div>
+      </div>
+      <div class="topbar-right">
+        <button class="tb-theme-btn" onclick="toggleTheme()"><span class="t-moon">🌙</span><span class="t-sun">☀️</span></button>
+      </div>
+    </header>
+
+    <div class="page-body">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Article Submissions</div>
+          <div class="page-sub">{{ articles.total }} total submission{{ 's' if articles.total != 1 else '' }}</div>
+        </div>
+      </div>
+
+      <div class="status-tabs">
+        <a href="{{ url_for('admin.submissions', q=search) }}" class="status-tab {% if not status_filter %}active{% endif %}">All</a>
+        {% for s in ['draft','submitted','under_review','accepted','rejected','published'] %}
+        <a href="{{ url_for('admin.submissions', status=s, q=search) }}" class="status-tab {% if status_filter==s %}active{% endif %}">{{ s.replace('_',' ').title() }}</a>
+        {% endfor %}
+      </div>
+
+      <form method="GET" action="{{ url_for('admin.submissions') }}">
+        {% if status_filter %}<input type="hidden" name="status" value="{{ status_filter }}">{% endif %}
+        <div class="filters-bar">
+          <input type="text" name="q" value="{{ search }}" placeholder="Search title or keywords…" class="filter-input">
+          <button type="submit" class="filter-btn">Search</button>
+          {% if search %}<a href="{{ url_for('admin.submissions', status=status_filter) }}" class="action-btn">Clear</a>{% endif %}
+        </div>
+      </form>
+
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Article</th><th>Author</th><th>Journal</th><th>Status</th><th>Date</th><th>Change Status</th></tr>
+            </thead>
+            <tbody>
+            {% for a in articles.items %}
+              {% set sb = {'draft':'badge-neutral','submitted':'badge-info','under_review':'badge-amber','accepted':'badge-green','rejected':'badge-red','published':'badge-green'} %}
+              <tr>
+                <td class="article-title-cell">
+                  <div class="art-title" title="{{ a.title }}">{{ a.title }}</div>
+                  <div class="art-meta">{{ a.category or 'Uncategorized' }}</div>
+                  {% if a.keyword_list %}
+                  <div class="art-keywords">{% for kw in a.keyword_list[:3] %}<span class="kw-tag">{{ kw }}</span>{% endfor %}</div>
+                  {% endif %}
+                </td>
+                <td>
+                  {% if a.author %}
+                  <div style="font-weight:600;color:var(--text-1);">{{ a.author.full_name }}</div>
+                  <div style="font-size:0.77rem;color:var(--text-3);">{{ a.author.email }}</div>
+                  {% else %}—{% endif %}
+                </td>
+                <td>{% if a.tenant %}<span style="font-weight:500;">{{ a.tenant.name }}</span>{% else %}—{% endif %}</td>
+                <td><span class="badge {{ sb.get(a.status,'badge-neutral') }}">{{ a.status_label }}</span></td>
+                <td style="white-space:nowrap;">{{ a.created_at.strftime('%d %b %Y') }}</td>
+                <td>
+                  <form method="POST" action="{{ url_for('admin.change_article_status', article_id=a.id) }}" class="status-form">
+                    <select name="status" class="status-select">
+                      {% for s in ['draft','submitted','under_review','accepted','rejected','published'] %}
+                      <option value="{{ s }}" {% if a.status==s %}selected{% endif %}>{{ s.replace('_',' ').title() }}</option>
+                      {% endfor %}
+                    </select>
+                    <button type="submit" class="save-btn">Save</button>
+                  </form>
+                </td>
+              </tr>
+            {% else %}
+              <tr><td colspan="6"><div class="empty-state"><div class="empty-icon">📄</div><div class="empty-text">No submissions found.</div></div></td></tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% if articles.pages > 1 %}
+        <div class="pagination">
+          <div class="pag-info">Page {{ articles.page }} of {{ articles.pages }}</div>
+          <div class="pag-links">
+            {% if articles.has_prev %}<a href="{{ url_for('admin.submissions', page=articles.prev_num, q=search, status=status_filter) }}" class="pag-btn">← Prev</a>{% endif %}
+            {% for p in articles.iter_pages() %}{% if p %}<a href="{{ url_for('admin.submissions', page=p, q=search, status=status_filter) }}" class="pag-btn {% if p==articles.page %}active{% endif %}">{{ p }}</a>{% endif %}{% endfor %}
+            {% if articles.has_next %}<a href="{{ url_for('admin.submissions', page=articles.next_num, q=search, status=status_filter) }}" class="pag-btn">Next →</a>{% endif %}
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

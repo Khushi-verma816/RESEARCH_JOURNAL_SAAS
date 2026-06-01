@@ -1,0 +1,176 @@
+﻿{% extends "base.html" %}
+{% block title %}Transactions – Research Hub{% endblock %}
+{% block extra_css %}
+<style>
+.app{
+  display:flex;
+  min-height:100vh;
+  background:
+    radial-gradient(1100px 540px at 92% -5%, rgba(56,173,248,0.18), transparent 65%),
+    radial-gradient(960px 520px at -8% 10%, rgba(2,91,160,0.16), transparent 60%),
+    linear-gradient(160deg, #ecf4ff 0%, #f3f8ff 50%, #eaf3ff 100%)
+}
+html[data-theme="dark"] .app{
+  background:
+    radial-gradient(1100px 540px at 92% -5%, rgba(56,173,248,0.16), transparent 65%),
+    radial-gradient(960px 520px at -8% 10%, rgba(2,91,160,0.22), transparent 60%),
+    linear-gradient(160deg, #0c1017 0%, #101722 52%, #141e2c 100%)
+}
+.sidebar{width:252px;flex-shrink:0;background:linear-gradient(180deg,#0b3d6a 0%,#025ba0 48%,#0272c6 100%);border-right:1px solid rgba(255,255,255,0.22);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;overflow-y:auto;z-index:50;box-shadow:12px 0 36px rgba(2,91,160,0.20)}
+html[data-theme="dark"] .sidebar{background:linear-gradient(180deg,#10161f 0%,#141c28 52%,#192536 100%);border-right-color:rgba(124,200,251,0.24);box-shadow:14px 0 42px rgba(0,0,0,0.42)}
+.sidebar-brand{display:flex;align-items:center;gap:10px;padding:20px 20px 16px;border-bottom:1px solid rgba(255,255,255,0.22)}
+.sb-icon{width:34px;height:34px;border-radius:10px;background:linear-gradient(140deg,#7cc8fb,#38adf8);display:flex;align-items:center;justify-content:center;font-size:15px;color:#0b3d6a;box-shadow:0 8px 20px rgba(0,0,0,0.2)}
+.sb-name{font-family:var(--font-serif);font-size:1.08rem;color:#f5fbff}
+.sb-nav-section{padding:18px 12px 4px}
+.sb-section-title{font-size:.68rem;font-weight:700;color:rgba(218,238,255,0.78);text-transform:uppercase;letter-spacing:.09em;padding:0 8px;margin-bottom:6px}
+.sb-nav{display:flex;flex-direction:column;gap:3px}
+.sidebar-link{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--r);font-size:.87rem;font-weight:500;color:rgba(230,245,255,0.9);transition:all .18s;text-decoration:none}
+.sidebar-link:hover{background:rgba(255,255,255,0.12);color:#fff}
+.sidebar-link.active{background:linear-gradient(135deg,rgba(56,173,248,0.32),rgba(124,200,251,0.24));color:#fff;box-shadow:inset 0 0 0 1px rgba(255,255,255,0.28)}
+.sl-icon{width:30px;height:30px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;background:rgba(255,255,255,0.08)}
+.sidebar-link.active .sl-icon{background:rgba(255,255,255,0.24)}
+.sb-user{padding:14px 16px;margin:10px 12px 6px;border:1px solid rgba(255,255,255,0.24);border-radius:12px;background:rgba(255,255,255,0.08)}
+.sb-user-inner{display:flex;align-items:center;gap:10px}
+.sb-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#7cc8fb,#38adf8);color:#0b3d6a;font-size:.78rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-user-name{font-size:.84rem;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-user-role{font-size:.74rem;color:rgba(220,240,255,0.82);text-transform:capitalize}
+.sb-footer{margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,0.22)}
+.sb-logout-btn{width:100%;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.28);background:rgba(0,0,0,0.20);color:#f8fbff;font-size:.84rem;font-weight:600;text-decoration:none;transition:all .18s}
+.sb-logout-btn:hover{background:rgba(239,68,68,0.22);border-color:rgba(252,165,165,0.55)}
+.main{margin-left:252px;flex:1;display:flex;flex-direction:column;min-width:0}
+.topbar{height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 32px;background:var(--white);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:40}
+.topbar-title{font-size:.95rem;font-weight:600;color:var(--text-1)}
+.topbar-subtitle{font-size:.75rem;color:var(--text-3)}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.tb-theme-btn{width:34px;height:34px;border-radius:var(--r);border:1.5px solid var(--border-md);background:var(--surface-muted);color:var(--text-2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px}
+.tb-theme-btn .t-moon{display:block}.tb-theme-btn .t-sun{display:none}
+html[data-theme="dark"] .tb-theme-btn .t-moon{display:none}
+html[data-theme="dark"] .tb-theme-btn .t-sun{display:block}
+.page-body{padding:28px 32px;flex:1}
+/* Stats */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.stat-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r-lg);padding:18px 20px}
+.stat-label{font-size:.76rem;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.stat-value{font-family:var(--font-serif);font-size:1.8rem;color:var(--text-1)}
+.stat-sub{font-size:.76rem;color:var(--text-4);margin-top:3px}
+/* Filters */
+.filters{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;align-items:center}
+.filter-select{padding:8px 12px;border-radius:var(--r);border:1.5px solid var(--border-md);background:var(--white);color:var(--text-2);font-size:.84rem;font-family:var(--font-sans);cursor:pointer}
+.filter-select:focus{outline:none;border-color:var(--sky-400)}
+.btn-reset{padding:8px 14px;border-radius:var(--r);border:1.5px solid var(--border-md);background:transparent;color:var(--text-3);font-size:.84rem;cursor:pointer;font-family:var(--font-sans);text-decoration:none}
+/* Table */
+.table-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r-xl);overflow:hidden}
+.table-header{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--border)}
+.table-title{font-size:.9rem;font-weight:600;color:var(--text-1)}
+table{width:100%;border-collapse:collapse}
+th{font-size:.74rem;font-weight:700;color:var(--text-4);text-transform:uppercase;letter-spacing:.07em;padding:12px 16px;text-align:left;background:var(--surface-muted);border-bottom:1px solid var(--border)}
+td{padding:14px 16px;font-size:.855rem;color:var(--text-2);border-bottom:1px solid var(--border)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--surface-muted)}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:var(--r-pill);font-size:.72rem;font-weight:600}
+.badge-green{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border)}
+.badge-amber{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-border)}
+.badge-red{background:var(--red-bg);color:var(--red);border:1px solid var(--red-border)}
+.badge-sky{background:var(--sky-50);color:var(--sky-700);border:1px solid var(--sky-200)}
+.method-tag{font-size:.75rem;color:var(--text-3);background:var(--surface-muted);padding:2px 8px;border-radius:var(--r-sm)}
+.empty-state{text-align:center;padding:60px 20px;color:var(--text-3)}
+@media(max-width:860px) and (pointer:coarse){.sidebar{transform:translateX(-100%)}.main{margin-left:0}.topbar,.page-body{padding-left:20px;padding-right:20px}}
+@media(max-width:700px){.stats-grid{grid-template-columns:repeat(2,1fr)}}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="app">
+      {% include "includes/app_sidebar.html" %}
+
+  <div class="main">
+    <header class="topbar">
+      <div><div class="topbar-title">Transactions</div><div class="topbar-subtitle">Payment history for {{ tenant.name }}</div></div>
+      <div class="topbar-right"><button class="tb-theme-btn" onclick="toggleTheme()"><span class="t-moon">&#9790;</span><span class="t-sun">&#9728;</span></button></div>
+    </header>
+
+    <div class="page-body">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">Total Paid</div>
+          <div class="stat-value">₹{{ "%.2f"|format(total_paid) }}</div>
+          <div class="stat-sub">All time</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">All Transactions</div>
+          <div class="stat-value">{{ total_count }}</div>
+          <div class="stat-sub">This account</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Pending</div>
+          <div class="stat-value" style="color:var(--amber)">{{ pending_count }}</div>
+          <div class="stat-sub">Awaiting confirmation</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Failed</div>
+          <div class="stat-value" style="color:var(--red)">{{ failed_count }}</div>
+          <div class="stat-sub">Need attention</div>
+        </div>
+      </div>
+
+      <form method="GET" action="{{ url_for('billing.transactions') }}">
+        <div class="filters">
+          <select name="status" class="filter-select" onchange="this.form.submit()">
+            <option value="" {% if not status_filter %}selected{% endif %}>All Statuses</option>
+            <option value="completed" {% if status_filter=='completed' %}selected{% endif %}>Completed</option>
+            <option value="pending"   {% if status_filter=='pending'   %}selected{% endif %}>Pending</option>
+            <option value="failed"    {% if status_filter=='failed'    %}selected{% endif %}>Failed</option>
+            <option value="refunded"  {% if status_filter=='refunded'  %}selected{% endif %}>Refunded</option>
+          </select>
+          <select name="method" class="filter-select" onchange="this.form.submit()">
+            <option value="" {% if not method_filter %}selected{% endif %}>All Methods</option>
+            <option value="online"        {% if method_filter=='online'        %}selected{% endif %}>Online</option>
+            <option value="cash"          {% if method_filter=='cash'          %}selected{% endif %}>Cash</option>
+            <option value="bank_transfer" {% if method_filter=='bank_transfer' %}selected{% endif %}>Bank Transfer</option>
+            <option value="cheque"        {% if method_filter=='cheque'        %}selected{% endif %}>Cheque</option>
+            <option value="upi"           {% if method_filter=='upi'           %}selected{% endif %}>UPI</option>
+          </select>
+          {% if status_filter or method_filter %}
+          <a href="{{ url_for('billing.transactions') }}" class="btn-reset">&#10005; Clear</a>
+          {% endif %}
+        </div>
+      </form>
+
+      <div class="table-card">
+        <div class="table-header"><div class="table-title">Transaction History</div></div>
+        {% if transactions %}
+        <table>
+          <thead>
+            <tr>
+              <th>#</th><th>Date</th><th>Plan</th><th>Amount</th><th>Method</th><th>Reference</th><th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for txn in transactions %}
+            {% set icon, color = txn.status_label %}
+            <tr>
+              <td style="color:var(--text-4);font-size:.78rem">#{{ txn.id }}</td>
+              <td>{{ txn.created_at.strftime('%d %b %Y') }}<br><span style="color:var(--text-4);font-size:.75rem">{{ txn.created_at.strftime('%H:%M') }}</span></td>
+              <td style="font-weight:600;color:var(--text-1)">{{ (txn.plan or '—').title() }}</td>
+              <td style="font-weight:600;color:var(--text-1)">₹{{ "%.2f"|format(txn.amount) }} <span style="color:var(--text-4);font-size:.78rem">INR</span></td>
+              <td><span class="method-tag">{{ txn.payment_method.replace('_',' ').title() }}</span></td>
+              <td style="color:var(--text-3);font-size:.82rem">{{ txn.reference_id or '—' }}</td>
+              <td><span class="badge badge-{{ color }}">{{ icon }} {{ txn.status.title() }}</span></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">
+          <div style="font-size:2.5rem;margin-bottom:12px">&#128237;</div>
+          <div style="font-weight:600;color:var(--text-2);margin-bottom:6px">No transactions yet</div>
+          <div style="font-size:.84rem">Transactions will appear here once payments are made.</div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+

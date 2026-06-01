@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Review Article – Research Hub{% endblock %}
+{% block extra_css %}
+<style>
+.page-wrap{min-height:100vh;background:var(--off-white);padding:40px 24px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:700px}
+.back-link{display:inline-flex;align-items:center;gap:6px;font-size:0.855rem;color:var(--text-3);margin-bottom:24px;transition:color 0.15s}
+.back-link:hover{color:var(--sky-600)}
+.article-summary{background:var(--white);border:1px solid var(--border);border-radius:var(--r-xl);padding:28px 32px;margin-bottom:20px}
+.article-title{font-size:1.2rem;color:var(--text-1);margin-bottom:12px}
+.abstract-preview{font-size:0.875rem;color:var(--text-2);line-height:1.75;background:var(--surface-muted);padding:14px 16px;border-radius:var(--r);margin-top:14px}
+.form-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r-xl);padding:32px}
+.form-card-title{font-size:1.4rem;color:var(--text-1);margin-bottom:24px}
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:20px}
+.field-label{font-size:0.8rem;font-weight:600;color:var(--text-2)}
+textarea.form-input{min-height:160px;resize:vertical}
+.btn-row{display:flex;gap:12px;margin-top:8px}
+.btn-submit{flex:1;padding:13px;border-radius:var(--r-lg);background:var(--sky-600);color:#fff;border:none;font-size:0.95rem;font-weight:600;font-family:var(--font-sans);cursor:pointer;transition:all 0.22s;box-shadow:var(--shadow-blue)}
+.btn-submit:hover{background:var(--sky-700);transform:translateY(-1px)}
+.btn-cancel{padding:13px 24px;border-radius:var(--r-lg);border:1.5px solid var(--border-md);background:var(--white);color:var(--text-2);font-size:0.9rem;font-weight:600;font-family:var(--font-sans);text-decoration:none;display:flex;align-items:center;transition:all 0.2s}
+.btn-cancel:hover{border-color:var(--sky-400);color:var(--sky-600)}
+</style>
+{% endblock %}
+{% block content %}
+<div class="page-wrap">
+    <div class="wrap">
+        <a href="{{ url_for('articles.editor_panel') }}" class="back-link">← Back to Editor Panel</a>
+        <div class="article-summary">
+            <h3 class="article-title">{{ article.title }}</h3>
+            <div style="font-size:0.82rem;color:var(--text-3)">👤 {{ article.author.full_name }} · 📂 {{ article.category.replace('_',' ').title() if article.category else '—' }}</div>
+            <div class="abstract-preview">{{ article.abstract }}</div>
+        </div>
+        <div class="form-card">
+            <h2 class="form-card-title">📝 Submit Your Review</h2>
+            <form method="POST">
+                {{ form.hidden_tag() }}
+                <div class="field">
+                    <label class="field-label">Your Decision *</label>
+                    {{ form.decision(class="form-input") }}
+                    {% if form.decision.errors %}<span class="form-error">{{ form.decision.errors[0] }}</span>{% endif %}
+                </div>
+                <div class="field">
+                    <label class="field-label">Review Comments * (shown to author)</label>
+                    {{ form.review_notes(class="form-input") }}
+                    {% if form.review_notes.errors %}<span class="form-error">{{ form.review_notes.errors[0] }}</span>{% endif %}
+                </div>
+                <div class="btn-row">
+                    {{ form.submit(class="btn-submit") }}
+                    <a href="{{ url_for('articles.editor_panel') }}" class="btn-cancel">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

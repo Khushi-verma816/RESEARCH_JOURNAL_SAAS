@@ -1,0 +1,262 @@
+{% extends "base.html" %}
+{% block title %}Content Creation - Research Hub{% endblock %}
+{% block extra_css %}
+<style>
+.app{
+  display:flex;
+  min-height:100vh;
+  background:
+    radial-gradient(1100px 540px at 92% -5%, rgba(56,173,248,0.18), transparent 65%),
+    radial-gradient(960px 520px at -8% 10%, rgba(2,91,160,0.16), transparent 60%),
+    linear-gradient(160deg, #ecf4ff 0%, #f3f8ff 50%, #eaf3ff 100%);
+}
+html[data-theme="dark"] .app{
+  background:
+    radial-gradient(1100px 540px at 92% -5%, rgba(56,173,248,0.16), transparent 65%),
+    radial-gradient(960px 520px at -8% 10%, rgba(2,91,160,0.22), transparent 60%),
+    linear-gradient(160deg, #0c1017 0%, #101722 52%, #141e2c 100%);
+}
+.sidebar{width:252px;flex-shrink:0;background:linear-gradient(180deg,#0b3d6a 0%,#025ba0 48%,#0272c6 100%);border-right:1px solid rgba(255,255,255,0.22);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;overflow-y:auto;z-index:50;box-shadow:12px 0 36px rgba(2,91,160,0.20)}
+html[data-theme="dark"] .sidebar{background:linear-gradient(180deg,#10161f 0%,#141c28 52%,#192536 100%);border-right-color:rgba(124,200,251,0.24);box-shadow:14px 0 42px rgba(0,0,0,0.42)}
+.sidebar-brand{display:flex;align-items:center;gap:10px;padding:20px 20px 16px;border-bottom:1px solid rgba(255,255,255,0.22)}
+.sb-icon{width:34px;height:34px;border-radius:10px;background:linear-gradient(140deg,#7cc8fb,#38adf8);display:flex;align-items:center;justify-content:center;font-size:15px;color:#0b3d6a;box-shadow:0 8px 20px rgba(0,0,0,0.2)}
+.sb-name{font-family:var(--font-serif);font-size:1.08rem;color:#f5fbff}
+.sb-nav-section{padding:18px 12px 4px}
+.sb-section-title{font-size:.68rem;font-weight:700;color:rgba(218,238,255,0.78);text-transform:uppercase;letter-spacing:.09em;padding:0 8px;margin-bottom:6px}
+.sb-nav{display:flex;flex-direction:column;gap:3px}
+.sidebar-link{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--r);font-size:.87rem;font-weight:500;color:rgba(230,245,255,0.9);transition:all .18s;text-decoration:none}
+.sidebar-link:hover{background:rgba(255,255,255,0.12);color:#fff}
+.sidebar-link.active{background:linear-gradient(135deg,rgba(56,173,248,0.32),rgba(124,200,251,0.24));color:#fff;box-shadow:inset 0 0 0 1px rgba(255,255,255,0.28)}
+.sl-icon{width:30px;height:30px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;background:rgba(255,255,255,0.08)}
+.sidebar-link.active .sl-icon{background:rgba(255,255,255,0.24)}
+.sb-user{padding:14px 16px;margin:10px 12px 6px;border:1px solid rgba(255,255,255,0.24);border-radius:12px;background:rgba(255,255,255,0.08)}
+.sb-user-inner{display:flex;align-items:center;gap:10px}
+.sb-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#7cc8fb,#38adf8);color:#0b3d6a;font-size:.78rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-user-name{font-size:.84rem;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-user-role{font-size:.74rem;color:rgba(220,240,255,0.82);text-transform:capitalize}
+.sb-footer{margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,0.22)}
+.sb-logout-btn{width:100%;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.28);background:rgba(0,0,0,0.20);color:#f8fbff;font-size:.84rem;font-weight:600;text-decoration:none;transition:all .18s}
+.sb-logout-btn:hover{background:rgba(239,68,68,0.22);border-color:rgba(252,165,165,0.55)}
+.main{margin-left:252px;flex:1;display:flex;flex-direction:column;min-width:0}
+.topbar{height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 32px;background:var(--white);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:40}
+.topbar-title{font-size:.95rem;font-weight:600;color:var(--text-1)}
+.topbar-subtitle{font-size:.75rem;color:var(--text-3)}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.tb-theme-btn{width:34px;height:34px;border-radius:var(--r);border:1.5px solid var(--border-md);background:var(--surface-muted);color:var(--text-2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px}
+.tb-theme-btn .t-moon{display:block}.tb-theme-btn .t-sun{display:none}
+html[data-theme="dark"] .tb-theme-btn .t-moon{display:none}
+html[data-theme="dark"] .tb-theme-btn .t-sun{display:block}
+.page-body{padding:28px 32px;flex:1;display:flex;justify-content:center}
+
+.layout-grid{display:grid;grid-template-columns:1fr;gap:18px;max-width:1040px;width:100%}
+.card{background:var(--white);border:1px solid var(--border);border-radius:var(--r-lg)}
+.card-head{padding:16px 20px;border-bottom:1px solid var(--border)}
+.card-title{font-size:.95rem;font-weight:600;color:var(--text-1)}
+.card-sub{font-size:.8rem;color:var(--text-3);margin-top:4px}
+.card-body{padding:18px 20px}
+
+.form-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:12px}
+.form-field{display:flex;flex-direction:column;gap:6px}
+.field-label{font-size:.79rem;font-weight:600;color:var(--text-2)}
+.field-input{width:100%;padding:10px 12px;border:1.5px solid var(--border-md);border-radius:var(--r);font-size:.86rem;background:var(--white);color:var(--text-1);font-family:var(--font-sans)}
+.field-input:focus{outline:none;border-color:var(--sky-400)}
+.prompt-box{width:100%;min-height:210px;resize:vertical}
+.action-row{display:flex;gap:10px;align-items:center;margin-top:14px}
+.btn-generate{padding:10px 18px;border:none;border-radius:var(--r);background:var(--sky-600);color:#fff;font-weight:600;font-size:.86rem}
+.btn-generate:disabled{opacity:.6;cursor:not-allowed}
+.btn-clear{padding:10px 14px;border:1.5px solid var(--border-md);border-radius:var(--r);background:transparent;color:var(--text-2);font-weight:600;font-size:.84rem}
+.status{font-size:.78rem;color:var(--text-3)}
+
+.output-wrap{position:relative}
+.output-box{min-height:260px;border:1px solid var(--border);background:var(--surface-muted);border-radius:var(--r);padding:18px 20px;font-size:.9rem;line-height:1.8;color:var(--text-1)}
+.output-box .section-heading{display:block;font-size:1rem;font-weight:700;color:var(--text-1);margin:18px 0 6px;letter-spacing:0.02em}
+.output-box .section-heading:first-child{margin-top:0}
+.output-box p{margin:0 0 10px}
+.output-box .finding-item{margin:8px 0;padding-left:4px}
+.copy-btn{position:absolute;top:10px;right:10px;padding:6px 10px;font-size:.76rem;border:1px solid var(--border-md);border-radius:var(--r-sm);background:var(--white);color:var(--text-2);font-weight:600;cursor:pointer}
+
+@media(max-width:1024px){.form-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:860px) and (pointer:coarse){.sidebar{transform:translateX(-100%)}.main{margin-left:0}.topbar,.page-body{padding-left:20px;padding-right:20px}}
+@media(max-width:660px){.form-grid{grid-template-columns:1fr}}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="app">
+  {% include "includes/app_sidebar.html" %}
+
+  <div class="main">
+    <header class="topbar">
+      <div>
+        <div class="topbar-title">AI Content Creation</div>
+        <div class="topbar-subtitle">Generate research-paper content from a prompt</div>
+      </div>
+      <div class="topbar-right"><button class="tb-theme-btn" onclick="toggleTheme()"><span class="t-moon">&#9790;</span><span class="t-sun">&#9728;</span></button></div>
+    </header>
+
+    <div class="page-body">
+      <div class="layout-grid">
+        <div class="card">
+          <div class="card-head">
+            <div class="card-title">Prompt Settings</div>
+            <div class="card-sub">Describe your topic, constraints, and what you want the model to write.</div>
+          </div>
+          <div class="card-body">
+            <div class="form-grid">
+              <div class="form-field">
+                <label class="field-label">Content Type</label>
+                <select id="contentType" class="field-input">
+                  <option value="section">Research Section</option>
+                  <option value="abstract">Abstract</option>
+                  <option value="introduction">Introduction</option>
+                  <option value="literature_review">Literature Review</option>
+                  <option value="methodology">Methodology</option>
+                  <option value="results_discussion">Results and Discussion</option>
+                  <option value="conclusion">Conclusion</option>
+                </select>
+              </div>
+              <div class="form-field">
+                <label class="field-label">Tone</label>
+                <select id="tone" class="field-input">
+                  <option value="academic">Academic</option>
+                  <option value="formal">Formal</option>
+                  <option value="concise">Concise</option>
+                  <option value="critical">Critical Analysis</option>
+                </select>
+              </div>
+              <div class="form-field">
+                <label class="field-label">Target Words</label>
+                <input id="wordCount" class="field-input" type="number" min="20" max="5000" value="700">
+              </div>
+            </div>
+
+            <div class="form-field">
+              <label class="field-label">Prompt</label>
+              <textarea id="prompt" class="field-input prompt-box" placeholder="Example: Write an introduction for a research paper on federated learning in healthcare. Include context, research gap, objectives, and contribution in 600-800 words."></textarea>
+            </div>
+
+            <div class="action-row">
+              <button id="generateBtn" class="btn-generate" onclick="generateContent()">Generate Content</button>
+              <button class="btn-clear" onclick="clearForm()">Clear</button>
+              <span id="status" class="status"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <div class="card-title">Generated Output</div>
+            <div class="card-sub">Review and copy the generated text.</div>
+          </div>
+          <div class="card-body">
+            <div class="output-wrap">
+              <button class="copy-btn" onclick="copyOutput()">Copy</button>
+              <div id="output" class="output-box">Generated content will appear here.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function parseMarkdown(text) {
+  let safe = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  // Code blocks ```...```
+  safe = safe.replace(/```([\s\S]*?)```/g, '<pre style="background:rgba(0,0,0,0.05);border-radius:6px;padding:12px 16px;overflow-x:auto;margin:10px 0;font-size:0.83rem;border:1px solid var(--border)"><code>$1</code></pre>');
+  // Inline code
+  safe = safe.replace(/`([^`]+)`/g, '<code style="background:rgba(0,0,0,0.06);padding:1px 6px;border-radius:4px;font-size:0.85em;font-family:monospace">$1</code>');
+  // H1
+  safe = safe.replace(/^# (.+)$/gm, '<h2 style="font-size:1.15rem;font-weight:800;color:var(--sky-700);margin:20px 0 8px;padding-bottom:6px;border-bottom:2px solid var(--sky-100)">$1</h2>');
+  // H2
+  safe = safe.replace(/^## (.+)$/gm, '<h3 style="font-size:1.02rem;font-weight:700;color:var(--text-1);margin:16px 0 6px">$1</h3>');
+  // H3
+  safe = safe.replace(/^### (.+)$/gm, '<h4 style="font-size:0.94rem;font-weight:700;color:var(--text-2);margin:12px 0 4px">$1</h4>');
+  // Bold
+  safe = safe.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  // Italic
+  safe = safe.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+  // Bullet list
+  safe = safe.replace(/^[\-\*] (.+)$/gm, '<li style="margin:4px 0 4px 20px;line-height:1.7">$1</li>');
+  // Numbered list
+  safe = safe.replace(/^(\d+)\. (.+)$/gm, '<li style="margin:5px 0 5px 20px;line-height:1.7"><strong>$1.</strong> $2</li>');
+  // Horizontal rule
+  safe = safe.replace(/^---$/gm, '<hr style="border:none;border-top:1px solid var(--border);margin:14px 0">');
+  // Double newline = paragraph
+  safe = safe.replace(/\n\n/g, '</p><p style="margin:0 0 12px">');
+  // Single newline
+  safe = safe.replace(/\n/g, '<br>');
+  return '<p style="margin:0 0 12px;line-height:1.82">' + safe + '</p>';
+}
+
+
+async function generateContent() {
+  const prompt = document.getElementById('prompt').value.trim();
+  const contentType = document.getElementById('contentType').value;
+  const tone = document.getElementById('tone').value;
+  const wordCount = parseInt(document.getElementById('wordCount').value || '700', 10);
+  const output = document.getElementById('output');
+  const status = document.getElementById('status');
+  const btn = document.getElementById('generateBtn');
+
+  if (!prompt) {
+    status.textContent = 'Please enter a prompt.';
+    return;
+  }
+  if (!Number.isFinite(wordCount) || wordCount < 20 || wordCount > 5000) {
+    status.textContent = 'Please choose target words between 20 and 5000.';
+    return;
+  }
+
+  btn.disabled = true;
+  output.innerHTML = '<span style="color:var(--text-3)">Generating your content, please wait...</span>';
+  status.textContent = 'Working on your draft...';
+
+  try {
+    const res = await fetch('{{ url_for("ai.generate_content") }}', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        prompt: prompt,
+        content_type: contentType,
+        tone: tone,
+        word_count: wordCount
+      })
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.error || 'Failed to generate content.');
+    }
+    const result = data.result || 'No content generated.';
+    output.innerHTML = parseMarkdown(result);
+    const actual = Number(data.actual_word_count || 0);
+    const target = Number(data.target_words || wordCount);
+    if (actual > 0) {
+      status.textContent = `Done. ${actual} words generated (target: ${target}).`;
+    } else {
+      status.textContent = 'Done. ✔';
+    }
+  } catch (err) {
+    output.innerHTML = '';
+    status.textContent = err.message || 'Something went wrong.';
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function clearForm() {
+  document.getElementById('prompt').value = '';
+  document.getElementById('output').innerHTML = 'Generated content will appear here.';
+  document.getElementById('status').textContent = '';
+}
+
+async function copyOutput() {
+  const el = document.getElementById('output');
+  const text = el.innerText.trim();
+  if (!text || text === 'Generated content will appear here.') return;
+  await navigator.clipboard.writeText(text);
+  document.getElementById('status').textContent = 'Copied to clipboard.';
+}
+</script>
+{% endblock %}

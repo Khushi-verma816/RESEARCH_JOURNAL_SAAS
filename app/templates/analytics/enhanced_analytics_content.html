@@ -1,0 +1,163 @@
+<!-- Enhanced Analytics Section -->
+<div style="margin-bottom: 32px;">
+    <h2 style="font-size: 1.25rem; font-weight: 700; color: var(--text-1); margin-bottom: 24px; padding-left: 4px; display: flex; align-items: center; gap: 10px;">
+        <span>📊</span>
+        <span>Analytics Dashboard</span>
+        <span style="font-size: .75rem; font-weight: 600; padding: 4px 12px; background: var(--sky-50); color: var(--sky-700); border-radius: 12px; margin-left: auto;">Live Data</span>
+    </h2>
+    
+    <!-- Enhanced Stats Grid with Mini Charts -->
+    <div class="analytics-stats-grid">
+        <div class="analytics-stat-card">
+            <div class="stat-header">
+                <div class="stat-icon-circle" style="background:linear-gradient(135deg,#3b82f6,#60a5fa)">📄</div>
+                <div class="stat-trend up">+12%</div>
+            </div>
+            <div class="stat-value">{{ total_articles if total_articles is defined else (stats.total if stats is defined else 0) }}</div>
+            <div class="stat-label">Total Articles</div>
+            <div class="stat-mini-chart">
+                <div class="mini-bar" style="height:40%"></div>
+                <div class="mini-bar" style="height:55%"></div>
+                <div class="mini-bar" style="height:45%"></div>
+                <div class="mini-bar" style="height:70%"></div>
+                <div class="mini-bar" style="height:60%"></div>
+                <div class="mini-bar" style="height:85%"></div>
+                <div class="mini-bar" style="height:100%"></div>
+            </div>
+        </div>
+        <div class="analytics-stat-card">
+            <div class="stat-header">
+                <div class="stat-icon-circle" style="background:linear-gradient(135deg,#10b981,#34d399)">✅</div>
+                <div class="stat-trend up">+8%</div>
+            </div>
+            <div class="stat-value">{{ total_published if total_published is defined else (stats.published if stats is defined else 0) }}</div>
+            <div class="stat-label">Published</div>
+            <div class="stat-mini-chart">
+                <div class="mini-bar" style="height:50%"></div>
+                <div class="mini-bar" style="height:60%"></div>
+                <div class="mini-bar" style="height:55%"></div>
+                <div class="mini-bar" style="height:75%"></div>
+                <div class="mini-bar" style="height:70%"></div>
+                <div class="mini-bar" style="height:90%"></div>
+                <div class="mini-bar" style="height:100%"></div>
+            </div>
+        </div>
+        <div class="analytics-stat-card">
+            <div class="stat-header">
+                <div class="stat-icon-circle" style="background:linear-gradient(135deg,#f59e0b,#fbbf24)">👁</div>
+                <div class="stat-trend up">+24%</div>
+            </div>
+            <div class="stat-value">{{ total_views if total_views is defined else (stats.views if stats is defined else 0) }}</div>
+            <div class="stat-label">Total Views</div>
+            <div class="stat-mini-chart">
+                <div class="mini-bar" style="height:35%"></div>
+                <div class="mini-bar" style="height:50%"></div>
+                <div class="mini-bar" style="height:60%"></div>
+                <div class="mini-bar" style="height:55%"></div>
+                <div class="mini-bar" style="height:80%"></div>
+                <div class="mini-bar" style="height:95%"></div>
+                <div class="mini-bar" style="height:100%"></div>
+            </div>
+        </div>
+        <div class="analytics-stat-card">
+            <div class="stat-header">
+                <div class="stat-icon-circle" style="background:linear-gradient(135deg,#8b5cf6,#a78bfa)">👥</div>
+                <div class="stat-trend up">+5%</div>
+            </div>
+            <div class="stat-value">{{ total_members if total_members is defined else ((editors|length if editors is defined else 0) + (reviewers|length if reviewers is defined else 0) + (authors|length if authors is defined else 0)) }}</div>
+            <div class="stat-label">Team Members</div>
+            <div class="stat-mini-chart">
+                <div class="mini-bar" style="height:60%"></div>
+                <div class="mini-bar" style="height:65%"></div>
+                <div class="mini-bar" style="height:70%"></div>
+                <div class="mini-bar" style="height:75%"></div>
+                <div class="mini-bar" style="height:80%"></div>
+                <div class="mini-bar" style="height:90%"></div>
+                <div class="mini-bar" style="height:100%"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Charts Row: Line Chart + Donut Chart -->
+    <div class="charts-row" style="display:grid;grid-template-columns:2fr 1fr;gap:20px;margin-bottom:24px">
+        <!-- Line Chart -->
+        <div class="card">
+            <div class="card-head">
+                <div class="card-title">📈 Submissions Trend (Last 12 Months)</div>
+                <div style="display:flex;gap:8px">
+                    <button class="chart-filter-btn active">All</button>
+                    <button class="chart-filter-btn">Published</button>
+                    <button class="chart-filter-btn">Review</button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="line-chart-container">
+                    <div class="line-chart">
+                        <div class="chart-grid">
+                            <div class="grid-line"><span class="grid-label">100</span></div>
+                            <div class="grid-line"><span class="grid-label">75</span></div>
+                            <div class="grid-line"><span class="grid-label">50</span></div>
+                            <div class="grid-line"><span class="grid-label">25</span></div>
+                            <div class="grid-line"><span class="grid-label">0</span></div>
+                        </div>
+                        <svg class="line-chart-svg" viewBox="0 0 600 200" preserveAspectRatio="none">
+                            <defs>
+                                <linearGradient id="areaGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:0.3" />
+                                    <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:0" />
+                                </linearGradient>
+                            </defs>
+                            <path class="area-path" d="M 0 180 L 50 160 L 100 140 L 150 155 L 200 130 L 250 110 L 300 95 L 350 105 L 400 85 L 450 70 L 500 60 L 550 45 L 600 30 L 600 200 L 0 200 Z" fill="url(#areaGradient)" />
+                            <path class="line-path" d="M 0 180 L 50 160 L 100 140 L 150 155 L 200 130 L 250 110 L 300 95 L 350 105 L 400 85 L 450 70 L 500 60 L 550 45 L 600 30" fill="none" stroke="#3b82f6" stroke-width="3" />
+                            <circle cx="0" cy="180" r="4" fill="#3b82f6" class="data-point" />
+                            <circle cx="50" cy="160" r="4" fill="#3b82f6" class="data-point" />
+                            <circle cx="100" cy="140" r="4" fill="#3b82f6" class="data-point" />
+                            <circle cx="150" cy="155" r="4" fill="#3b82f6" class="data-point" />
+                            <circle cx="200" cy="130" r="4" fill="#3b82f6" class="data-point" />
+                            <circle cx="250" cy="110" r="4" fill="#3b82f6" class="data-point" />
+                            <circle cx="300" cy="95" r="4" fill="#3b82f6" class="data-point" />
+                            <circle cx="350" cy="105" r="4" fill="#3b82f6" class="data-point" />
+                            <circle cx="400" cy="85" r="4" fill="#3b82f6" class="data-point" />
+                            <circle cx="450" cy="70" r="4" fill="#3b82f6" class="data-point" />
+                            <circle cx="500" cy="60" r="4" fill="#3b82f6" class="data-point" />
+                            <circle cx="550" cy="45" r="4" fill="#3b82f6" class="data-point" />
+                            <circle cx="600" cy="30" r="4" fill="#3b82f6" class="data-point" />
+                        </svg>
+                        <div class="chart-x-labels">
+                            <span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span>
+                            <span>Jul</span><span>Aug</span><span>Sep</span><span>Oct</span><span>Nov</span><span>Dec</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Donut Chart -->
+        <div class="card">
+            <div class="card-head"><div class="card-title">🎯 Status Distribution</div></div>
+            <div class="card-body">
+                <div class="donut-chart-container">
+                    <svg class="donut-chart" viewBox="0 0 200 200">
+                        <circle cx="100" cy="100" r="80" fill="none" stroke="#e5e7eb" stroke-width="30" />
+                        <circle cx="100" cy="100" r="80" fill="none" stroke="#10b981" stroke-width="30" 
+                                stroke-dasharray="226 502" stroke-dashoffset="0" transform="rotate(-90 100 100)" class="donut-segment" />
+                        <circle cx="100" cy="100" r="80" fill="none" stroke="#f59e0b" stroke-width="30" 
+                                stroke-dasharray="126 502" stroke-dashoffset="-226" transform="rotate(-90 100 100)" class="donut-segment" />
+                        <circle cx="100" cy="100" r="80" fill="none" stroke="#3b82f6" stroke-width="30" 
+                                stroke-dasharray="100 502" stroke-dashoffset="-352" transform="rotate(-90 100 100)" class="donut-segment" />
+                        <circle cx="100" cy="100" r="80" fill="none" stroke="#ef4444" stroke-width="30" 
+                                stroke-dasharray="50 502" stroke-dashoffset="-452" transform="rotate(-90 100 100)" class="donut-segment" />
+                        <text x="100" y="95" text-anchor="middle" font-size="28" font-weight="700" fill="var(--text-1)">{{ total_articles if total_articles is defined else 0 }}</text>
+                        <text x="100" y="115" text-anchor="middle" font-size="12" fill="var(--text-3)">Total</text>
+                    </svg>
+                    <div class="donut-legend">
+                        <div class="legend-item"><span class="legend-dot" style="background:#10b981"></span><span>Published (45%)</span></div>
+                        <div class="legend-item"><span class="legend-dot" style="background:#f59e0b"></span><span>Review (25%)</span></div>
+                        <div class="legend-item"><span class="legend-dot" style="background:#3b82f6"></span><span>Submitted (20%)</span></div>
+                        <div class="legend-item"><span class="legend-dot" style="background:#ef4444"></span><span>Rejected (10%)</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

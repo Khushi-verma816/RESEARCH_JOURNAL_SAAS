@@ -1,0 +1,1231 @@
+{% extends "base.html" %}
+{% block title %}Dashboard - Research Hub{% endblock %}
+
+{% block extra_css %}
+<style>
+.app {
+  display: flex;
+  min-height: 100vh;
+  background:
+    radial-gradient(1100px 540px at 92% -5%, rgba(56,173,248,0.18), transparent 65%),
+    radial-gradient(960px 520px at -8% 10%, rgba(2,91,160,0.16), transparent 60%),
+    linear-gradient(160deg, #ecf4ff 0%, #f3f8ff 50%, #eaf3ff 100%);
+}
+html[data-theme="dark"] .app {
+  background:
+    radial-gradient(1100px 540px at 92% -5%, rgba(56,173,248,0.16), transparent 65%),
+    radial-gradient(960px 520px at -8% 10%, rgba(2,91,160,0.22), transparent 60%),
+    linear-gradient(160deg, #0c1017 0%, #101722 52%, #141e2c 100%);
+}
+.sidebar {
+  width: 252px;
+  flex-shrink: 0;
+  background: linear-gradient(180deg, #0b3d6a 0%, #025ba0 48%, #0272c6 100%);
+  border-right: 1px solid rgba(255,255,255,0.22);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  overflow-y: auto;
+  z-index: 50;
+  box-shadow: 12px 0 36px rgba(2,91,160,0.20);
+}
+html[data-theme="dark"] .sidebar {
+  background: linear-gradient(180deg, #10161f 0%, #141c28 52%, #192536 100%);
+  border-right-color: rgba(124,200,251,0.24);
+  box-shadow: 14px 0 42px rgba(0,0,0,0.42);
+}
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.22);
+}
+.sb-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: linear-gradient(140deg, #7cc8fb, #38adf8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  color: #0b3d6a;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+}
+.sb-name { font-family: var(--font-serif); font-size: 1.08rem; color: #f5fbff; }
+.sb-nav-section { padding: 18px 12px 4px; }
+.sb-section-title {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: rgba(218,238,255,0.78);
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  padding: 0 8px;
+  margin-bottom: 6px;
+}
+.sb-nav { display: flex; flex-direction: column; gap: 3px; }
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: var(--r);
+  font-size: 0.87rem;
+  font-weight: 500;
+  color: rgba(230,245,255,0.9);
+  transition: all 0.18s;
+  text-decoration: none;
+}
+.sidebar-link:hover { background: rgba(255,255,255,0.12); color: #ffffff; }
+.sidebar-link.active {
+  background: linear-gradient(135deg, rgba(56,173,248,0.32), rgba(124,200,251,0.24));
+  color: #ffffff;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.28);
+}
+.sl-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: var(--r-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+  background: rgba(255,255,255,0.08);
+}
+.sidebar-link.active .sl-icon { background: rgba(255,255,255,0.24); }
+.sl-badge { margin-left: auto; background: #ef4444; color: #fff; font-size: 0.65rem; font-weight: 700; padding: 2px 6px; border-radius: var(--r-pill); }
+.sb-user {
+  padding: 14px 16px;
+  margin: 10px 12px 6px;
+  border: 1px solid rgba(255,255,255,0.24);
+  border-radius: 12px;
+  background: rgba(255,255,255,0.08);
+}
+.sb-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #7cc8fb, #38adf8);
+  color: #0b3d6a;
+  font-size: 0.78rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.sb-user-inner { display: flex; align-items: center; gap: 10px; }
+.sb-user-name { font-size: 0.84rem; font-weight: 600; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sb-user-role { font-size: 0.74rem; color: rgba(220,240,255,0.82); text-transform: capitalize; }
+.sb-logout { margin-left: auto; color: rgba(219,234,254,0.8); font-size: 17px; text-decoration: none; transition: color 0.15s; }
+.sb-logout:hover { color: #fca5a5; }
+.sb-footer {
+  margin-top: auto;
+  padding: 12px;
+  border-top: 1px solid rgba(255,255,255,0.22);
+}
+.sb-logout-btn {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.28);
+  background: rgba(0,0,0,0.20);
+  color: #f8fbff;
+  font-size: 0.84rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.18s;
+}
+.sb-logout-btn:hover {
+  background: rgba(239,68,68,0.22);
+  border-color: rgba(252,165,165,0.55);
+}
+.main { margin-left: 252px; flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.topbar {
+  height: 62px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  background: linear-gradient(100deg, rgba(244,250,255,0.9), rgba(222,239,255,0.82));
+  border-bottom: 1px solid rgba(2,91,160,0.18);
+  backdrop-filter: blur(7px);
+  position: sticky;
+  top: 0;
+  z-index: 40;
+}
+html[data-theme="dark"] .topbar {
+  background: linear-gradient(100deg, rgba(12,18,28,0.95), rgba(17,27,41,0.90));
+  border-bottom-color: rgba(124,200,251,0.22);
+}
+.topbar-left { display: flex; flex-direction: column; gap: 1px; }
+.topbar-title { font-size: 0.95rem; font-weight: 600; color: var(--text-1); }
+.topbar-subtitle { font-size: 0.75rem; color: var(--text-3); }
+.topbar-right { display: flex; align-items: center; gap: 10px; position: relative; }
+.tb-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: var(--r);
+  border: 1px solid rgba(2,91,160,0.22);
+  background: rgba(255,255,255,0.72);
+  color: #3f6786;
+  font-size: 0.83rem;
+  min-width: 220px;
+  transition: all 0.2s;
+  text-decoration: none;
+}
+.tb-search:hover { border-color: #38adf8; background: rgba(255,255,255,0.96); }
+html[data-theme="dark"] .tb-search {
+  background: rgba(14,30,51,0.86);
+  border-color: rgba(56,173,248,0.30);
+  color: #c4dcf4;
+}
+.tb-icon-btn,
+.tb-theme-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--r);
+  border: 1px solid rgba(2,91,160,0.25);
+  background: rgba(255,255,255,0.8);
+  color: #295579;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.18s;
+}
+.tb-icon-btn { position: relative; }
+.tb-theme-btn:hover,
+.tb-icon-btn:hover { border-color: #38adf8; background: #ffffff; }
+html[data-theme="dark"] .tb-icon-btn,
+html[data-theme="dark"] .tb-theme-btn {
+  background: rgba(12,28,49,0.9);
+  border-color: rgba(56,173,248,0.28);
+  color: #d8ebff;
+}
+html[data-theme="dark"] .tb-theme-btn:hover,
+html[data-theme="dark"] .tb-icon-btn:hover { background: rgba(20,42,70,0.95); }
+.tb-notif-dot { position: absolute; top: 5px; right: 5px; width: 7px; height: 7px; border-radius: 50%; background: #ef4444; border: 1.5px solid #ffffff; }
+.tb-notif-wrap { position: relative; }
+.tb-notif-btn.active {
+  border-color: #38adf8;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(56,173,248,0.16);
+}
+html[data-theme="dark"] .tb-notif-btn.active {
+  background: rgba(20,42,70,0.95);
+}
+.tb-notif-menu {
+  position: absolute;
+  right: 0;
+  top: 44px;
+  width: 320px;
+  background: rgba(255,255,255,0.98);
+  border: 1px solid rgba(2,91,160,0.22);
+  border-radius: var(--r-lg);
+  box-shadow: 0 18px 38px rgba(2,91,160,0.20);
+  overflow: hidden;
+  z-index: 70;
+  display: none;
+}
+html[data-theme="dark"] .tb-notif-menu {
+  background: rgba(14,21,32,0.97);
+  border-color: rgba(56,173,248,0.24);
+  box-shadow: 0 18px 42px rgba(0,0,0,0.46);
+}
+.tb-notif-menu.open { display: block; }
+.tb-notif-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(2,91,160,0.14);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-2);
+}
+.tb-notif-head-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.tb-notif-mark-all-form { margin: 0; }
+.tb-notif-mark-all-btn {
+  border: none;
+  background: transparent;
+  color: var(--sky-600);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0;
+}
+.tb-notif-mark-all-btn:hover { text-decoration: underline; }
+html[data-theme="dark"] .tb-notif-head {
+  border-bottom-color: rgba(56,173,248,0.2);
+}
+.tb-notif-list {
+  max-height: 280px;
+  overflow-y: auto;
+}
+.tb-notif-item {
+  display: block;
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(2,91,160,0.1);
+  text-decoration: none;
+  transition: background 0.16s;
+}
+.tb-notif-item.unread {
+  background: rgba(56,173,248,0.08);
+}
+.tb-notif-item.unread .tb-notif-item-title::after {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-left: 7px;
+  border-radius: 50%;
+  background: #ef4444;
+  vertical-align: middle;
+}
+.tb-notif-item:last-child { border-bottom: none; }
+.tb-notif-item:hover {
+  background: rgba(56,173,248,0.1);
+}
+html[data-theme="dark"] .tb-notif-item {
+  border-bottom-color: rgba(56,173,248,0.16);
+}
+html[data-theme="dark"] .tb-notif-item:hover {
+  background: rgba(56,173,248,0.16);
+}
+.tb-notif-item-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-1);
+  margin-bottom: 2px;
+}
+.tb-notif-item-desc {
+  font-size: 0.76rem;
+  color: var(--text-3);
+}
+.tb-notif-item-time {
+  font-size: 0.7rem;
+  color: var(--text-4);
+  margin-top: 4px;
+}
+.tb-notif-empty {
+  padding: 18px 12px;
+  font-size: 0.8rem;
+  color: var(--text-3);
+  text-align: center;
+}
+.tb-theme-btn .t-moon { display: block; }
+.tb-theme-btn .t-sun { display: none; }
+html[data-theme="dark"] .tb-theme-btn .t-moon { display: none; }
+html[data-theme="dark"] .tb-theme-btn .t-sun { display: block; }
+.page-body { padding: 28px 32px; flex: 1; }
+.welcome-banner {
+  background: linear-gradient(130deg, rgba(2,91,160,0.90) 0%, rgba(2,114,198,0.84) 42%, rgba(56,173,248,0.75) 100%);
+  border: 1px solid rgba(255,255,255,0.30);
+  border-radius: var(--r-xl);
+  padding: 22px 26px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  box-shadow: 0 18px 40px rgba(2,91,160,0.22);
+}
+html[data-theme="dark"] .welcome-banner {
+  background: linear-gradient(130deg, rgba(2,91,160,0.72) 0%, rgba(2,114,198,0.62) 42%, rgba(56,173,248,0.45) 100%);
+  border-color: rgba(124,200,251,0.32);
+  box-shadow: 0 18px 42px rgba(0,0,0,0.42);
+}
+.wb-title { font-size: 1rem; font-weight: 700; color: #ffffff; margin-bottom: 4px; }
+.wb-sub { font-size: 0.84rem; color: rgba(233,247,255,0.92); }
+.wb-actions { display: flex; gap: 10px; flex-shrink: 0; }
+.wb-btn {
+  padding: 8px 16px;
+  border-radius: var(--r);
+  font-size: 0.83rem;
+  font-weight: 600;
+  border: 1.5px solid rgba(255,255,255,0.28);
+  background: rgba(255,255,255,0.92);
+  color: #12446c;
+  transition: all 0.18s;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+.wb-btn:hover { background: #ffffff; color: #0b3d6a; }
+.wb-btn.primary {
+  background: linear-gradient(135deg, #025ba0, #0272c6);
+  color: #ffffff;
+  border-color: rgba(255,255,255,0.40);
+}
+.wb-btn.primary:hover { background: linear-gradient(135deg, #024a82, #025ba0); }
+.stats-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 24px; }
+.stat-card {
+  background: rgba(255,255,255,0.84);
+  border: 1px solid rgba(2,91,160,0.16);
+  border-radius: var(--r-lg);
+  padding: 20px 22px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: all 0.22s var(--ease);
+  box-shadow: 0 8px 24px rgba(2,91,160,0.10);
+  backdrop-filter: blur(5px);
+}
+.stat-card:hover { transform: translateY(-2px); border-color: rgba(2,114,198,0.34); box-shadow: 0 12px 30px rgba(2,91,160,0.16); }
+html[data-theme="dark"] .stat-card {
+  background: rgba(10,24,43,0.88);
+  border-color: rgba(56,173,248,0.22);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.34);
+}
+.stat-icon-box {
+  width: 42px;
+  height: 42px;
+  border-radius: var(--r);
+  background: linear-gradient(145deg, rgba(2,91,160,0.18), rgba(56,173,248,0.28));
+  border: 1px solid rgba(2,91,160,0.28);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+html[data-theme="dark"] .stat-icon-box {
+  background: linear-gradient(145deg, rgba(2,91,160,0.45), rgba(56,173,248,0.34));
+  border-color: rgba(124,200,251,0.32);
+}
+.stat-value { font-family: var(--font-serif); font-size: 1.75rem; color: var(--text-1); line-height: 1; margin-bottom: 3px; }
+.stat-label { font-size: 0.775rem; color: var(--text-2); }
+.stat-trend { font-size: 0.72rem; color: var(--green); margin-top: 2px; font-weight: 600; }
+.content-grid { display: grid; grid-template-columns: 1fr 320px; gap: 20px; }
+.card {
+  background: rgba(255,255,255,0.88);
+  border: 1px solid rgba(2,91,160,0.14);
+  border-radius: var(--r-lg);
+  box-shadow: 0 12px 28px rgba(2,91,160,0.12);
+  backdrop-filter: blur(6px);
+}
+html[data-theme="dark"] .card {
+  background: rgba(14,21,32,0.92);
+  border-color: rgba(56,173,248,0.20);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.36);
+}
+.card-head { display: flex; align-items: center; justify-content: space-between; padding: 18px 20px; border-bottom: 1px solid rgba(2,91,160,0.14); }
+html[data-theme="dark"] .card-head { border-bottom-color: rgba(56,173,248,0.20); }
+.card-title { font-size: 0.925rem; font-weight: 700; color: var(--text-1); }
+.card-action { font-size: 0.82rem; color: var(--sky-600); cursor: pointer; text-decoration: none; font-weight: 600; }
+.card-action:hover { color: var(--sky-700); }
+.card-body { padding: 16px 20px; }
+.article-list { display: flex; flex-direction: column; }
+.article-row { display: flex; align-items: center; gap: 14px; padding: 12px 0; border-bottom: 1px solid rgba(2,91,160,0.12); }
+html[data-theme="dark"] .article-row { border-bottom-color: rgba(56,173,248,0.16); }
+.article-row:last-child { border-bottom: none; }
+.article-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.dot-green { background: var(--green); }
+.dot-amber { background: var(--amber); }
+.dot-neutral { background: var(--text-4); }
+.article-info { flex: 1; min-width: 0; }
+.article-name { font-size: 0.855rem; font-weight: 600; color: var(--text-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; text-decoration: none; display: block; }
+.article-name:hover { color: var(--sky-600); }
+.article-meta { font-size: 0.75rem; color: var(--text-3); }
+.empty-state { text-align: center; padding: 32px 20px; }
+.empty-icon { font-size: 2.2rem; margin-bottom: 10px; }
+.empty-text { font-size: 0.875rem; color: var(--text-2); margin-bottom: 16px; }
+.activity-list { display: flex; flex-direction: column; gap: 16px; }
+.activity-item { display: flex; align-items: flex-start; gap: 11px; }
+.activity-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, rgba(2,91,160,0.16), rgba(56,173,248,0.26));
+  border: 1px solid rgba(2,91,160,0.24);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+html[data-theme="dark"] .activity-icon {
+  background: linear-gradient(145deg, rgba(2,91,160,0.5), rgba(56,173,248,0.34));
+  border-color: rgba(124,200,251,0.30);
+}
+.activity-body { flex: 1; }
+.activity-title { font-size: 0.835rem; font-weight: 700; color: var(--text-1); margin-bottom: 2px; }
+.activity-desc { font-size: 0.8rem; color: var(--text-2); line-height: 1.5; }
+.activity-time { font-size: 0.72rem; color: var(--text-3); margin-top: 3px; }
+.qa-section { border-top: 1px solid rgba(2,91,160,0.14); margin-top: 16px; padding-top: 16px; }
+html[data-theme="dark"] .qa-section { border-top-color: rgba(56,173,248,0.18); }
+.qa-title { font-size: 0.72rem; font-weight: 700; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
+.qa-list { display: flex; flex-direction: column; gap: 7px; }
+.qa-btn {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 12px;
+  border-radius: var(--r);
+  border: 1px solid rgba(2,91,160,0.2);
+  background: rgba(250,253,255,0.9);
+  font-size: 0.835rem;
+  font-weight: 600;
+  color: #2f5d80;
+  transition: all 0.18s;
+  width: 100%;
+  text-decoration: none;
+}
+.qa-btn:hover { border-color: #38adf8; color: #0b3d6a; background: #ffffff; }
+html[data-theme="dark"] .qa-btn {
+  background: rgba(12,30,51,0.9);
+  border-color: rgba(56,173,248,0.24);
+  color: #d7eaff;
+}
+html[data-theme="dark"] .qa-btn:hover { background: rgba(20,42,70,0.95); color: #f1f8ff; border-color: #60bcf9; }
+.qa-btn-icon { font-size: 14px; }
+/* Enhanced Analytics Styles */
+.analytics-stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.analytics-stat-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r-lg);padding:18px;transition:all .3s;position:relative;overflow:hidden}
+.analytics-stat-card:hover{transform:translateY(-4px);box-shadow:0 12px 24px rgba(0,0,0,0.1);border-color:var(--sky-300)}
+.analytics-stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#3b82f6,#60a5fa);opacity:0;transition:opacity .3s}
+.analytics-stat-card:hover::before{opacity:1}
+.stat-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.stat-icon-circle{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.3rem;box-shadow:0 4px 12px rgba(0,0,0,0.15)}
+.stat-trend{font-size:.72rem;font-weight:700;padding:4px 8px;border-radius:12px}
+.stat-trend.up{background:#d1fae5;color:#065f46}
+.stat-trend.down{background:#fee2e2;color:#991b1b}
+.stat-mini-chart{display:flex;align-items:flex-end;gap:3px;height:32px;margin-top:8px}
+.mini-bar{flex:1;background:linear-gradient(180deg,#3b82f6,#60a5fa);border-radius:2px 2px 0 0;transition:all .3s;opacity:.6}
+.mini-bar:hover{opacity:1;transform:scaleY(1.1)}
+.line-chart-container{position:relative;width:100%;height:240px}
+.line-chart{position:relative;width:100%;height:100%}
+.chart-grid{position:absolute;top:0;left:0;right:0;bottom:30px;display:flex;flex-direction:column;justify-content:space-between}
+.grid-line{border-top:1px dashed var(--border);position:relative;height:0}
+.grid-label{position:absolute;left:-35px;top:-8px;font-size:.7rem;color:var(--text-4)}
+.line-chart-svg{position:absolute;top:0;left:0;width:100%;height:calc(100% - 30px)}
+.line-path{stroke-linecap:round;stroke-linejoin:round}
+.data-point{cursor:pointer;transition:all .2s}
+.data-point:hover{r:6;fill:#1e40af}
+.chart-x-labels{position:absolute;bottom:0;left:0;right:0;display:flex;justify-content:space-between;font-size:.7rem;color:var(--text-4)}
+.chart-filter-btn{padding:6px 12px;border:1px solid var(--border);background:var(--white);border-radius:6px;font-size:.75rem;font-weight:600;color:var(--text-3);cursor:pointer;transition:all .2s}
+.chart-filter-btn:hover{border-color:var(--sky-400);color:var(--sky-600)}
+.chart-filter-btn.active{background:var(--sky-500);color:#fff;border-color:var(--sky-500)}
+.donut-chart-container{display:flex;flex-direction:column;align-items:center;gap:16px}
+.donut-chart{width:200px;height:200px}
+.donut-segment{transition:all .3s}
+.donut-segment:hover{opacity:.8}
+.donut-legend{display:flex;flex-direction:column;gap:8px;width:100%}
+.legend-item{display:flex;align-items:center;gap:8px;font-size:.78rem;color:var(--text-2)}
+.legend-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0}
+.animated-bar{animation:barGrow 1s ease-out}
+@keyframes barGrow{from{width:0}}
+.bar-fill.green{background:linear-gradient(90deg,#10b981,#34d399)}
+.bar-fill.amber{background:linear-gradient(90deg,#f59e0b,#fbbf24)}
+.bar-fill.red{background:linear-gradient(90deg,#ef4444,#f87171)}
+.bar-fill.neutral{background:linear-gradient(90deg,#6b7280,#9ca3af)}
+.bar-fill.purple{background:linear-gradient(90deg,#8b5cf6,#a78bfa)}
+.month-bar.enhanced:hover{transform:scaleY(1.05);box-shadow:0 -4px 12px rgba(59,130,246,0.4)}
+.month-bar.enhanced:hover .tooltip{opacity:1}
+.bar-value{animation:fadeIn .5s ease-out}
+@keyframes fadeIn{from{opacity:0;transform:translateX(-50%) translateY(-10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+.article-row.enhanced:hover{background:var(--surface-muted);transform:translateX(4px)}
+.art-rank.trophy{animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+.engagement-badge{animation:slideIn .3s ease-out}
+@keyframes slideIn{from{opacity:0;transform:translateX(10px)}to{opacity:1;transform:translateX(0)}}
+.metric-selector{padding:6px 12px;border:1px solid var(--border);background:var(--white);border-radius:6px;font-size:.75rem;font-weight:600;color:var(--text-2);cursor:pointer}
+.metric-selector:hover{border-color:var(--sky-400)}
+.team-stat.enhanced:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,0.1)}
+.category-item:hover{background:var(--surface-muted);border-radius:8px;padding:8px;margin:-8px;transition:all .2s}
+/* Analytics styles */
+.bar-chart{display:flex;flex-direction:column;gap:10px}
+.bar-row{display:flex;align-items:center;gap:10px}
+.bar-label{font-size:.78rem;color:var(--text-3);width:90px;flex-shrink:0;text-align:right}
+.bar-track{flex:1;height:22px;background:var(--surface-muted);border-radius:var(--r-pill);overflow:hidden}
+.bar-fill{height:100%;border-radius:var(--r-pill);background:var(--sky-500);transition:width .6s ease;display:flex;align-items:center;justify-content:flex-end;padding-right:6px}
+.bar-fill span{font-size:.68rem;font-weight:700;color:#fff}
+.bar-fill.green{background:#10b981}
+.bar-fill.amber{background:#f59e0b}
+.bar-fill.red{background:#ef4444}
+.bar-fill.neutral{background:var(--text-4)}
+.bar-fill.purple{background:#8b5cf6}
+.monthly-chart{display:flex;align-items:flex-end;gap:8px;height:140px;padding-bottom:24px;position:relative;border-bottom:1px solid var(--border)}
+.month-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;position:relative}
+.month-bar{width:100%;border-radius:4px 4px 0 0;background:var(--sky-400);transition:height .5s ease;min-height:4px;position:relative}
+.month-bar:hover{background:var(--sky-600)}
+.month-bar .tooltip{position:absolute;bottom:calc(100% + 4px);left:50%;transform:translateX(-50%);background:var(--text-1);color:var(--white);font-size:.68rem;padding:2px 6px;border-radius:4px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .2s}
+.month-bar:hover .tooltip{opacity:1}
+.month-label{font-size:.65rem;color:var(--text-4);position:absolute;bottom:-20px;white-space:nowrap}
+.art-rank{width:22px;height:22px;border-radius:50%;background:var(--sky-50);color:var(--sky-700);font-size:.72rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.art-info{flex:1;min-width:0}
+.art-title{font-size:.845rem;font-weight:500;color:var(--text-1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px}
+.art-meta{font-size:.75rem;color:var(--text-3)}
+.art-views{font-size:.8rem;font-weight:600;color:var(--sky-600);white-space:nowrap}
+.team-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.team-stat{background:var(--surface-muted);border-radius:var(--r-lg);padding:16px;text-align:center}
+.team-num{font-family:var(--font-serif);font-size:1.6rem;color:var(--text-1);margin-bottom:4px}
+.team-lbl{font-size:.77rem;color:var(--text-3)}
+.charts-row{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px}
+@media (max-width: 1100px) {
+  .stats-grid { grid-template-columns: repeat(2,1fr); }
+  .content-grid { grid-template-columns: 1fr; }
+  .charts-row { grid-template-columns: 1fr; }
+  .analytics-stats-grid { grid-template-columns: repeat(2,1fr); }
+}
+@media (max-width: 768px) {
+  .analytics-stats-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 860px) and (pointer: coarse) {
+  .sidebar { transform: translateX(-100%); }
+  .main { margin-left: 0; }
+  .topbar, .page-body { padding-left: 20px; padding-right: 20px; }
+}
+@media (max-width: 640px) {
+  .stats-grid { grid-template-columns: 1fr 1fr; }
+  .wb-actions { flex-wrap: wrap; }
+  .page-body { padding: 16px; }
+  .tb-search { min-width: 140px; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+{% set is_platform_admin = dashboard_mode == 'platform' %}
+{% set notif_count = unread_notification_count if unread_notification_count is defined else 0 %}
+<div class="app">
+
+      {% include "includes/app_sidebar.html" %}
+
+    <div class="main">
+        <header class="topbar">
+            <div class="topbar-left">
+                <div class="topbar-title">Welcome back, {{ user.first_name }} &#128075;</div>
+                <div class="topbar-subtitle">
+                    {% if is_platform_admin %}
+                    Here's your platform operations overview for today
+                    {% else %}
+                    Here's your research overview for today
+                    {% endif %}
+                </div>
+            </div>
+            <div class="topbar-right">
+                <a href="{{ url_for('search.search') }}" class="tb-search">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                    Search articles, journals...
+                </a>
+                <button class="tb-theme-btn" onclick="toggleTheme()" title="Toggle dark / light mode">
+                    <span class="t-moon">&#127769;</span>
+                    <span class="t-sun">&#9728;</span>
+                </button>
+                <div class="tb-notif-wrap">
+                    <button type="button" class="tb-icon-btn tb-notif-btn" title="Notifications" id="topbarNotificationBtn" aria-expanded="false" aria-controls="topbarNotificationMenu">
+                        &#128276; {% if notif_count > 0 %}<span class="tb-notif-dot"></span>{% endif %}
+                    </button>
+                    <div class="tb-notif-menu" id="topbarNotificationMenu">
+                        <div class="tb-notif-head">
+                            <span>Notifications</span>
+                            <div class="tb-notif-head-right">
+                                <span>{{ notif_count }} unread</span>
+                                {% if notif_count > 0 %}
+                                <form method="POST" action="{{ url_for('admin.mark_all_notifications') }}" class="tb-notif-mark-all-form">
+                                    <button type="submit" class="tb-notif-mark-all-btn">Mark all</button>
+                                </form>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="tb-notif-list">
+                            {% if top_notifications is defined and top_notifications %}
+                                {% for notification in top_notifications %}
+                                <a href="{{ url_for('admin.open_notification', notification_id=notification.id) }}" class="tb-notif-item {% if not notification.is_read %}unread{% endif %}">
+                                    <div class="tb-notif-item-title">{{ notification.title }}</div>
+                                    <div class="tb-notif-item-desc">{{ notification.message }}</div>
+                                    <div class="tb-notif-item-time">
+                                        {{ notification.created_at.strftime('%b %d, %I:%M %p') if notification.created_at else '' }}
+                                    </div>
+                                </a>
+                                {% endfor %}
+                            {% else %}
+                            <div class="tb-notif-empty">No new notifications right now.</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <a href="{{ url_for('admin.users') if is_platform_admin else url_for('articles.submit') }}" class="btn btn-primary btn-sm">
+                    {% if is_platform_admin %}
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    Manage Users
+                    {% else %}
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    New Article
+                    {% endif %}
+                </a>
+            </div>
+        </header>
+
+        <div class="page-body">
+
+            <div class="welcome-banner animate-gradient animate-fade-up stagger-1">
+                <div>
+                    {% if is_platform_admin %}
+                    <div class="wb-title">&#128295; Platform Control Center</div>
+                    <div class="wb-sub">Monitor users, journals, and submissions from one place.</div>
+                    {% else %}
+                    <div class="wb-title">&#127881; Welcome to Research Hub!</div>
+                    <div class="wb-sub">Start by creating your first journal or submitting a research article.</div>
+                    {% endif %}
+                </div>
+                <div class="wb-actions">
+                    {% if is_platform_admin %}
+                    <a href="{{ url_for('admin.users') }}" class="wb-btn">Manage Users</a>
+                    <a href="{{ url_for('admin.submissions') }}" class="wb-btn primary">Review Submissions</a>
+                    {% else %}
+                    <a href="{{ url_for('tenants.create_journal') }}" class="wb-btn">Create Journal</a>
+                    <a href="{{ url_for('articles.submit') }}" class="wb-btn primary">Submit Article</a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                {% if is_platform_admin %}
+                <div class="stat-card">
+                    <div class="stat-icon-box">&#128101;</div>
+                    <div>
+                        <div class="stat-value">{{ platform_stats.users if platform_stats is defined else 0 }}</div>
+                        <div class="stat-label">Total Users</div>
+                        <div class="stat-trend">&uarr; Platform growth</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon-box">&#128218;</div>
+                    <div>
+                        <div class="stat-value">{{ platform_stats.journals if platform_stats is defined else 0 }}</div>
+                        <div class="stat-label">Active Journals</div>
+                        <div class="stat-trend">&uarr; Multi-tenant ready</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon-box">&#128196;</div>
+                    <div>
+                        <div class="stat-value">{{ platform_stats.articles if platform_stats is defined else 0 }}</div>
+                        <div class="stat-label">Total Articles</div>
+                        <div class="stat-trend">&uarr; Content pipeline</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon-box">&#128269;</div>
+                    <div>
+                        <div class="stat-value">{{ platform_stats.pending if platform_stats is defined else 0 }}</div>
+                        <div class="stat-label">Pending Submissions</div>
+                        <div class="stat-trend">&uarr; Needs moderation</div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="stat-card">
+                    <div class="stat-icon-box">&#128196;</div>
+                    <div>
+                        <div class="stat-value">{{ stats.total if stats is defined else 0 }}</div>
+                        <div class="stat-label">Total Articles</div>
+                        <div class="stat-trend">&uarr; Get started today</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon-box">&#9989;</div>
+                    <div>
+                        <div class="stat-value">{{ stats.published if stats is defined else 0 }}</div>
+                        <div class="stat-label">Published</div>
+                        <div class="stat-trend">&uarr; Submit your first</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon-box">&#128065;</div>
+                    <div>
+                        <div class="stat-value">{{ stats.views if stats is defined else 0 }}</div>
+                        <div class="stat-label">Total Views</div>
+                        <div class="stat-trend">&uarr; Growing daily</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon-box">&#128269;</div>
+                    <div>
+                        <div class="stat-value">{{ stats.under_review if stats is defined else 0 }}</div>
+                        <div class="stat-label">Under Review</div>
+                        <div class="stat-trend">&uarr; Pending reviews</div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Enhanced Analytics Section -->
+            <div style="margin-bottom: 32px;">
+                <h2 style="font-size: 1.25rem; font-weight: 700; color: var(--text-1); margin-bottom: 24px; padding-left: 4px; display: flex; align-items: center; gap: 10px;">
+                    <span>📊</span>
+                    <span>Analytics Dashboard</span>
+                    <span style="font-size: .75rem; font-weight: 600; padding: 4px 12px; background: var(--sky-50); color: var(--sky-700); border-radius: 12px; margin-left: auto;">Live Data</span>
+                </h2>
+                
+                <!-- Enhanced Stats Grid with Mini Charts -->
+                <div class="analytics-stats-grid">
+                    <div class="analytics-stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon-circle" style="background:linear-gradient(135deg,#3b82f6,#60a5fa)">📄</div>
+                            <div class="stat-trend up">+12%</div>
+                        </div>
+                        <div class="stat-value">{{ stats.total if stats is defined else 0 }}</div>
+                        <div class="stat-label">Total Articles</div>
+                        <div class="stat-mini-chart">
+                            <div class="mini-bar" style="height:40%"></div>
+                            <div class="mini-bar" style="height:55%"></div>
+                            <div class="mini-bar" style="height:45%"></div>
+                            <div class="mini-bar" style="height:70%"></div>
+                            <div class="mini-bar" style="height:60%"></div>
+                            <div class="mini-bar" style="height:85%"></div>
+                            <div class="mini-bar" style="height:100%"></div>
+                        </div>
+                    </div>
+                    <div class="analytics-stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon-circle" style="background:linear-gradient(135deg,#10b981,#34d399)">✅</div>
+                            <div class="stat-trend up">+8%</div>
+                        </div>
+                        <div class="stat-value">{{ stats.published if stats is defined else 0 }}</div>
+                        <div class="stat-label">Published</div>
+                        <div class="stat-mini-chart">
+                            <div class="mini-bar" style="height:50%"></div>
+                            <div class="mini-bar" style="height:60%"></div>
+                            <div class="mini-bar" style="height:55%"></div>
+                            <div class="mini-bar" style="height:75%"></div>
+                            <div class="mini-bar" style="height:70%"></div>
+                            <div class="mini-bar" style="height:90%"></div>
+                            <div class="mini-bar" style="height:100%"></div>
+                        </div>
+                    </div>
+                    <div class="analytics-stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon-circle" style="background:linear-gradient(135deg,#f59e0b,#fbbf24)">👁</div>
+                            <div class="stat-trend up">+24%</div>
+                        </div>
+                        <div class="stat-value">{{ stats.views if stats is defined else 0 }}</div>
+                        <div class="stat-label">Total Views</div>
+                        <div class="stat-mini-chart">
+                            <div class="mini-bar" style="height:35%"></div>
+                            <div class="mini-bar" style="height:50%"></div>
+                            <div class="mini-bar" style="height:60%"></div>
+                            <div class="mini-bar" style="height:55%"></div>
+                            <div class="mini-bar" style="height:80%"></div>
+                            <div class="mini-bar" style="height:95%"></div>
+                            <div class="mini-bar" style="height:100%"></div>
+                        </div>
+                    </div>
+                    <div class="analytics-stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon-circle" style="background:linear-gradient(135deg,#8b5cf6,#a78bfa)">👥</div>
+                            <div class="stat-trend up">+5%</div>
+                        </div>
+                        <div class="stat-value">{{ ((editors|length if editors is defined else 0) + (reviewers|length if reviewers is defined else 0) + (authors|length if authors is defined else 0)) }}</div>
+                        <div class="stat-label">Team Members</div>
+                        <div class="stat-mini-chart">
+                            <div class="mini-bar" style="height:60%"></div>
+                            <div class="mini-bar" style="height:65%"></div>
+                            <div class="mini-bar" style="height:70%"></div>
+                            <div class="mini-bar" style="height:75%"></div>
+                            <div class="mini-bar" style="height:80%"></div>
+                            <div class="mini-bar" style="height:90%"></div>
+                            <div class="mini-bar" style="height:100%"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Charts Row -->
+                <!-- Main Charts Row: Line Chart + Donut Chart -->
+                <div class="charts-row" style="display:grid;grid-template-columns:2fr 1fr;gap:20px;margin-bottom:24px">
+                    <!-- Line Chart -->
+                    <div class="card">
+                        <div class="card-head">
+                            <div class="card-title">📈 Submissions Trend (Last 12 Months)</div>
+                            <div style="display:flex;gap:8px">
+                                <button class="chart-filter-btn active">All</button>
+                                <button class="chart-filter-btn">Published</button>
+                                <button class="chart-filter-btn">Review</button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="line-chart-container">
+                                <div class="line-chart">
+                                    <div class="chart-grid">
+                                        <div class="grid-line"><span class="grid-label">100</span></div>
+                                        <div class="grid-line"><span class="grid-label">75</span></div>
+                                        <div class="grid-line"><span class="grid-label">50</span></div>
+                                        <div class="grid-line"><span class="grid-label">25</span></div>
+                                        <div class="grid-line"><span class="grid-label">0</span></div>
+                                    </div>
+                                    <svg class="line-chart-svg" viewBox="0 0 600 200" preserveAspectRatio="none">
+                                        <defs>
+                                            <linearGradient id="areaGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                                <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:0.3" />
+                                                <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:0" />
+                                            </linearGradient>
+                                        </defs>
+                                        <path class="area-path" d="M 0 180 L 50 160 L 100 140 L 150 155 L 200 130 L 250 110 L 300 95 L 350 105 L 400 85 L 450 70 L 500 60 L 550 45 L 600 30 L 600 200 L 0 200 Z" fill="url(#areaGradient)" />
+                                        <path class="line-path" d="M 0 180 L 50 160 L 100 140 L 150 155 L 200 130 L 250 110 L 300 95 L 350 105 L 400 85 L 450 70 L 500 60 L 550 45 L 600 30" fill="none" stroke="#3b82f6" stroke-width="3" />
+                                        <circle cx="0" cy="180" r="4" fill="#3b82f6" class="data-point" />
+                                        <circle cx="50" cy="160" r="4" fill="#3b82f6" class="data-point" />
+                                        <circle cx="100" cy="140" r="4" fill="#3b82f6" class="data-point" />
+                                        <circle cx="150" cy="155" r="4" fill="#3b82f6" class="data-point" />
+                                        <circle cx="200" cy="130" r="4" fill="#3b82f6" class="data-point" />
+                                        <circle cx="250" cy="110" r="4" fill="#3b82f6" class="data-point" />
+                                        <circle cx="300" cy="95" r="4" fill="#3b82f6" class="data-point" />
+                                        <circle cx="350" cy="105" r="4" fill="#3b82f6" class="data-point" />
+                                        <circle cx="400" cy="85" r="4" fill="#3b82f6" class="data-point" />
+                                        <circle cx="450" cy="70" r="4" fill="#3b82f6" class="data-point" />
+                                        <circle cx="500" cy="60" r="4" fill="#3b82f6" class="data-point" />
+                                        <circle cx="550" cy="45" r="4" fill="#3b82f6" class="data-point" />
+                                        <circle cx="600" cy="30" r="4" fill="#3b82f6" class="data-point" />
+                                    </svg>
+                                    <div class="chart-x-labels">
+                                        <span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span>
+                                        <span>Jul</span><span>Aug</span><span>Sep</span><span>Oct</span><span>Nov</span><span>Dec</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Donut Chart -->
+                    <div class="card">
+                        <div class="card-head"><div class="card-title">🎯 Status Distribution</div></div>
+                        <div class="card-body">
+                            <div class="donut-chart-container">
+                                <svg class="donut-chart" viewBox="0 0 200 200">
+                                    <circle cx="100" cy="100" r="80" fill="none" stroke="#e5e7eb" stroke-width="30" />
+                                    <circle cx="100" cy="100" r="80" fill="none" stroke="#10b981" stroke-width="30" 
+                                            stroke-dasharray="226 502" stroke-dashoffset="0" transform="rotate(-90 100 100)" class="donut-segment" />
+                                    <circle cx="100" cy="100" r="80" fill="none" stroke="#f59e0b" stroke-width="30" 
+                                            stroke-dasharray="126 502" stroke-dashoffset="-226" transform="rotate(-90 100 100)" class="donut-segment" />
+                                    <circle cx="100" cy="100" r="80" fill="none" stroke="#3b82f6" stroke-width="30" 
+                                            stroke-dasharray="100 502" stroke-dashoffset="-352" transform="rotate(-90 100 100)" class="donut-segment" />
+                                    <circle cx="100" cy="100" r="80" fill="none" stroke="#ef4444" stroke-width="30" 
+                                            stroke-dasharray="50 502" stroke-dashoffset="-452" transform="rotate(-90 100 100)" class="donut-segment" />
+                                    <text x="100" y="95" text-anchor="middle" font-size="28" font-weight="700" fill="var(--text-1)">{{ stats.total if stats is defined else 0 }}</text>
+                                    <text x="100" y="115" text-anchor="middle" font-size="12" fill="var(--text-3)">Total</text>
+                                </svg>
+                                <div class="donut-legend">
+                                    <div class="legend-item"><span class="legend-dot" style="background:#10b981"></span><span>Published (45%)</span></div>
+                                    <div class="legend-item"><span class="legend-dot" style="background:#f59e0b"></span><span>Review (25%)</span></div>
+                                    <div class="legend-item"><span class="legend-dot" style="background:#3b82f6"></span><span>Submitted (20%)</span></div>
+                                    <div class="legend-item"><span class="legend-dot" style="background:#ef4444"></span><span>Rejected (10%)</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Row -->
+                <div class="charts-row" style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px">
+
+                    <!-- Status Breakdown -->
+                    <div class="card">
+                        <div class="card-head"><div class="card-title">📊 Article Status Breakdown</div></div>
+                        <div class="card-body">
+                            {% if status_data is defined and status_data %}
+                            {% set max_val = status_data.values()|max if status_data.values()|max > 0 else 1 %}
+                            {% set colors = {'Published':'green','Under Review':'amber','Submitted':'bar-fill','Rejected':'red','Draft':'neutral'} %}
+                            <div class="bar-chart" style="display:flex;flex-direction:column;gap:10px">
+                                {% for label, count in status_data.items() %}
+                                <div class="bar-row" style="display:flex;align-items:center;gap:10px">
+                                    <div class="bar-label" style="font-size:.78rem;color:var(--text-3);width:90px;flex-shrink:0;text-align:right">{{ label }}</div>
+                                    <div class="bar-track" style="flex:1;height:22px;background:var(--surface-muted);border-radius:var(--r-pill);overflow:hidden">
+                                        <div class="bar-fill {{ colors.get(label,'') }}" style="width:{{ (count / max_val * 100)|int }}%;height:100%;border-radius:var(--r-pill);background:var(--sky-500);transition:width .6s ease;display:flex;align-items:center;justify-content:flex-end;padding-right:6px">
+                                            {% if count > 0 %}<span style="font-size:.68rem;font-weight:700;color:#fff">{{ count }}</span>{% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <div style="text-align:center;padding:32px;color:var(--text-3);font-size:.875rem">No data available yet.</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Monthly Submissions -->
+                    <div class="card">
+                        <div class="card-head"><div class="card-title">📅 Monthly Submissions (6 months)</div></div>
+                        <div class="card-body">
+                            {% if monthly_data is defined and monthly_data %}
+                            {% set max_month = monthly_data|map(attribute='count')|max %}
+                            {% set max_month = max_month if max_month > 0 else 1 %}
+                            <div class="monthly-chart" style="display:flex;align-items:flex-end;gap:8px;height:140px;padding-bottom:24px;position:relative;border-bottom:1px solid var(--border)">
+                                {% for m in monthly_data %}
+                                <div class="month-col" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;position:relative">
+                                    <div class="month-bar" style="width:100%;border-radius:4px 4px 0 0;background:var(--sky-400);transition:height .5s ease;min-height:4px;position:relative;height:{{ (m.count / max_month * 110)|int }}px">
+                                        <div class="tooltip" style="position:absolute;bottom:calc(100% + 4px);left:50%;transform:translateX(-50%);background:var(--text-1);color:var(--white);font-size:.68rem;padding:2px 6px;border-radius:4px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .2s">{{ m.count }} articles</div>
+                                    </div>
+                                    <div class="month-label" style="font-size:.65rem;color:var(--text-4);position:absolute;bottom:-20px;white-space:nowrap">{{ m.month }}</div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <div style="text-align:center;padding:32px;color:var(--text-3);font-size:.875rem">No data available yet.</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Bottom Analytics Row -->
+                <div class="charts-row" style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px">
+
+                    <!-- Top Articles -->
+                    <div class="card">
+                        <div class="card-head"><div class="card-title">🏆 Top Articles by Views</div></div>
+                        <div class="card-body">
+                            {% if top_articles is defined and top_articles %}
+                            <div class="article-list">
+                                {% for a in top_articles %}
+                                <div class="article-row" style="display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border)">
+                                    <div class="art-rank" style="width:22px;height:22px;border-radius:50%;background:var(--sky-50);color:var(--sky-700);font-size:.72rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">{{ loop.index }}</div>
+                                    <div class="art-info" style="flex:1;min-width:0">
+                                        <div class="art-title" style="font-size:.845rem;font-weight:500;color:var(--text-1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px">{{ a.title }}</div>
+                                        <div class="art-meta" style="font-size:.75rem;color:var(--text-3)">{{ a.author.full_name if a.author else 'Unknown' }} · {{ a.published_at.strftime('%d %b %Y') if a.published_at else '' }}</div>
+                                    </div>
+                                    <div class="art-views" style="font-size:.8rem;font-weight:600;color:var(--sky-600);white-space:nowrap">👁 {{ a.views }}</div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <div style="text-align:center;padding:32px;color:var(--text-3);font-size:.875rem">No published articles yet.</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Right column -->
+                    <div style="display:flex;flex-direction:column;gap:20px">
+
+                        <!-- Team Breakdown -->
+                        <div class="card">
+                            <div class="card-head"><div class="card-title">👥 Team Breakdown</div></div>
+                            <div class="card-body">
+                                {% if editors is defined or reviewers is defined or authors is defined %}
+                                <div class="team-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+                                    <div class="team-stat" style="background:var(--surface-muted);border-radius:var(--r-lg);padding:16px;text-align:center">
+                                        <div class="team-num" style="font-family:var(--font-serif);font-size:1.6rem;color:var(--text-1);margin-bottom:4px">{{ editors|length if editors is defined else 0 }}</div>
+                                        <div class="team-lbl" style="font-size:.77rem;color:var(--text-3)">Editors</div>
+                                    </div>
+                                    <div class="team-stat" style="background:var(--surface-muted);border-radius:var(--r-lg);padding:16px;text-align:center">
+                                        <div class="team-num" style="font-family:var(--font-serif);font-size:1.6rem;color:var(--text-1);margin-bottom:4px">{{ reviewers|length if reviewers is defined else 0 }}</div>
+                                        <div class="team-lbl" style="font-size:.77rem;color:var(--text-3)">Reviewers</div>
+                                    </div>
+                                    <div class="team-stat" style="background:var(--surface-muted);border-radius:var(--r-lg);padding:16px;text-align:center">
+                                        <div class="team-num" style="font-family:var(--font-serif);font-size:1.6rem;color:var(--text-1);margin-bottom:4px">{{ authors|length if authors is defined else 0 }}</div>
+                                        <div class="team-lbl" style="font-size:.77rem;color:var(--text-3)">Authors</div>
+                                    </div>
+                                </div>
+                                {% else %}
+                                <div style="text-align:center;padding:32px;color:var(--text-3);font-size:.875rem">No team data available.</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Top Categories -->
+                        <div class="card">
+                            <div class="card-head"><div class="card-title">🏷 Top Categories</div></div>
+                            <div class="card-body">
+                                {% if top_categories is defined and top_categories %}
+                                {% set max_cat = top_categories[0][1] if top_categories[0][1] > 0 else 1 %}
+                                <div class="bar-chart" style="display:flex;flex-direction:column;gap:10px">
+                                    {% for cat, count in top_categories %}
+                                    <div class="bar-row" style="display:flex;align-items:center;gap:10px">
+                                        <div class="bar-label" style="font-size:.72rem;color:var(--text-3);width:90px;flex-shrink:0;text-align:right">{{ cat[:12] }}{% if cat|length > 12 %}…{% endif %}</div>
+                                        <div class="bar-track" style="flex:1;height:22px;background:var(--surface-muted);border-radius:var(--r-pill);overflow:hidden">
+                                            <div class="bar-fill purple" style="width:{{ (count / max_cat * 100)|int }}%;height:100%;border-radius:var(--r-pill);background:#8b5cf6;transition:width .6s ease;display:flex;align-items:center;justify-content:flex-end;padding-right:6px">
+                                                {% if count > 0 %}<span style="font-size:.68rem;font-weight:700;color:#fff">{{ count }}</span>{% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                {% else %}
+                                <div style="text-align:center;padding:32px;color:var(--text-3);font-size:.875rem">No categories yet.</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-grid">
+
+                <div class="card">
+                    <div class="card-head">
+                        <div class="card-title">Recent Articles</div>
+                        <a href="{{ url_for('admin.submissions') if is_platform_admin else url_for('articles.my_articles') }}" class="card-action">View All &rarr;</a>
+                    </div>
+                    <div class="card-body">
+                        {% if recent_articles is defined and recent_articles %}
+                        <div class="article-list">
+                            {% for article in recent_articles %}
+                            <div class="article-row">
+                                <div class="article-dot {% if article.status == 'published' %}dot-green{% elif article.status == 'under_review' %}dot-amber{% else %}dot-neutral{% endif %}"></div>
+                                <div class="article-info">
+                                    <a href="{{ url_for('articles.view', article_id=article.id) }}" class="article-name">{{ article.title }}</a>
+                                    <div class="article-meta">{{ article.author.full_name }} &middot; {{ article.created_at.strftime('%b %d') }}</div>
+                                </div>
+                                <span class="badge badge-{{ article.status_badge }}">{{ article.status_label }}</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="empty-state">
+                            <div class="empty-icon">&#128221;</div>
+                            {% if is_platform_admin %}
+                            <div class="empty-text">No submissions yet on the platform.</div>
+                            <a href="{{ url_for('admin.submissions') }}" class="btn btn-primary btn-sm">Open Submission Queue</a>
+                            {% else %}
+                            <div class="empty-text">You haven't submitted any articles yet.</div>
+                            <a href="{{ url_for('articles.submit') }}" class="btn btn-primary btn-sm">Submit Your First Article</a>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-head">
+                        <div class="card-title">Activity</div>
+                        <span class="card-action">See All</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="activity-list">
+                            <div class="activity-item">
+                                <div class="activity-icon">&#127881;</div>
+                                <div class="activity-body">
+                                    <div class="activity-title">Account Created</div>
+                                    <div class="activity-desc">Welcome to Research Hub!</div>
+                                    <div class="activity-time">Just now</div>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon">&#128231;</div>
+                                <div class="activity-body">
+                                    {% if is_platform_admin %}
+                                    <div class="activity-title">Moderation Queue</div>
+                                    <div class="activity-desc">Review submitted articles and keep workflow moving.</div>
+                                    <div class="activity-time"><a href="{{ url_for('admin.submissions') }}" style="color:var(--sky-600)">Open queue</a></div>
+                                    {% else %}
+                                    <div class="activity-title">Verify Your Email</div>
+                                    <div class="activity-desc">Verify your email to unlock all features.</div>
+                                    <div class="activity-time">Action needed</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon">&#128300;</div>
+                                <div class="activity-body">
+                                    {% if is_platform_admin %}
+                                    <div class="activity-title">User Administration</div>
+                                    <div class="activity-desc">Manage user roles, account status, and platform access.</div>
+                                    <div class="activity-time"><a href="{{ url_for('admin.users') }}" style="color:var(--sky-600)">Manage users</a></div>
+                                    {% else %}
+                                    <div class="activity-title">Create Your Journal</div>
+                                    <div class="activity-desc">Set up your first research journal.</div>
+                                    <div class="activity-time"><a href="{{ url_for('tenants.create_journal') }}" style="color:var(--sky-600)">Get started</a></div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon">&#129302;</div>
+                                <div class="activity-body">
+                                    <div class="activity-title">Try AI Assistant</div>
+                                    <div class="activity-desc">Generate your first research abstract with AI.</div>
+                                    <div class="activity-time"><a href="{{ url_for('ai.assistant') }}" style="color:var(--sky-600)">Try now</a></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="qa-section">
+                            <div class="qa-title">Quick Actions</div>
+                            <div class="qa-list">
+                                {% if is_platform_admin %}
+                                <a href="{{ url_for('admin.users') }}" class="qa-btn">
+                                    <span class="qa-btn-icon">&#128101;</span> Manage Users
+                                </a>
+                                <a href="{{ url_for('admin.journals') }}" class="qa-btn">
+                                    <span class="qa-btn-icon">&#128218;</span> Manage Journals
+                                </a>
+                                <a href="{{ url_for('admin.submissions') }}" class="qa-btn">
+                                    <span class="qa-btn-icon">&#128269;</span> Review Submissions
+                                </a>
+                                <a href="{{ url_for('search.search') }}" class="qa-btn">
+                                    <span class="qa-btn-icon">&#128270;</span> Platform Search
+                                </a>
+                                {% else %}
+                                <a href="{{ url_for('tenants.create_journal') }}" class="qa-btn">
+                                    <span class="qa-btn-icon">&#128194;</span> Create New Journal
+                                </a>
+                                <a href="{{ url_for('articles.submit') }}" class="qa-btn">
+                                    <span class="qa-btn-icon">&#9997;</span> Write New Article
+                                </a>
+                                <a href="{{ url_for('video.index') }}" class="qa-btn">
+                                    <span class="qa-btn-icon">&#127909;</span> Start Video Room
+                                </a>
+                                <a href="{{ url_for('billing.pending_requests') if is_platform_admin else url_for('billing.dashboard') }}" class="qa-btn">
+                                    <span class="qa-btn-icon">&#128179;</span> Manage Billing
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  (function () {
+    var btn = document.getElementById('topbarNotificationBtn');
+    var menu = document.getElementById('topbarNotificationMenu');
+    if (!btn || !menu) return;
+
+    function closeMenu() {
+      menu.classList.remove('open');
+      btn.classList.remove('active');
+      btn.setAttribute('aria-expanded', 'false');
+    }
+
+    btn.addEventListener('click', function (event) {
+      event.stopPropagation();
+      var isOpen = menu.classList.toggle('open');
+      btn.classList.toggle('active', isOpen);
+      btn.setAttribute('aria-expanded', String(isOpen));
+    });
+
+    menu.addEventListener('click', function (event) {
+      event.stopPropagation();
+    });
+
+    document.addEventListener('click', closeMenu);
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape') closeMenu();
+    });
+  })();
+</script>
+{% endblock %}
+
+

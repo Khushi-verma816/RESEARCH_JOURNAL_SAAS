@@ -1,0 +1,384 @@
+﻿{% extends "base.html" %}
+{% block title %}Billing – Research Hub{% endblock %}
+{% block extra_css %}
+<style>
+.app{
+  display:flex;
+  min-height:100vh;
+  background:
+    radial-gradient(1100px 540px at 92% -5%, rgba(56,173,248,0.18), transparent 65%),
+    radial-gradient(960px 520px at -8% 10%, rgba(2,91,160,0.16), transparent 60%),
+    linear-gradient(160deg, #ecf4ff 0%, #f3f8ff 50%, #eaf3ff 100%)
+}
+html[data-theme="dark"] .app{
+  background:
+    radial-gradient(1100px 540px at 92% -5%, rgba(56,173,248,0.16), transparent 65%),
+    radial-gradient(960px 520px at -8% 10%, rgba(2,91,160,0.22), transparent 60%),
+    linear-gradient(160deg, #0c1017 0%, #101722 52%, #141e2c 100%)
+}
+.sidebar{width:252px;flex-shrink:0;background:linear-gradient(180deg,#0b3d6a 0%,#025ba0 48%,#0272c6 100%);border-right:1px solid rgba(255,255,255,0.22);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;overflow-y:auto;z-index:50;box-shadow:12px 0 36px rgba(2,91,160,0.20)}
+html[data-theme="dark"] .sidebar{background:linear-gradient(180deg,#10161f 0%,#141c28 52%,#192536 100%);border-right-color:rgba(124,200,251,0.24);box-shadow:14px 0 42px rgba(0,0,0,0.42)}
+.sidebar-brand{display:flex;align-items:center;gap:10px;padding:20px 20px 16px;border-bottom:1px solid rgba(255,255,255,0.22)}
+.sb-icon{width:34px;height:34px;border-radius:10px;background:linear-gradient(140deg,#7cc8fb,#38adf8);display:flex;align-items:center;justify-content:center;font-size:15px;color:#0b3d6a;box-shadow:0 8px 20px rgba(0,0,0,0.2)}
+.sb-name{font-family:var(--font-serif);font-size:1.08rem;color:#f5fbff}
+.sb-nav-section{padding:18px 12px 4px}
+.sb-section-title{font-size:.68rem;font-weight:700;color:rgba(218,238,255,0.78);text-transform:uppercase;letter-spacing:.09em;padding:0 8px;margin-bottom:6px}
+.sb-nav{display:flex;flex-direction:column;gap:3px}
+.sidebar-link{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--r);font-size:.87rem;font-weight:500;color:rgba(230,245,255,0.9);transition:all .18s;text-decoration:none}
+.sidebar-link:hover{background:rgba(255,255,255,0.12);color:#fff}
+.sidebar-link.active{background:linear-gradient(135deg,rgba(56,173,248,0.32),rgba(124,200,251,0.24));color:#fff;box-shadow:inset 0 0 0 1px rgba(255,255,255,0.28)}
+.sl-icon{width:30px;height:30px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;background:rgba(255,255,255,0.08)}
+.sidebar-link.active .sl-icon{background:rgba(255,255,255,0.24)}
+.sb-user{padding:14px 16px;margin:10px 12px 6px;border:1px solid rgba(255,255,255,0.24);border-radius:12px;background:rgba(255,255,255,0.08)}
+.sb-user-inner{display:flex;align-items:center;gap:10px}
+.sb-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#7cc8fb,#38adf8);color:#0b3d6a;font-size:.78rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-user-name{font-size:.84rem;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-user-role{font-size:.74rem;color:rgba(220,240,255,0.82);text-transform:capitalize}
+.sb-footer{margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,0.22)}
+.sb-logout-btn{width:100%;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.28);background:rgba(0,0,0,0.20);color:#f8fbff;font-size:.84rem;font-weight:600;text-decoration:none;transition:all .18s}
+.sb-logout-btn:hover{background:rgba(239,68,68,0.22);border-color:rgba(252,165,165,0.55)}
+.main{margin-left:252px;flex:1;display:flex;flex-direction:column;min-width:0}
+.topbar{height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 32px;background:var(--white);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:40}
+.topbar-title{font-size:.95rem;font-weight:600;color:var(--text-1)}
+.topbar-subtitle{font-size:.75rem;color:var(--text-3)}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.tb-theme-btn{width:34px;height:34px;border-radius:var(--r);border:1.5px solid var(--border-md);background:var(--surface-muted);color:var(--text-2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px}
+.tb-theme-btn .t-moon{display:block}.tb-theme-btn .t-sun{display:none}
+html[data-theme="dark"] .tb-theme-btn .t-moon{display:none}
+html[data-theme="dark"] .tb-theme-btn .t-sun{display:block}
+.page-body{padding:28px 32px;flex:1}
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+.page-title{font-family:var(--font-serif);font-size:1.4rem;color:var(--text-1)}
+.page-sub{font-size:.82rem;color:var(--text-3);margin-top:2px}
+
+/* Current Plan Card */
+.plan-banner{border-radius:var(--r-xl);padding:28px 32px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.plan-banner.free{background:linear-gradient(135deg,var(--sky-50),rgba(14,145,232,.04));border:1px solid var(--sky-100)}
+.plan-banner.pro{background:linear-gradient(135deg,#f0f9ff,#e0f2fe);border:1px solid #7dd3fc}
+.plan-banner.enterprise{background:linear-gradient(135deg,#f5f3ff,#ede9fe);border:1px solid #c4b5fd}
+html[data-theme="dark"] .plan-banner.free{background:linear-gradient(135deg,rgba(56,173,248,.07),rgba(56,173,248,.02));border-color:rgba(56,173,248,.18)}
+html[data-theme="dark"] .plan-banner.pro{background:linear-gradient(135deg,rgba(56,173,248,.09),rgba(56,173,248,.03));border-color:rgba(56,173,248,.25)}
+html[data-theme="dark"] .plan-banner.enterprise{background:linear-gradient(135deg,rgba(139,92,246,.09),rgba(139,92,246,.03));border-color:rgba(139,92,246,.25)}
+.pb-left{}
+.pb-eyebrow{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--sky-600);margin-bottom:6px}
+.pb-plan{font-family:var(--font-serif);font-size:1.8rem;color:var(--text-1);margin-bottom:4px}
+.pb-desc{font-size:.84rem;color:var(--text-2)}
+.pb-badges{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.pb-badge{padding:3px 10px;border-radius:var(--r-pill);font-size:.72rem;font-weight:600;background:var(--sky-50);color:var(--sky-700);border:1px solid var(--sky-200)}
+.pb-right{display:flex;flex-direction:column;gap:10px;align-items:flex-end}
+.pb-price{font-family:var(--font-serif);font-size:2rem;color:var(--text-1)}
+.pb-price span{font-size:.9rem;font-family:var(--font-sans);color:var(--text-3)}
+.pb-status{display:inline-flex;align-items:center;padding:4px 12px;border-radius:var(--r-pill);font-size:.75rem;font-weight:600}
+.status-active{background:#ecfdf5;color:#15803d}
+.status-trial{background:#fffbeb;color:#b45309}
+.status-cancelled{background:#fef2f2;color:#b91c1c}
+
+/* Usage */
+.usage-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-bottom:24px}
+.usage-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px 22px}
+.uc-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.uc-label{font-size:.84rem;font-weight:600;color:var(--text-1)}
+.uc-count{font-size:.82rem;color:var(--text-3)}
+.progress-bar{height:8px;border-radius:var(--r-pill);background:var(--surface-muted);overflow:hidden}
+.progress-fill{height:100%;border-radius:var(--r-pill);background:var(--sky-500);transition:width .4s}
+.progress-fill.warning{background:#f59e0b}
+.progress-fill.danger{background:var(--red)}
+.uc-footer{display:flex;align-items:center;justify-content:space-between;margin-top:8px;font-size:.76rem;color:var(--text-4)}
+
+/* Plans grid */
+.plans-title{font-size:.92rem;font-weight:600;color:var(--text-1);margin-bottom:16px}
+.plans-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px}
+.plan-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r-xl);padding:24px;position:relative;transition:all .22s}
+.plan-card:hover{box-shadow:var(--shadow-md);transform:translateY(-2px)}
+.plan-card.current{border-color:var(--sky-400);box-shadow:0 0 0 2px rgba(14,145,232,.12)}
+.plan-card.popular{border-color:var(--sky-300)}
+.plan-badge{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--sky-600);color:#fff;font-size:.68rem;font-weight:700;padding:3px 12px;border-radius:var(--r-pill);white-space:nowrap}
+.plan-current-badge{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:#15803d;color:#fff;font-size:.68rem;font-weight:700;padding:3px 12px;border-radius:var(--r-pill)}
+.plan-name{font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);margin-bottom:8px}
+.plan-price{font-family:var(--font-serif);font-size:2.2rem;color:var(--text-1);margin-bottom:4px}
+.plan-price sub{font-size:.9rem;font-family:var(--font-sans);color:var(--text-3)}
+.plan-desc{font-size:.82rem;color:var(--text-3);margin-bottom:16px}
+.plan-divider{height:1px;background:var(--border);margin-bottom:16px}
+.plan-features{list-style:none;display:flex;flex-direction:column;gap:8px;margin-bottom:20px}
+.plan-features li{font-size:.82rem;color:var(--text-2);display:flex;align-items:center;gap:7px}
+.plan-features li::before{content:'\2713';color:var(--sky-600);font-weight:700;font-size:.75rem;flex-shrink:0}
+.plan-features li.no::before{content:'\2715';color:var(--text-4)}
+.plan-features li.no{color:var(--text-4)}
+.btn-upgrade{width:100%;padding:10px;border-radius:var(--r);font-weight:600;font-size:.855rem;background:var(--sky-600);color:#fff;border:none;cursor:pointer;font-family:var(--font-sans);transition:all .18s}
+.btn-upgrade:hover{background:var(--sky-700)}
+.btn-current{width:100%;padding:10px;border-radius:var(--r);font-weight:600;font-size:.855rem;background:var(--surface-muted);color:var(--text-3);border:1px solid var(--border-md);cursor:default;font-family:var(--font-sans)}
+.btn-cancel{width:100%;padding:8px;border-radius:var(--r);font-size:.82rem;font-weight:500;background:transparent;color:var(--red);border:1px solid #fecaca;cursor:pointer;font-family:var(--font-sans);transition:all .18s;margin-top:8px}
+.btn-cancel:hover{background:#fef2f2}
+
+/* Info card */
+.billing-lock-note{background:#fff9db;border:1px solid #fde68a;color:#92400e;border-radius:var(--r-lg);padding:12px 14px;margin-bottom:16px;font-size:.82rem}
+.billing-lock-note a{color:#b45309;font-weight:600;text-decoration:none}
+.billing-lock-note a:hover{text-decoration:underline}
+.info-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px 22px}
+.info-card-title{font-size:.88rem;font-weight:600;color:var(--text-1);margin-bottom:14px}
+.info-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);font-size:.84rem}
+.info-row:last-child{border-bottom:none}
+.info-label{color:var(--text-3)}
+.info-value{color:var(--text-1);font-weight:500}
+
+@media(max-width:860px) and (pointer:coarse){.sidebar{transform:translateX(-100%)}.main{margin-left:0}.topbar,.page-body{padding-left:20px;padding-right:20px}}
+@media(max-width:700px){.plans-grid{grid-template-columns:1fr}.usage-grid{grid-template-columns:1fr}}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="app">
+      {% include "includes/app_sidebar.html" %}
+
+  <div class="main">
+    <header class="topbar">
+      <div><div class="topbar-title">Billing & Plans</div><div class="topbar-subtitle">Manage your subscription and usage</div></div>
+      <div class="topbar-right"><button class="tb-theme-btn" onclick="toggleTheme()"><span class="t-moon">&#9790;</span><span class="t-sun">&#9728;</span></button></div>
+    </header>
+
+    <div class="page-body">
+      {% if billing_locked %}
+      <div class="billing-lock-note">
+        Billing is ready, but your journal is not created yet. <a href="{{ url_for('tenants.create_journal') }}">Create journal first</a> to activate payments.
+      </div>
+      {% endif %}
+
+      <!-- Current Plan Banner -->
+      <div class="plan-banner {{ sub.plan }}">
+        <div class="pb-left">
+          <div class="pb-eyebrow">Current Plan</div>
+          <div class="pb-plan">{{ sub.plan.title() }} Plan</div>
+          <div class="pb-desc">{{ tenant.name }}</div>
+          <div class="pb-badges">
+            {% if limits.custom_domain %}<span class="pb-badge">&#10003; Custom Domain</span>{% endif %}
+            {% if limits.analytics %}<span class="pb-badge">&#10003; Analytics</span>{% endif %}
+            {% if limits.video %}<span class="pb-badge">&#10003; Video Rooms</span>{% endif %}
+            {% if limits.articles == -1 %}<span class="pb-badge">&#10003; Unlimited Articles</span>{% endif %}
+          </div>
+        </div>
+        <div class="pb-right">
+          <div class="pb-price">
+            ₹{{ limits.price }}<span>/mo</span>
+          </div>
+          {% if sub.is_trial %}
+            <span class="pb-status status-trial">&#9203; Trial - {{ sub.days_remaining }} days left</span>
+          {% elif sub.is_active %}
+            <span class="pb-status status-active">&#10003; Active</span>
+          {% else %}
+            <span class="pb-status status-cancelled">Cancelled</span>
+          {% endif %}
+          {% if sub.expires_at %}
+          <div style="font-size:.77rem;color:var(--text-3)">Renews {{ sub.expires_at.strftime('%d %b %Y') }}</div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Usage -->
+      <div class="usage-grid">
+        <div class="usage-card">
+          <div class="uc-head">
+            <div class="uc-label">&#128196; Articles</div>
+            <div class="uc-count">
+              {{ article_count }} / {% if limits.articles == -1 %}8{% else %}{{ limits.articles }}{% endif %}
+            </div>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill {% if art_pct > 90 %}danger{% elif art_pct > 70 %}warning{% endif %}" style="width:{{ art_pct if limits.articles != -1 else 10 }}%"></div>
+          </div>
+          <div class="uc-footer">
+            <span>{% if limits.articles == -1 %}Unlimited{% else %}{{ limits.articles - article_count }} remaining{% endif %}</span>
+            <span>{{ art_pct if limits.articles != -1 else 0 }}% used</span>
+          </div>
+        </div>
+        <div class="usage-card">
+          <div class="uc-head">
+            <div class="uc-label">&#128101; Team Members</div>
+            <div class="uc-count">
+              {{ member_count }} / {% if limits.members == -1 %}8{% else %}{{ limits.members }}{% endif %}
+            </div>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill {% if mem_pct > 90 %}danger{% elif mem_pct > 70 %}warning{% endif %}" style="width:{{ mem_pct if limits.members != -1 else 10 }}%"></div>
+          </div>
+          <div class="uc-footer">
+            <span>{% if limits.members == -1 %}Unlimited{% else %}{{ limits.members - member_count }} remaining{% endif %}</span>
+            <span>{{ mem_pct if limits.members != -1 else 0 }}% used</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Plans -->
+      <div class="plans-title">Available Plans</div>
+      <div class="plans-grid">
+        {% for plan_name, plan_data in plans.items() %}
+        <div class="plan-card {% if sub.plan == plan_name %}current{% elif plan_name == 'pro' %}popular{% endif %}">
+          {% if sub.plan == plan_name %}
+            <div class="plan-current-badge">Current Plan</div>
+          {% elif plan_name == 'pro' %}
+            <div class="plan-badge">Most Popular</div>
+          {% endif %}
+          <div class="plan-name">{{ plan_name.title() }}</div>
+          <div class="plan-price">
+            {% if plan_data.price == 0 and plan_name == 'enterprise' %}Custom
+            {% else %}₹{{ plan_data.price }}<sub>/mo</sub>{% endif %}
+          </div>
+          <div class="plan-desc">
+            {% if plan_name == 'free' %}For independent researchers
+            {% elif plan_name == 'pro' %}For serious publishers
+            {% else %}For universities & institutions{% endif %}
+          </div>
+          <div class="plan-divider"></div>
+          <ul class="plan-features">
+            <li>{% if plan_data.articles == -1 %}Unlimited articles{% else %}{{ plan_data.articles }} articles{% endif %}</li>
+            <li>{% if plan_data.members == -1 %}Unlimited members{% else %}{{ plan_data.members }} members{% endif %}</li>
+            <li {% if not plan_data.custom_domain %}class="no"{% endif %}>Custom domain</li>
+            <li {% if not plan_data.analytics %}class="no"{% endif %}>Analytics dashboard</li>
+            <li {% if not plan_data.video %}class="no"{% endif %}>Video conferencing</li>
+            <li>{% if plan_data.ai_requests == -1 %}Unlimited AI{% else %}{{ plan_data.ai_requests }} AI requests{% endif %}</li>
+          </ul>
+          {% if sub.plan == plan_name %}
+            <button class="btn-current">&#10003; Current Plan</button>
+            {% if plan_name != 'free' %}
+            <form method="POST" action="{{ url_for('billing.cancel') }}">
+              <button type="submit" class="btn-cancel" onclick="return confirm('Downgrade to Free plan?')">Cancel Subscription</button>
+            </form>
+            {% endif %}
+          {% elif plan_name == 'enterprise' %}
+            <button class="btn-upgrade" onclick="alert('Contact sales@researchhub.com for Enterprise pricing.')">Contact Sales</button>
+          {% elif plan_name == 'free' %}
+            <form method="POST" action="{{ url_for('billing.upgrade', plan=plan_name) }}">
+              <button type="submit" class="btn-upgrade">
+                Downgrade
+              </button>
+            </form>
+          {% elif billing_locked %}
+            <button type="button" class="btn-upgrade" onclick="alert('Create your journal first to start subscription payments.')">Create Journal First</button>
+          {% elif razorpay_key_id %}
+            <button type="button" class="btn-upgrade" onclick="startRazorpayCheckout('{{ plan_name }}')">Upgrade to {{ plan_name.title() }}</button>
+          {% else %}
+            <button type="button" class="btn-upgrade" onclick="alert('Razorpay is not configured yet. Add RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET in environment.')">Enable Payments</button>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+
+      <!-- Subscription Info -->
+      <div class="info-card">
+        <div class="info-card-title">&#128179; Subscription Details</div>
+        <div class="info-row"><span class="info-label">Journal</span><span class="info-value">{{ tenant.name }}</span></div>
+        <div class="info-row"><span class="info-label">Plan</span><span class="info-value">{{ sub.plan.title() }}</span></div>
+        <div class="info-row"><span class="info-label">Status</span><span class="info-value">{{ sub.status.title() }}</span></div>
+        <div class="info-row"><span class="info-label">Amount</span><span class="info-value">₹{{ sub.amount }} / {{ 'year' if sub.billing_cycle == 'annual' else 'month' }} (INR)</span></div>
+        <div class="info-row"><span class="info-label">Started</span><span class="info-value">{{ sub.started_at.strftime('%d %b %Y') }}</span></div>
+        {% if sub.expires_at %}
+        <div class="info-row"><span class="info-label">Renews</span><span class="info-value">{{ sub.expires_at.strftime('%d %b %Y') }}</span></div>
+        {% endif %}
+        {% if sub.trial_ends_at %}
+        <div class="info-row"><span class="info-label">Trial ends</span><span class="info-value">{{ sub.trial_ends_at.strftime('%d %b %Y') }}</span></div>
+        {% endif %}
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+  const razorpayCurrency = "{{ razorpay_currency }}";
+  const activeBillingCycle = "{{ sub.billing_cycle or 'monthly' }}";
+  const billingLocked = {{ 'true' if billing_locked else 'false' }};
+
+  async function startRazorpayCheckout(planName) {
+    if (billingLocked) {
+      alert("Create your journal first to start subscription payments.");
+      return;
+    }
+    try {
+      const orderResp = await fetch("{{ url_for('billing.create_order') }}", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ plan: planName, billing_cycle: activeBillingCycle })
+      });
+      const orderData = await orderResp.json();
+      if (!orderResp.ok || !orderData.ok) {
+        alert(orderData.message || "Unable to create payment order.");
+        return;
+      }
+
+      const options = {
+        key: orderData.key_id,
+        amount: orderData.amount,
+        currency: orderData.currency || razorpayCurrency,
+        name: "Research Hub",
+        description: "Subscription upgrade to " + planName.toUpperCase(),
+        order_id: orderData.order_id,
+        prefill: {
+          name: orderData.user_name || "{{ user.full_name }}",
+          email: orderData.user_email || "{{ user.email }}"
+        },
+        notes: {
+          tenant: orderData.tenant_name || "{{ tenant.name }}",
+          plan: planName,
+          billing_cycle: activeBillingCycle
+        },
+        theme: { color: "#0272c6" },
+        handler: async function (response) {
+          const verifyResp = await fetch("{{ url_for('billing.verify_payment') }}", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              plan: planName,
+              billing_cycle: activeBillingCycle,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_signature: response.razorpay_signature
+            })
+          });
+          const verifyData = await verifyResp.json();
+          if (!verifyResp.ok || !verifyData.ok) {
+            alert(verifyData.message || "Payment verification failed.");
+            return;
+          }
+          window.location.href = verifyData.redirect_url || "{{ url_for('billing.dashboard') }}";
+        },
+        modal: {
+          ondismiss: async function () {
+            await fetch("{{ url_for('billing.payment_failed') }}", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                plan: planName,
+                billing_cycle: activeBillingCycle,
+                error: "checkout_dismissed"
+              })
+            });
+          }
+        }
+      };
+
+      const rzp = new Razorpay(options);
+      rzp.on("payment.failed", async function (response) {
+        await fetch("{{ url_for('billing.payment_failed') }}", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            plan: planName,
+            billing_cycle: activeBillingCycle,
+            razorpay_order_id: response.error && response.error.metadata ? response.error.metadata.order_id : "",
+            razorpay_payment_id: response.error && response.error.metadata ? response.error.metadata.payment_id : "",
+            error: response.error || "payment_failed"
+          })
+        });
+        alert("Payment failed. Please try again.");
+      });
+      rzp.open();
+    } catch (error) {
+      alert("Unable to start payment checkout.");
+    }
+  }
+</script>
+{% endblock %}
+
+

@@ -1,0 +1,309 @@
+{% extends "base.html" %}
+{% block title %}Custom Domains – Research Hub{% endblock %}
+
+{% block extra_css %}
+<style>
+.app {
+  display: flex;
+  min-height: 100vh;
+  background:
+    radial-gradient(1100px 540px at 92% -5%, rgba(56,173,248,0.18), transparent 65%),
+    radial-gradient(960px 520px at -8% 10%, rgba(2,91,160,0.16), transparent 60%),
+    linear-gradient(160deg, #ecf4ff 0%, #f3f8ff 50%, #eaf3ff 100%);
+}
+html[data-theme="dark"] .app {
+  background:
+    radial-gradient(1100px 540px at 92% -5%, rgba(56,173,248,0.16), transparent 65%),
+    radial-gradient(960px 520px at -8% 10%, rgba(2,91,160,0.22), transparent 60%),
+    linear-gradient(160deg, #0c1017 0%, #101722 52%, #141e2c 100%);
+}
+.sidebar {
+  width: 252px;
+  flex-shrink: 0;
+  background: linear-gradient(180deg, #0b3d6a 0%, #025ba0 48%, #0272c6 100%);
+  border-right: 1px solid rgba(255,255,255,0.22);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  overflow-y: auto;
+  z-index: 50;
+  box-shadow: 12px 0 36px rgba(2,91,160,0.20);
+}
+html[data-theme="dark"] .sidebar {
+  background: linear-gradient(180deg, #10161f 0%, #141c28 52%, #192536 100%);
+  border-right-color: rgba(124,200,251,0.24);
+  box-shadow: 14px 0 42px rgba(0,0,0,0.42);
+}
+.sidebar-brand { display: flex; align-items: center; gap: 10px; padding: 20px 20px 16px; border-bottom: 1px solid rgba(255,255,255,0.22); }
+.sb-icon { width: 34px; height: 34px; border-radius: 10px; background: linear-gradient(140deg, #7cc8fb, #38adf8); display: flex; align-items: center; justify-content: center; font-size: 15px; color: #0b3d6a; box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
+.sb-name { font-family: var(--font-serif); font-size: 1.08rem; color: #f5fbff; }
+.sb-nav-section { padding: 18px 12px 4px; }
+.sb-section-title { font-size: 0.68rem; font-weight: 700; color: rgba(218,238,255,0.78); text-transform: uppercase; letter-spacing: 0.09em; padding: 0 8px; margin-bottom: 6px; }
+.sb-nav { display: flex; flex-direction: column; gap: 3px; }
+.sidebar-link { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: var(--r); font-size: 0.87rem; font-weight: 500; color: rgba(230,245,255,0.9); transition: all 0.18s; text-decoration: none; }
+.sidebar-link:hover { background: rgba(255,255,255,0.12); color: #ffffff; }
+.sidebar-link.active { background: linear-gradient(135deg, rgba(56,173,248,0.32), rgba(124,200,251,0.24)); color: #ffffff; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.28); }
+.sl-icon { width: 30px; height: 30px; border-radius: var(--r-sm); display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; background: rgba(255,255,255,0.08); }
+.sidebar-link.active .sl-icon { background: rgba(255,255,255,0.24); }
+.sb-user { padding: 14px 16px; margin: 10px 12px 6px; border: 1px solid rgba(255,255,255,0.24); border-radius: 12px; background: rgba(255,255,255,0.08); }
+.sb-user-inner { display: flex; align-items: center; gap: 10px; }
+.sb-avatar { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, #7cc8fb, #38adf8); color: #0b3d6a; font-size: 0.78rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.sb-user-name { font-size: 0.84rem; font-weight: 600; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sb-user-role { font-size: 0.74rem; color: rgba(220,240,255,0.82); text-transform: capitalize; }
+.sb-footer { margin-top: auto; padding: 12px; border-top: 1px solid rgba(255,255,255,0.22); }
+.sb-logout-btn { width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.28); background: rgba(0,0,0,0.20); color: #f8fbff; font-size: 0.84rem; font-weight: 600; text-decoration: none; transition: all 0.18s; }
+.sb-logout-btn:hover { background: rgba(239,68,68,0.22); border-color: rgba(252,165,165,0.55); }
+.main { margin-left: 252px; flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.topbar { height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 32px; background: var(--white); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 40; }
+.topbar-title { font-size: 0.95rem; font-weight: 600; color: var(--text-1); }
+.topbar-subtitle { font-size: 0.75rem; color: var(--text-3); }
+.topbar-right { display: flex; align-items: center; gap: 10px; }
+.tb-theme-btn { width: 34px; height: 34px; border-radius: var(--r); border: 1.5px solid var(--border-md); background: var(--surface-muted); color: var(--text-2); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; }
+.tb-theme-btn .t-moon { display: block; } .tb-theme-btn .t-sun { display: none; }
+html[data-theme="dark"] .tb-theme-btn .t-moon { display: none; }
+html[data-theme="dark"] .tb-theme-btn .t-sun  { display: block; }
+.page-body { padding: 28px 32px; flex: 1; }
+.page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; }
+.page-title { font-family: var(--font-serif); font-size: 1.4rem; color: var(--text-1); }
+.page-sub { font-size: 0.82rem; color: var(--text-3); margin-top: 2px; }
+.filters-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; flex-wrap: wrap; }
+.filter-input { padding: 8px 14px; border-radius: var(--r); border: 1px solid var(--border-md); background: var(--white); color: var(--text-1); font-size: 0.83rem; font-family: var(--font-sans); outline: none; min-width: 220px; transition: border-color 0.2s; }
+.filter-input:focus { border-color: var(--sky-400); }
+.filter-select { padding: 8px 12px; border-radius: var(--r); border: 1px solid var(--border-md); background: var(--white); color: var(--text-1); font-size: 0.83rem; font-family: var(--font-sans); cursor: pointer; outline: none; }
+.filter-btn { padding: 8px 16px; border-radius: var(--r); border: 1.5px solid var(--sky-600); background: var(--sky-600); color: #fff; font-size: 0.83rem; font-weight: 600; cursor: pointer; font-family: var(--font-sans); }
+.filter-btn:hover { background: var(--sky-700); }
+.action-btn { padding: 5px 10px; border-radius: var(--r-sm); border: 1px solid var(--border-md); background: var(--surface-muted); color: var(--text-2); font-size: 0.77rem; font-weight: 600; cursor: pointer; font-family: var(--font-sans); transition: all 0.15s; text-decoration: none; display: inline-block; }
+.action-btn:hover { border-color: var(--sky-400); color: var(--sky-600); }
+.action-btn.danger:hover { border-color: var(--red); color: var(--red); }
+.btn-primary { padding: 8px 16px; border-radius: var(--r); border: 1.5px solid var(--sky-600); background: var(--sky-600); color: #fff; font-size: 0.83rem; font-weight: 600; cursor: pointer; font-family: var(--font-sans); text-decoration: none; display: inline-block; }
+.btn-primary:hover { background: var(--sky-700); }
+
+/* Stats Cards */
+.stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+.stat-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 16px 20px; }
+.stat-label { font-size: 0.75rem; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+.stat-value { font-size: 1.5rem; font-weight: 700; color: var(--text-1); }
+.stat-card.pending .stat-value { color: #b45309; }
+.stat-card.approved .stat-value { color: #15803d; }
+.stat-card.rejected .stat-value { color: #b91c1c; }
+.stat-card.total .stat-value { color: var(--sky-600); }
+
+.card { background: var(--white); border: 1px solid var(--border); border-radius: var(--r-lg); overflow: hidden; }
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; }
+thead th { padding: 11px 16px; font-size: 0.72rem; font-weight: 700; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.07em; background: var(--surface-muted); border-bottom: 1px solid var(--border); text-align: left; white-space: nowrap; }
+tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s; }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: var(--surface-muted); }
+tbody td { padding: 12px 16px; font-size: 0.845rem; color: var(--text-2); vertical-align: middle; }
+.admin-name { font-weight: 600; color: var(--text-1); }
+.admin-role { font-size: 0.75rem; color: var(--text-3); }
+.btn-edit { background: #e0f2fe; color: #075985; border: 1px solid #bae6fd; padding: 5px 10px; border-radius: var(--r-sm); font-size: 0.75rem; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-block; }
+.btn-edit:hover { background: #bae6fd; }
+.domain-link { color: var(--sky-600); text-decoration: none; }
+.domain-link:hover { text-decoration: underline; }
+.badge { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: var(--r-pill); font-size: 0.72rem; font-weight: 600; }
+.badge-green { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+.badge-amber { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+.badge-red { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+.badge-sky { background: #e0f2fe; color: #075985; border: 1px solid #bae6fd; }
+.badge-neutral { background: var(--surface-muted); color: var(--text-3); border: 1px solid var(--border); }
+.action-buttons { display: flex; align-items: center; gap: 6px; }
+.btn-sm { padding: 5px 10px; border-radius: var(--r-sm); font-size: 0.75rem; font-weight: 600; cursor: pointer; border: none; font-family: var(--font-sans); }
+.btn-approve { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+.btn-approve:hover { background: #bbf7d0; }
+.btn-reject { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+.btn-reject:hover { background: #fde68a; }
+.btn-delete { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 14px; }
+.btn-delete:hover { background: #fecaca; }
+.pagination { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; border-top: 1px solid var(--border); }
+.pag-info { font-size: 0.8rem; color: var(--text-3); }
+.pag-links { display: flex; gap: 4px; }
+.pag-btn { padding: 6px 12px; border-radius: var(--r-sm); border: 1px solid var(--border-md); background: var(--white); color: var(--text-2); font-size: 0.8rem; text-decoration: none; }
+.pag-btn:hover, .pag-btn.active { background: var(--sky-600); color: #fff; border-color: var(--sky-600); }
+.empty-state { text-align: center; padding: 56px 20px; }
+.empty-icon { font-size: 2.5rem; margin-bottom: 12px; }
+.empty-text { font-size: 0.88rem; color: var(--text-3); }
+@media (max-width: 860px) and (pointer: coarse) { .sidebar { transform: translateX(-100%); } .main { margin-left: 0; } .topbar, .page-body { padding-left: 20px; padding-right: 20px; } .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="app">
+    {% include "includes/app_sidebar.html" %}
+
+  <div class="main">
+    <header class="topbar">
+      <div>
+        <div class="topbar-title">Custom Domain Management</div>
+        <div class="topbar-subtitle">Manage school custom domain requests</div>
+      </div>
+      <div class="topbar-right">
+        <button class="tb-theme-btn" onclick="toggleTheme()"><span class="t-moon">🌙</span><span class="t-sun">☀️</span></button>
+      </div>
+    </header>
+
+    <div class="page-body">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Custom Domains</div>
+          <div class="page-sub">Manage custom domain requests from schools</div>
+        </div>
+        <a href="{{ url_for('admin.create_custom_domain') }}" class="btn-primary">+ Add Custom Domain</a>
+      </div>
+
+      <!-- Stats Cards -->
+      <div class="stats-grid">
+        <div class="stat-card pending">
+          <div class="stat-label">Pending</div>
+          <div class="stat-value">{{ pending_count }}</div>
+        </div>
+        <div class="stat-card approved">
+          <div class="stat-label">Approved</div>
+          <div class="stat-value">{{ approved_count }}</div>
+        </div>
+        <div class="stat-card rejected">
+          <div class="stat-label">Rejected</div>
+          <div class="stat-value">{{ rejected_count }}</div>
+        </div>
+        <div class="stat-card total">
+          <div class="stat-label">Total Requests</div>
+          <div class="stat-value">{{ total_count }}</div>
+        </div>
+      </div>
+
+      <form method="GET" action="{{ url_for('admin.custom_domains') }}">
+        <div class="filters-bar">
+          <input type="text" name="q" value="{{ search }}" placeholder="Search school name or domain…" class="filter-input">
+          <select name="status" class="filter-select">
+            <option value="">All Status</option>
+            <option value="pending"  {% if status_filter=='pending'  %}selected{% endif %}>Pending</option>
+            <option value="approved" {% if status_filter=='approved' %}selected{% endif %}>Approved</option>
+            <option value="rejected" {% if status_filter=='rejected' %}selected{% endif %}>Rejected</option>
+          </select>
+          <button type="submit" class="filter-btn">Search</button>
+          {% if search or status_filter %}<a href="{{ url_for('admin.custom_domains') }}" class="action-btn">Clear</a>{% endif %}
+        </div>
+      </form>
+
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Admin Name (Role)</th>
+                <th>Origin Url</th>
+                <th>Custom Domain</th>
+                <th>Domain Type</th>
+                <th>Request Date</th>
+                <th>Approved Date</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+            {% if domain_requests.items %}
+              {% for req in domain_requests.items %}
+              <tr>
+                <td>
+                  {% set admin = req.primary_admin %}
+                  {% if admin %}
+                    <div class="admin-name">{{ admin.full_name }}</div>
+                    <div class="admin-role">{{ admin.role.replace('_', ' ').title() }}</div>
+                  {% else %}
+                    <div class="admin-name">No Admin</div>
+                    <div class="admin-role">{{ req.tenant.name if req.tenant else 'Unknown School' }}</div>
+                  {% endif %}
+                </td>
+                <td>
+                  <a href="{{ req.full_origin_url }}" target="_blank" class="domain-link">{{ req.full_origin_url }}</a>
+                </td>
+                <td>
+                  <span class="domain-link">{{ req.custom_domain }}</span>
+                </td>
+                <td>
+                  <span class="badge badge-sky">{{ req.domain_type }}</span>
+                </td>
+                <td>
+                  {{ req.request_date.strftime('%d.%b.%Y') if req.request_date else '-' }}
+                </td>
+                <td>
+                  {{ req.approved_date.strftime('%d.%b.%Y') if req.approved_date else '-' }}
+                </td>
+                <td>
+                  {% if req.status == 'approved' %}
+                    <span class="badge badge-green">Approved</span>
+                  {% elif req.status == 'pending' %}
+                    <span class="badge badge-amber">Pending</span>
+                  {% elif req.status == 'rejected' %}
+                    <span class="badge badge-red">Rejected</span>
+                  {% else %}
+                    <span class="badge badge-neutral">{{ req.status.title() }}</span>
+                  {% endif %}
+                </td>
+                <td>
+                  <div class="action-buttons">
+                    <a href="{{ url_for('admin.edit_custom_domain', request_id=req.id) }}" class="btn-edit">Edit</a>
+                    {% if req.status == 'pending' %}
+                      <form method="POST" action="{{ url_for('admin.approve_custom_domain', request_id=req.id) }}" style="display:inline">
+                        <button type="submit" class="btn-sm btn-approve" onclick="return confirm('Approve this custom domain?')">Approve</button>
+                      </form>
+                      <form method="POST" action="{{ url_for('admin.reject_custom_domain', request_id=req.id) }}" style="display:inline">
+                        <button type="submit" class="btn-sm btn-reject" onclick="return confirm('Reject this custom domain?')">Reject</button>
+                      </form>
+                    {% endif %}
+                    <form method="POST" action="{{ url_for('admin.delete_custom_domain', request_id=req.id) }}" style="display:inline">
+                      <button type="submit" class="btn-delete" onclick="return confirm('Are you sure you want to delete this domain request?')" title="Delete">🗑️</button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            {% else %}
+              <tr>
+                <td colspan="8" class="empty-state">
+                  <div class="empty-icon">🌐</div>
+                  <div class="empty-text">No custom domain requests found.</div>
+                </td>
+              </tr>
+            {% endif %}
+            </tbody>
+          </table>
+        </div>
+
+        {% if domain_requests.items and domain_requests.pages > 1 %}
+        <div class="pagination">
+          <div class="pag-info">
+            Showing {{ (domain_requests.page - 1) * domain_requests.per_page + 1 }} - 
+            {{ [domain_requests.page * domain_requests.per_page, domain_requests.total] | min }} 
+            of {{ domain_requests.total }} entries
+          </div>
+          <div class="pag-links">
+            {% if domain_requests.has_prev %}
+            <a href="{{ url_for('admin.custom_domains', page=domain_requests.prev_num, q=search, status=status_filter) }}" class="pag-btn">← Prev</a>
+            {% endif %}
+            {% for p in domain_requests.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+              {% if p %}
+                {% if p == domain_requests.page %}
+                  <span class="pag-btn active">{{ p }}</span>
+                {% else %}
+                  <a href="{{ url_for('admin.custom_domains', page=p, q=search, status=status_filter) }}" class="pag-btn">{{ p }}</a>
+                {% endif %}
+              {% else %}
+                <span class="pag-btn" style="border:none;background:none;cursor:default">…</span>
+              {% endif %}
+            {% endfor %}
+            {% if domain_requests.has_next %}
+            <a href="{{ url_for('admin.custom_domains', page=domain_requests.next_num, q=search, status=status_filter) }}" class="pag-btn">Next →</a>
+            {% endif %}
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

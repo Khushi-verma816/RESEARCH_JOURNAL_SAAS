@@ -1,0 +1,335 @@
+﻿{% extends "base.html" %}
+{% block title %}Manage Journal - {{ tenant.name }}{% endblock %}
+{% block extra_css %}
+<style>
+.app {
+  display: flex;
+  min-height: 100vh;
+  background:
+    radial-gradient(1100px 540px at 92% -5%, rgba(56,173,248,0.18), transparent 65%),
+    radial-gradient(960px 520px at -8% 10%, rgba(2,91,160,0.16), transparent 60%),
+    linear-gradient(160deg, #ecf4ff 0%, #f3f8ff 50%, #eaf3ff 100%);
+}
+html[data-theme="dark"] .app {
+  background:
+    radial-gradient(1100px 540px at 92% -5%, rgba(56,173,248,0.16), transparent 65%),
+    radial-gradient(960px 520px at -8% 10%, rgba(2,91,160,0.22), transparent 60%),
+    linear-gradient(160deg, #0c1017 0%, #101722 52%, #141e2c 100%);
+}
+.sidebar {
+  width: 252px;
+  flex-shrink: 0;
+  background: linear-gradient(180deg, #0b3d6a 0%, #025ba0 48%, #0272c6 100%);
+  border-right: 1px solid rgba(255,255,255,0.22);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  overflow-y: auto;
+  z-index: 50;
+  box-shadow: 12px 0 36px rgba(2,91,160,0.20);
+}
+html[data-theme="dark"] .sidebar {
+  background: linear-gradient(180deg, #10161f 0%, #141c28 52%, #192536 100%);
+  border-right-color: rgba(124,200,251,0.24);
+  box-shadow: 14px 0 42px rgba(0,0,0,0.42);
+}
+.sidebar-brand { display:flex; align-items:center; gap:10px; padding:20px 20px 16px; border-bottom:1px solid rgba(255,255,255,0.22); }
+.sb-icon { width:34px; height:34px; border-radius:10px; background:linear-gradient(140deg,#7cc8fb,#38adf8); display:flex; align-items:center; justify-content:center; font-size:15px; color:#0b3d6a; box-shadow:0 8px 20px rgba(0,0,0,0.2); }
+.sb-name { font-family:var(--font-serif); font-size:1.08rem; color:#f5fbff; }
+.sb-user { padding:14px 16px; margin:10px 12px 6px; border:1px solid rgba(255,255,255,0.24); border-radius:12px; background:rgba(255,255,255,0.08); }
+.sb-user-inner { display:flex; align-items:center; gap:10px; }
+.sb-avatar { width:34px; height:34px; border-radius:50%; background:linear-gradient(135deg,#7cc8fb,#38adf8); color:#0b3d6a; font-size:0.78rem; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.sb-user-name { font-size:0.84rem; font-weight:600; color:#ffffff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.sb-user-role { font-size:0.74rem; color:rgba(220,240,255,0.82); text-transform:capitalize; }
+.sb-nav-section { padding:18px 12px 4px; }
+.sb-section-title { font-size:0.68rem; font-weight:700; color:rgba(218,238,255,0.78); text-transform:uppercase; letter-spacing:0.09em; padding:0 8px; margin-bottom:6px; }
+.sb-nav { display:flex; flex-direction:column; gap:3px; }
+.sidebar-link { display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:var(--r); font-size:0.87rem; font-weight:500; color:rgba(230,245,255,0.9); transition:all 0.18s; text-decoration:none; }
+.sidebar-link:hover { background:rgba(255,255,255,0.12); color:#ffffff; }
+.sidebar-link.active { background:linear-gradient(135deg, rgba(56,173,248,0.32), rgba(124,200,251,0.24)); color:#ffffff; box-shadow:inset 0 0 0 1px rgba(255,255,255,0.28); }
+.sl-icon { width:30px; height:30px; border-radius:var(--r-sm); display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0; background:rgba(255,255,255,0.08); }
+.sidebar-link.active .sl-icon { background:rgba(255,255,255,0.24); }
+.sb-footer { margin-top:auto; padding:12px; border-top:1px solid rgba(255,255,255,0.22); }
+.sb-logout-btn { width:100%; display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:10px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.28); background:rgba(0,0,0,0.20); color:#f8fbff; font-size:0.84rem; font-weight:600; text-decoration:none; transition:all 0.18s; }
+.sb-logout-btn:hover { background:rgba(239,68,68,0.22); border-color:rgba(252,165,165,0.55); }
+.main { margin-left:252px; flex:1; min-width:0; }
+.topbar { height:62px; display:flex; align-items:center; justify-content:space-between; padding:0 32px; background:linear-gradient(100deg, rgba(244,250,255,0.9), rgba(222,239,255,0.82)); border-bottom:1px solid rgba(2,91,160,0.18); backdrop-filter:blur(7px); position:sticky; top:0; z-index:40; }
+html[data-theme="dark"] .topbar { background:linear-gradient(100deg, rgba(12,18,28,0.95), rgba(17,27,41,0.90)); border-bottom-color:rgba(124,200,251,0.22); }
+.topbar-title { font-size:1.02rem; font-weight:700; color:var(--text-1); display:flex; align-items:center; gap:8px; }
+.page-body { padding:28px 32px; }
+.page-header { margin-bottom:28px; }
+.page-title { font-size:1.6rem; color:var(--text-1); margin-bottom:6px; }
+.page-sub { font-size:0.875rem; color:var(--text-3); }
+.tab-nav { display:flex; gap:4px; border-bottom:1px solid var(--border); margin-bottom:28px; }
+.tab-btn { padding:10px 18px; font-size:0.875rem; font-weight:500; color:var(--text-3); border:none; background:none; cursor:pointer; font-family:var(--font-sans); border-bottom:2px solid transparent; margin-bottom:-1px; transition:all 0.18s; }
+.tab-btn:hover { color:var(--text-1); }
+.tab-btn.active { color:var(--sky-600); border-bottom-color:var(--sky-600); }
+.tab-panel { display:none; }
+.tab-panel.active { display:block; }
+.settings-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+.card { background:var(--white); border:1px solid var(--border); border-radius:var(--r-lg); }
+.card-head { padding:18px 20px; border-bottom:1px solid var(--border); }
+.card-title { font-size:0.925rem; font-weight:600; color:var(--text-1); }
+.card-body { padding:20px; }
+.field { display:flex; flex-direction:column; gap:6px; margin-bottom:18px; }
+.field-label { font-size:0.8rem; font-weight:600; color:var(--text-2); }
+.color-field { display:flex; align-items:center; gap:10px; }
+.color-input { width:44px; height:36px; border:1.5px solid var(--border-md); border-radius:var(--r-sm); cursor:pointer; padding:2px; }
+.color-text { flex:1; }
+.btn-save { padding:10px 24px; background:var(--sky-600); color:#fff; border:none; border-radius:var(--r); font-weight:600; font-size:0.875rem; font-family:var(--font-sans); cursor:pointer; box-shadow:var(--shadow-blue); transition:all 0.2s; }
+.btn-save:hover { background:var(--sky-700); transform:translateY(-1px); }
+.journal-url-box { display:flex; align-items:center; gap:10px; background:var(--surface-muted); border:1px solid var(--border-md); border-radius:var(--r); padding:12px 16px; margin-bottom:24px; }
+.journal-url { font-family:var(--font-mono); font-size:0.875rem; color:var(--sky-600); flex:1; }
+.copy-btn { padding:6px 14px; border:1px solid var(--border-md); border-radius:var(--r-sm); background:var(--white); font-size:0.8rem; font-weight:600; color:var(--text-2); cursor:pointer; transition:all 0.18s; white-space:nowrap; }
+.copy-btn:hover { border-color:var(--sky-400); color:var(--sky-600); }
+.members-table { width:100%; border-collapse:collapse; }
+.members-table th { text-align:left; padding:10px 14px; font-size:0.75rem; font-weight:700; color:var(--text-3); text-transform:uppercase; letter-spacing:0.06em; border-bottom:1px solid var(--border); }
+.members-table td { padding:12px 14px; font-size:0.875rem; border-bottom:1px solid var(--border); color:var(--text-1); }
+.members-table tr:last-child td { border-bottom:none; }
+.member-avatar { width:30px; height:30px; border-radius:50%; background:var(--sky-600); color:#fff; font-size:0.72rem; font-weight:700; display:inline-flex; align-items:center; justify-content:center; margin-right:8px; }
+.invite-form { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:20px; }
+.invite-form .form-input { flex:1; min-width:200px; }
+.invite-form select { padding:11px 14px; border:1.5px solid var(--border-md); border-radius:var(--r); background:var(--white); color:var(--text-1); font-size:0.9rem; font-family:var(--font-sans); outline:none; }
+.badge { display:inline-flex; align-items:center; padding:2px 9px; border-radius:var(--r-pill); font-size:0.72rem; font-weight:600; }
+.badge-owner { background:rgba(14,145,232,0.1); color:var(--sky-700); }
+.badge-editor { background:rgba(217,119,6,0.1); color:var(--amber); }
+.badge-author { background:rgba(5,150,105,0.1); color:var(--green); }
+.badge-reviewer { background:rgba(109,40,217,0.1); color:#7c3aed; }
+.badge-subscriber { background:var(--surface-muted); color:var(--text-3); }
+.remove-btn { padding:5px 12px; border:1px solid var(--red-border); background:transparent; color:var(--red); border-radius:var(--r-sm); font-size:0.78rem; font-weight:600; cursor:pointer; transition:all 0.18s; }
+.remove-btn:hover { background:var(--red-bg); }
+@media (max-width: 860px) and (pointer: coarse) { .sidebar { transform: translateX(-100%); } .main { margin-left: 0; } .topbar, .page-body { padding-left: 20px; padding-right: 20px; } }
+</style>
+{% endblock %}
+{% block content %}
+<div class="app">
+      {% include "includes/app_sidebar.html" %}
+
+    <div class="main">
+        <header class="topbar">
+            <div class="topbar-title"><span>&#9881;</span><span>Journal Settings - {{ tenant.name }}</span></div>
+            <button class="theme-toggle" onclick="toggleTheme()">
+                <span class="t-moon">&#127769;</span><span class="t-sun">&#9728;</span>
+            </button>
+        </header>
+
+        <div class="page-body">
+            <div class="page-header">
+                <h1 class="page-title">{{ tenant.name }}</h1>
+                <p class="page-sub">Manage your journal settings, team members, and branding.</p>
+            </div>
+
+            <!-- Journal URL Box -->
+            <div class="journal-url-box">
+                <span style="font-size:0.8rem;color:var(--text-3);font-weight:600">Your Journal URL:</span>
+                <span class="journal-url">{{ tenant.full_url }}</span>
+                <button class="copy-btn" onclick="navigator.clipboard.writeText('{{ tenant.full_url }}');this.textContent='Copied!'">&#128203; Copy</button>
+                <a href="{{ url_for('tenants.view_journal', subdomain=tenant.subdomain) }}" target="_blank" style="padding:6px 14px;background:var(--sky-600);color:#fff;border-radius:var(--r-sm);font-size:0.8rem;font-weight:600">&#8599; View</a>
+            </div>
+
+            <!-- Tabs -->
+            <div class="tab-nav">
+                <button class="tab-btn active" onclick="showTab('settings', this)">&#9881; Settings</button>
+                <button class="tab-btn"        onclick="showTab('branding', this)">&#127912; Branding</button>
+                <button class="tab-btn"        onclick="showTab('members',  this)">&#128101; Team Members</button>
+            </div>
+
+            <!-- Tab: Settings -->
+            <div id="tab-settings" class="tab-panel active">
+                <form method="POST" action="{{ url_for('tenants.manage_journal') }}">
+                    {{ form.hidden_tag() }}
+                    <div class="settings-grid">
+                        <div class="card">
+                            <div class="card-head"><div class="card-title">Basic Information</div></div>
+                            <div class="card-body">
+                                <div class="field">
+                                    <label class="field-label">Journal Name</label>
+                                    {{ form.name(class="form-input") }}
+                                    {% if form.name.errors %}<span class="form-error">{{ form.name.errors[0] }}</span>{% endif %}
+                                </div>
+                                <div class="field">
+                                    <label class="field-label">Description</label>
+                                    {{ form.description(class="form-input", rows="4", style="resize:vertical") }}
+                                </div>
+                                <div class="field">
+                                    <label class="field-label">Contact Email</label>
+                                    {{ form.contact_email(class="form-input") }}
+                                </div>
+                                <div class="field">
+                                    <label class="field-label">Website URL</label>
+                                    {{ form.website_url(class="form-input") }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-head"><div class="card-title">Journal Info</div></div>
+                            <div class="card-body">
+                                <div class="field">
+                                    <label class="field-label">Subdomain</label>
+                                    <input class="form-input" value="{{ tenant.subdomain }}" disabled style="opacity:0.6">
+                                    <span class="form-hint">Contact support to change your subdomain.</span>
+                                </div>
+                                <div class="field">
+                                    <label class="field-label">Plan</label>
+                                    <input class="form-input" value="{{ tenant.plan | capitalize }}" disabled style="opacity:0.6">
+                                </div>
+                                <div class="field">
+                                    <label class="field-label">Members</label>
+                                    <input class="form-input" value="{{ tenant.member_count }} members" disabled style="opacity:0.6">
+                                </div>
+                                <div class="field">
+                                    <label class="field-label">Created</label>
+                                    <input class="form-input" value="{{ tenant.created_at.strftime('%B %d, %Y') }}" disabled style="opacity:0.6">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="margin-top:20px">
+                        <button type="submit" class="btn-save">&#128190; Save Changes</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Tab: Branding -->
+            <div id="tab-branding" class="tab-panel">
+                <form method="POST" action="{{ url_for('tenants.manage_journal') }}">
+                    {{ form.hidden_tag() }}
+                    <div class="settings-grid">
+                        <div class="card">
+                            <div class="card-head"><div class="card-title">Colors</div></div>
+                            <div class="card-body">
+                                <div class="field">
+                                    <label class="field-label">Primary Color</label>
+                                    <div class="color-field">
+                                        {{ form.primary_color(class="color-input") }}
+                                        <input type="text" class="form-input color-text" value="{{ tenant.primary_color }}" id="primaryColorText">
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <label class="field-label">Secondary Color</label>
+                                    <div class="color-field">
+                                        {{ form.secondary_color(class="color-input") }}
+                                        <input type="text" class="form-input color-text" value="{{ tenant.secondary_color }}" id="secondaryColorText">
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <label class="field-label">Footer Text</label>
+                                    {{ form.footer_text(class="form-input") }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-head"><div class="card-title">Preview</div></div>
+                            <div class="card-body">
+                                <div id="brandPreview" style="border-radius:var(--r-lg);overflow:hidden;border:1px solid var(--border)">
+                                    <div id="previewHeader" style="padding:16px 20px;background:{{ tenant.primary_color }};color:#fff">
+                                        <div style="font-family:var(--font-serif);font-size:1.1rem">{{ tenant.name }}</div>
+                                        <div style="font-size:0.78rem;opacity:0.8">Research Journal</div>
+                                    </div>
+                                    <div style="padding:16px 20px;background:var(--surface-muted)">
+                                        <div style="font-size:0.82rem;color:var(--text-3)">Your journal will look like this with the selected colors.</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="margin-top:20px">
+                        <button type="submit" class="btn-save">&#128190; Save Branding</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Tab: Members -->
+            <div id="tab-members" class="tab-panel">
+                <div class="card" style="margin-bottom:20px">
+                    <div class="card-head"><div class="card-title">Invite New Member</div></div>
+                    <div class="card-body">
+                        <form method="POST" action="{{ url_for('tenants.invite_member') }}">
+                            {{ form.hidden_tag() }}
+                            <div class="invite-form">
+                                <input type="email" name="email" class="form-input" placeholder="member@email.com" required>
+                                <select name="role">
+                                    <option value="author">Author</option>
+                                    <option value="reviewer">Reviewer</option>
+                                    <option value="editor">Editor</option>
+                                    <option value="subscriber">Subscriber</option>
+                                </select>
+                                <button type="submit" class="btn-save">&#10133; Invite</button>
+                            </div>
+                            <p class="form-hint">The person must already have a Research Hub account.</p>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-head"><div class="card-title">Team Members ({{ members|length }})</div></div>
+                    <div class="card-body" style="padding:0">
+                        <table class="members-table">
+                            <thead>
+                                <tr>
+                                    <th>Member</th>
+                                    <th>Email</th>
+                                    <th>Role</th>
+                                    <th>Joined</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for member in members %}
+                                <tr>
+                                    <td>
+                                        <span class="member-avatar">{{ member.initials }}</span>
+                                        {{ member.full_name }}
+                                    </td>
+                                    <td style="color:var(--text-3)">{{ member.email }}</td>
+                                    <td>
+                                        <span class="badge badge-{{ member.role }}">
+                                            {{ member.role.replace('_',' ') | capitalize }}
+                                        </span>
+                                    </td>
+                                    <td style="color:var(--text-3)">{{ member.created_at.strftime('%b %d, %Y') }}</td>
+                                    <td>
+                                        {% if member.id != current_user.id %}
+                                        <form method="POST" action="{{ url_for('tenants.remove_member', user_id=member.id) }}" style="display:inline">
+                                            {{ form.hidden_tag() }}
+                                            <button type="submit" class="remove-btn" onclick="return confirm('Remove this member?')">Remove</button>
+                                        </form>
+                                        {% else %}
+                                        <span style="font-size:0.78rem;color:var(--text-4)">You</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="5" style="text-align:center;padding:32px;color:var(--text-3)">
+                                        No members yet. Invite your first team member above.
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- end page-body -->
+    </div><!-- end main -->
+</div>
+
+<script>
+function showTab(name, btn) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    btn.classList.add('active');
+}
+// Live color preview
+document.querySelector('[name="primary_color"]').addEventListener('input', function(){
+    document.getElementById('previewHeader').style.background = this.value;
+    document.getElementById('primaryColorText').value = this.value;
+});
+</script>
+{% endblock %}

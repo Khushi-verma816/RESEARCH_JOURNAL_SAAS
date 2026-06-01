@@ -1,0 +1,17 @@
+.env
+__pycache__/
+*.pyc
+venv/
+instance/
+*.db
+.vscode/
+debug/
+*.log
+scripts/
+server.err.log
+server.out.log
+tests/
+*.sqlite
+*.sqlite3
+.DS_Store
+Thumbs.db

@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Editor Decision – Research Hub{% endblock %}
+{% block extra_css %}
+<style>
+.page-wrap{min-height:100vh;background:var(--off-white);padding:40px 24px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:700px}
+.back-link{display:inline-flex;align-items:center;gap:6px;font-size:0.855rem;color:var(--text-3);margin-bottom:24px;transition:color 0.15s}
+.back-link:hover{color:var(--sky-600)}
+.article-summary{background:var(--white);border:1px solid var(--border);border-radius:var(--r-xl);padding:28px 32px;margin-bottom:20px}
+.article-summary-title{font-size:1.2rem;color:var(--text-1);margin-bottom:10px}
+.meta-row{display:flex;gap:16px;flex-wrap:wrap}
+.meta-item{font-size:0.82rem;color:var(--text-3)}
+.meta-item strong{color:var(--text-2)}
+.badge{display:inline-flex;padding:3px 9px;border-radius:var(--r-pill);font-size:0.72rem;font-weight:600;border:1px solid transparent}
+.badge-warning{background:var(--amber-bg);color:var(--amber);border-color:var(--amber-border)}
+.badge-info{background:var(--sky-50);color:var(--sky-700);border-color:var(--sky-200)}
+.form-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r-xl);padding:32px}
+.form-card-title{font-size:1.4rem;color:var(--text-1);margin-bottom:24px}
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:20px}
+.field-label{font-size:0.8rem;font-weight:600;color:var(--text-2)}
+textarea.form-input{min-height:120px;resize:vertical}
+.btn-row{display:flex;gap:12px;margin-top:8px}
+.btn-submit{flex:1;padding:13px;border-radius:var(--r-lg);background:var(--sky-600);color:#fff;border:none;font-size:0.95rem;font-weight:600;font-family:var(--font-sans);cursor:pointer;transition:all 0.22s;box-shadow:var(--shadow-blue)}
+.btn-submit:hover{background:var(--sky-700);transform:translateY(-1px)}
+.btn-cancel{padding:13px 24px;border-radius:var(--r-lg);border:1.5px solid var(--border-md);background:var(--white);color:var(--text-2);font-size:0.9rem;font-weight:600;font-family:var(--font-sans);text-decoration:none;display:flex;align-items:center;transition:all 0.2s}
+.btn-cancel:hover{border-color:var(--sky-400);color:var(--sky-600)}
+</style>
+{% endblock %}
+{% block content %}
+<div class="page-wrap">
+    <div class="wrap">
+        <a href="{{ url_for('articles.editor_panel') }}" class="back-link">← Back to Editor Panel</a>
+
+        <div class="article-summary">
+            <h3 class="article-summary-title">{{ article.title }}</h3>
+            <div class="meta-row">
+                <div class="meta-item">👤 <strong>{{ article.author.full_name }}</strong></div>
+                <div class="meta-item">📂 {{ article.category.replace('_',' ').title() if article.category else '—' }}</div>
+                <span class="badge badge-{{ article.status_badge }}">{{ article.status_label }}</span>
+            </div>
+            {% if article.abstract %}
+            <div style="margin-top:14px;font-size:0.875rem;color:var(--text-3);line-height:1.7;background:var(--surface-muted);padding:14px 16px;border-radius:var(--r)">{{ article.abstract[:400] }}{% if article.abstract|length > 400 %}…{% endif %}</div>
+            {% endif %}
+        </div>
+
+        <div class="form-card">
+            <h2 class="form-card-title">📋 Make Editorial Decision</h2>
+            <form method="POST">
+                {{ form.hidden_tag() }}
+                <div class="field">
+                    <label class="field-label">Final Decision *</label>
+                    {{ form.decision(class="form-input") }}
+                    {% if form.decision.errors %}<span class="form-error">{{ form.decision.errors[0] }}</span>{% endif %}
+                </div>
+                <div class="field">
+                    <label class="field-label">Editor Notes (shown to author)</label>
+                    {{ form.editor_notes(class="form-input") }}
+                </div>
+                <div class="btn-row">
+                    {{ form.submit(class="btn-submit") }}
+                    <a href="{{ url_for('articles.editor_panel') }}" class="btn-cancel">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

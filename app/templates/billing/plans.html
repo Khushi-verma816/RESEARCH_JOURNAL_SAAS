@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block title %}Plans – Research Hub{% endblock %}
+{% block extra_css %}
+<style>
+.plans-page{max-width:960px;margin:0 auto;padding:64px 24px}
+.plans-header{text-align:center;margin-bottom:52px}
+.plans-header h1{font-family:var(--font-serif);font-size:clamp(2rem,4vw,2.8rem);color:var(--text-1);margin-bottom:12px}
+.plans-header p{font-size:1rem;color:var(--text-2);max-width:480px;margin:0 auto}
+.plans-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.plan-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r-xl);padding:32px 26px;position:relative;transition:all .25s}
+.plan-card:hover{box-shadow:var(--shadow-md);transform:translateY(-3px)}
+.plan-card.popular{border-color:var(--sky-400);box-shadow:0 8px 40px rgba(14,145,232,.12)}
+.plan-badge{position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:var(--sky-600);color:#fff;font-size:.72rem;font-weight:700;padding:4px 14px;border-radius:var(--r-pill)}
+.plan-name{font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);margin-bottom:10px}
+.plan-price{font-family:var(--font-serif);font-size:2.8rem;color:var(--text-1);margin-bottom:4px}
+.plan-price sub{font-size:1rem;font-family:var(--font-sans);color:var(--text-3)}
+.plan-desc{font-size:.85rem;color:var(--text-3);margin-bottom:24px}
+.plan-divider{height:1px;background:var(--border);margin-bottom:20px}
+.plan-features{list-style:none;display:flex;flex-direction:column;gap:10px;margin-bottom:28px}
+.plan-features li{font-size:.865rem;color:var(--text-2);display:flex;align-items:center;gap:9px}
+.plan-features li::before{content:'✓';color:var(--sky-600);font-weight:700;font-size:.8rem;flex-shrink:0}
+.btn-outline{width:100%;padding:11px;border-radius:var(--r);font-weight:600;font-size:.875rem;border:1.5px solid var(--border-md);background:transparent;color:var(--text-2);cursor:pointer;font-family:var(--font-sans);transition:all .2s}
+.btn-outline:hover{border-color:var(--sky-400);color:var(--text-1)}
+.btn-primary{width:100%;padding:11px;border-radius:var(--r);font-weight:600;font-size:.875rem;background:var(--sky-600);color:#fff;border:none;cursor:pointer;font-family:var(--font-sans);box-shadow:var(--shadow-blue);transition:all .2s}
+.btn-primary:hover{background:var(--sky-700)}
+.nav-bar{display:flex;align-items:center;justify-content:space-between;padding:16px 24px;background:var(--white);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:40}
+.nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none}
+.nav-icon{width:30px;height:30px;border-radius:7px;background:linear-gradient(135deg,var(--sky-700),var(--sky-400));display:flex;align-items:center;justify-content:center;font-size:14px}
+.nav-name{font-family:var(--font-serif);font-size:1rem;color:var(--text-1)}
+.nav-actions{display:flex;gap:10px}
+.nav-btn{padding:7px 18px;border-radius:var(--r);font-size:.84rem;font-weight:500;text-decoration:none;transition:all .18s}
+.nav-btn.outline{border:1px solid var(--border-md);color:var(--text-2)}
+.nav-btn.outline:hover{border-color:var(--sky-300);color:var(--sky-600)}
+.nav-btn.filled{background:var(--sky-600);color:#fff;border:1px solid var(--sky-600)}
+.nav-btn.filled:hover{background:var(--sky-700)}
+@media(max-width:768px){.plans-grid{grid-template-columns:1fr}}
+</style>
+{% endblock %}
+
+{% block content %}
+<nav class="nav-bar">
+  <a href="{{ url_for('main.index') }}" class="nav-brand">
+    <div class="nav-icon">🔬</div>
+    <span class="nav-name">Research Hub</span>
+  </a>
+  <div class="nav-actions">
+    <a href="{{ url_for('auth.login') }}" class="nav-btn outline">Sign in</a>
+    <a href="{{ url_for('auth.register') }}" class="nav-btn filled">Get Started</a>
+  </div>
+</nav>
+
+<div class="plans-page">
+  <div class="plans-header">
+    <h1>Simple, Transparent Pricing</h1>
+    <p>Start free. Scale as your journal grows. No hidden fees ever.</p>
+  </div>
+
+  <div class="plans-grid">
+    {% for plan_name, plan_data in plans.items() %}
+    <div class="plan-card {% if plan_name == 'pro' %}popular{% endif %}">
+      {% if plan_name == 'pro' %}<div class="plan-badge">Most Popular</div>{% endif %}
+      <div class="plan-name">{{ plan_name.title() }}</div>
+      <div class="plan-price">
+        {% if plan_data.price == 0 and plan_name == 'enterprise' %}Custom
+        {% else %}₹{{ plan_data.price }}<sub>/mo</sub>{% endif %}
+      </div>
+      <div class="plan-desc">
+        {% if plan_name == 'free' %}Perfect for independent researchers
+        {% elif plan_name == 'pro' %}For serious academic publishers
+        {% else %}For universities & institutions{% endif %}
+      </div>
+      <div class="plan-divider"></div>
+      <ul class="plan-features">
+        <li>{% if plan_data.articles == -1 %}Unlimited articles{% else %}Up to {{ plan_data.articles }} articles{% endif %}</li>
+        <li>{% if plan_data.members == -1 %}Unlimited members{% else %}Up to {{ plan_data.members }} members{% endif %}</li>
+        <li>{% if plan_data.ai_requests == -1 %}Unlimited AI requests{% else %}{{ plan_data.ai_requests }} AI requests/month{% endif %}</li>
+        {% if plan_data.custom_domain %}<li>Custom domain</li>{% endif %}
+        {% if plan_data.analytics %}<li>Analytics dashboard</li>{% endif %}
+        {% if plan_data.video %}<li>Video conferencing</li>{% endif %}
+        {% if plan_name == 'enterprise' %}<li>SSO / LDAP login</li><li>Dedicated support</li><li>SLA guarantee</li>{% endif %}
+      </ul>
+      {% if plan_name == 'enterprise' %}
+        <button class="btn-outline" onclick="alert('Contact sales@researchhub.com')">Contact Sales</button>
+      {% elif plan_name == 'pro' %}
+        <button class="btn-primary" onclick="location.href='{{ url_for('auth.register') }}'">Start 14-Day Trial</button>
+      {% else %}
+        <button class="btn-outline" onclick="location.href='{{ url_for('auth.register') }}'">Get Started Free</button>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

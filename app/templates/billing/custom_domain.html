@@ -1,0 +1,153 @@
+﻿{% extends "base.html" %}
+{% block title %}Custom Domain – Research Hub{% endblock %}
+{% block extra_css %}
+<style>
+.app{
+  display:flex;
+  min-height:100vh;
+  background:
+    radial-gradient(1100px 540px at 92% -5%, rgba(56,173,248,0.18), transparent 65%),
+    radial-gradient(960px 520px at -8% 10%, rgba(2,91,160,0.16), transparent 60%),
+    linear-gradient(160deg, #ecf4ff 0%, #f3f8ff 50%, #eaf3ff 100%)
+}
+html[data-theme="dark"] .app{
+  background:
+    radial-gradient(1100px 540px at 92% -5%, rgba(56,173,248,0.16), transparent 65%),
+    radial-gradient(960px 520px at -8% 10%, rgba(2,91,160,0.22), transparent 60%),
+    linear-gradient(160deg, #0c1017 0%, #101722 52%, #141e2c 100%)
+}
+.sidebar{width:252px;flex-shrink:0;background:linear-gradient(180deg,#0b3d6a 0%,#025ba0 48%,#0272c6 100%);border-right:1px solid rgba(255,255,255,0.22);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;overflow-y:auto;z-index:50;box-shadow:12px 0 36px rgba(2,91,160,0.20)}
+html[data-theme="dark"] .sidebar{background:linear-gradient(180deg,#10161f 0%,#141c28 52%,#192536 100%);border-right-color:rgba(124,200,251,0.24);box-shadow:14px 0 42px rgba(0,0,0,0.42)}
+.sidebar-brand{display:flex;align-items:center;gap:10px;padding:20px 20px 16px;border-bottom:1px solid rgba(255,255,255,0.22)}
+.sb-icon{width:34px;height:34px;border-radius:10px;background:linear-gradient(140deg,#7cc8fb,#38adf8);display:flex;align-items:center;justify-content:center;font-size:15px;color:#0b3d6a;box-shadow:0 8px 20px rgba(0,0,0,0.2)}
+.sb-name{font-family:var(--font-serif);font-size:1.08rem;color:#f5fbff}
+.sb-nav-section{padding:18px 12px 4px}
+.sb-section-title{font-size:.68rem;font-weight:700;color:rgba(218,238,255,0.78);text-transform:uppercase;letter-spacing:.09em;padding:0 8px;margin-bottom:6px}
+.sb-nav{display:flex;flex-direction:column;gap:3px}
+.sidebar-link{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--r);font-size:.87rem;font-weight:500;color:rgba(230,245,255,0.9);transition:all .18s;text-decoration:none}
+.sidebar-link:hover{background:rgba(255,255,255,0.12);color:#fff}
+.sidebar-link.active{background:linear-gradient(135deg,rgba(56,173,248,0.32),rgba(124,200,251,0.24));color:#fff;box-shadow:inset 0 0 0 1px rgba(255,255,255,0.28)}
+.sl-icon{width:30px;height:30px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;background:rgba(255,255,255,0.08)}
+.sidebar-link.active .sl-icon{background:rgba(255,255,255,0.24)}
+.sb-user{padding:14px 16px;margin:10px 12px 6px;border:1px solid rgba(255,255,255,0.24);border-radius:12px;background:rgba(255,255,255,0.08)}
+.sb-user-inner{display:flex;align-items:center;gap:10px}
+.sb-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#7cc8fb,#38adf8);color:#0b3d6a;font-size:.78rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-user-name{font-size:.84rem;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-user-role{font-size:.74rem;color:rgba(220,240,255,0.82);text-transform:capitalize}
+.sb-footer{margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,0.22)}
+.sb-logout-btn{width:100%;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.28);background:rgba(0,0,0,0.20);color:#f8fbff;font-size:.84rem;font-weight:600;text-decoration:none;transition:all .18s}
+.sb-logout-btn:hover{background:rgba(239,68,68,0.22);border-color:rgba(252,165,165,0.55)}
+.main{margin-left:252px;flex:1;display:flex;flex-direction:column;min-width:0}
+.topbar{height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 32px;background:var(--white);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:40}
+.topbar-title{font-size:.95rem;font-weight:600;color:var(--text-1)}
+.topbar-subtitle{font-size:.75rem;color:var(--text-3)}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.tb-theme-btn{width:34px;height:34px;border-radius:var(--r);border:1.5px solid var(--border-md);background:var(--surface-muted);color:var(--text-2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px}
+.tb-theme-btn .t-moon{display:block}.tb-theme-btn .t-sun{display:none}
+html[data-theme="dark"] .tb-theme-btn .t-moon{display:none}
+html[data-theme="dark"] .tb-theme-btn .t-sun{display:block}
+.page-body{padding:28px 32px;flex:1;display:flex;flex-direction:column;align-items:center}
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:26px;width:100%;max-width:780px}
+.stat-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px 18px}
+.stat-label{font-size:.76rem;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
+.stat-value{font-size:.9rem;font-weight:600;color:var(--text-1)}
+.stat-sub{font-size:.74rem;color:var(--text-4);margin-top:2px}
+.domain-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r-xl);padding:24px;margin-bottom:18px;width:100%;max-width:780px}
+.domain-card-title{font-size:.92rem;font-weight:600;color:var(--text-1);margin-bottom:5px}
+.domain-card-desc{font-size:.82rem;color:var(--text-3);margin-bottom:18px}
+.current-domain-bar{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--surface-muted);border-radius:var(--r-lg);margin-bottom:14px;border:1px solid var(--border)}
+.dot-green{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0}
+.domain-mono{font-family:var(--font-mono);font-size:.88rem;color:var(--sky-600);flex:1}
+.input-row{display:flex;gap:0}
+.input-row input{flex:1;padding:10px 14px;border-radius:var(--r) 0 0 var(--r);border:1.5px solid var(--border-md);border-right:none;background:var(--white);color:var(--text-1);font-size:.88rem;font-family:var(--font-mono)}
+.input-row input:focus{outline:none;border-color:var(--sky-400)}
+.input-row button{padding:10px 20px;border-radius:0 var(--r) var(--r) 0;background:var(--sky-600);color:#fff;border:none;font-size:.855rem;font-weight:600;cursor:pointer;font-family:var(--font-sans)}
+.input-row button:hover{background:var(--sky-700)}
+.dns-title{font-size:.84rem;font-weight:600;color:var(--text-2);margin:20px 0 10px}
+.dns-table{width:100%;border-collapse:collapse;border-radius:var(--r-lg);overflow:hidden;border:1px solid var(--border)}
+.dns-table th{font-size:.74rem;font-weight:700;color:var(--text-4);text-transform:uppercase;letter-spacing:.06em;padding:10px 14px;background:var(--surface-muted);border-bottom:1px solid var(--border);text-align:left}
+.dns-table td{padding:10px 14px;font-family:var(--font-mono);font-size:.82rem;color:var(--text-2)}
+.alert{padding:13px 16px;border-radius:var(--r-lg);font-size:.84rem;margin-bottom:18px;display:flex;gap:10px;width:100%;max-width:780px}
+.alert-info{background:var(--sky-50);border:1px solid var(--sky-200);color:var(--sky-700)}
+.alert-success{background:var(--green-bg);border:1px solid var(--green-border);color:var(--green)}
+.btn-danger{padding:8px 18px;border-radius:var(--r);background:transparent;color:var(--red);border:1.5px solid rgba(220,38,38,.3);font-size:.84rem;font-weight:500;cursor:pointer;font-family:var(--font-sans)}
+.btn-danger:hover{background:var(--red-bg)}
+@media(max-width:860px) and (pointer:coarse){.sidebar{transform:translateX(-100%)}.main{margin-left:0}.topbar,.page-body{padding-left:20px;padding-right:20px}}
+@media(max-width:560px){.stats-grid{grid-template-columns:1fr}.input-row{flex-direction:column}.input-row input{border-radius:var(--r);border-right:1.5px solid var(--border-md);margin-bottom:6px}.input-row button{border-radius:var(--r)}}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="app">
+      {% include "includes/app_sidebar.html" %}
+
+  <div class="main">
+    <header class="topbar">
+      <div><div class="topbar-title">Custom Domain</div><div class="topbar-subtitle">Connect your own domain to {{ tenant.name }}</div></div>
+      <div class="topbar-right"><button class="tb-theme-btn" onclick="toggleTheme()"><span class="t-moon">&#9790;</span><span class="t-sun">&#9728;</span></button></div>
+    </header>
+
+    <div class="page-body">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">Default URL</div>
+          <div class="stat-value" style="font-family:var(--font-mono);font-size:.8rem;color:var(--sky-600)">{{ tenant.subdomain }}.researchhub.com</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Custom Domain</div>
+          <div class="stat-value" style="font-family:var(--font-mono);font-size:.8rem;color:{{ 'var(--green)' if tenant.custom_domain else 'var(--text-4)' }}">{{ tenant.custom_domain or 'Not set' }}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">SSL</div>
+          <div class="stat-value" style="color:{{ 'var(--green)' if tenant.custom_domain else 'var(--text-4)' }}">{% if tenant.custom_domain %}&#10003; Active{% else %}Pending{% endif %}</div>
+          <div class="stat-sub">Auto via Let's Encrypt</div>
+        </div>
+      </div>
+
+      {% if tenant.custom_domain %}
+      <div class="alert alert-success">
+        <span>&#10003;</span>
+        <div><strong>{{ tenant.custom_domain }}</strong> is configured. Ensure your DNS CNAME points to <code style="background:rgba(0,0,0,.07);padding:1px 6px;border-radius:4px">app.researchhub.com</code>.</div>
+      </div>
+      <div class="domain-card">
+        <div class="domain-card-title">Active Domain</div>
+        <div class="domain-card-desc">Your journal is accessible at this domain.</div>
+        <div class="current-domain-bar">
+          <div class="dot-green"></div>
+          <div class="domain-mono">{{ tenant.custom_domain }}</div>
+          <a href="https://{{ tenant.custom_domain }}" target="_blank" style="font-size:.78rem;color:var(--sky-600);text-decoration:none">Open &#8599;</a>
+        </div>
+        <form method="POST" action="{{ url_for('billing.custom_domain') }}">
+          <input type="hidden" name="action" value="remove_domain">
+          <button type="submit" class="btn-danger" onclick="return confirm('Remove custom domain?')">Remove Domain</button>
+        </form>
+      </div>
+      {% endif %}
+
+      <div class="domain-card">
+        <div class="domain-card-title">{{ 'Update' if tenant.custom_domain else 'Connect a' }} Custom Domain</div>
+        <div class="domain-card-desc">Enter a domain you own. You'll add a CNAME record pointing to our servers.</div>
+        <form method="POST" action="{{ url_for('billing.custom_domain') }}">
+          <input type="hidden" name="action" value="set_domain">
+          <div class="input-row">
+            <input type="text" name="domain" placeholder="journal.youruniversity.edu" value="{{ tenant.custom_domain or '' }}">
+            <button type="submit">{{ 'Update' if tenant.custom_domain else 'Connect' }}</button>
+          </div>
+        </form>
+        <div class="dns-title">DNS Configuration</div>
+        <table class="dns-table">
+          <thead><tr><th>Type</th><th>Name</th><th>Value</th><th>TTL</th></tr></thead>
+          <tbody><tr><td>CNAME</td><td>@ or www</td><td>app.researchhub.com</td><td>3600</td></tr></tbody>
+        </table>
+      </div>
+
+      <div class="alert alert-info">
+        <span>&#9432;</span>
+        <div>DNS changes can take up to <strong>48 hours</strong> to propagate. SSL is auto-provisioned after DNS verifies.</div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+

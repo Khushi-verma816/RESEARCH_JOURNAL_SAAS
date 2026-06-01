@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Create Your Journal – Research Hub{% endblock %}
+{% block extra_css %}
+<style>
+.page-wrap { min-height:100vh; background:var(--off-white); display:flex; align-items:center; justify-content:center; padding:40px 20px; }
+.form-card { width:100%; max-width:560px; background:var(--white); border:1px solid var(--border); border-radius:var(--r-2xl); padding:44px 40px; box-shadow:var(--shadow-xl); }
+.form-card-header { margin-bottom:32px; }
+.form-card-icon { width:48px; height:48px; border-radius:var(--r-lg); background:linear-gradient(135deg,var(--sky-700),var(--sky-400)); display:flex; align-items:center; justify-content:center; font-size:22px; margin-bottom:16px; box-shadow:var(--shadow-blue); }
+.form-card-title { font-size:1.75rem; color:var(--text-1); margin-bottom:6px; }
+.form-card-sub { font-size:0.875rem; color:var(--text-3); }
+.field { display:flex; flex-direction:column; gap:6px; margin-bottom:20px; }
+.field-label { font-size:0.8rem; font-weight:600; color:var(--text-2); }
+.subdomain-wrap { display:flex; align-items:center; border:1.5px solid var(--border-md); border-radius:var(--r); overflow:hidden; transition:border-color 0.15s; }
+.subdomain-wrap:focus-within { border-color:var(--sky-500); box-shadow:0 0 0 3px rgba(14,145,232,0.1); }
+.subdomain-prefix { padding:11px 14px; background:var(--surface-muted); color:var(--text-3); font-size:0.875rem; border-right:1px solid var(--border-md); white-space:nowrap; }
+.subdomain-input { flex:1; padding:11px 14px; border:none; background:var(--white); color:var(--text-1); font-size:0.9rem; font-family:var(--font-sans); outline:none; }
+.subdomain-suffix { padding:11px 14px; background:var(--surface-muted); color:var(--text-3); font-size:0.875rem; border-left:1px solid var(--border-md); white-space:nowrap; }
+.btn-submit { width:100%; padding:13px; border-radius:var(--r-lg); background:var(--sky-600); color:#fff; border:none; font-size:0.95rem; font-weight:600; font-family:var(--font-sans); cursor:pointer; box-shadow:var(--shadow-blue); transition:all 0.22s; margin-top:8px; }
+.btn-submit:hover { background:var(--sky-700); transform:translateY(-2px); box-shadow:var(--shadow-blue-lg); }
+</style>
+{% endblock %}
+{% block content %}
+<div class="page-wrap">
+    <div class="form-card">
+        <div class="form-card-header">
+            <div class="form-card-icon">🔬</div>
+            <h2 class="form-card-title">Create Your Journal</h2>
+            <p class="form-card-sub">Set up your research journal in minutes. You can change everything later.</p>
+        </div>
+        <form method="POST" action="{{ url_for('tenants.create_journal') }}">
+            {{ form.hidden_tag() }}
+            <div class="field">
+                <label class="field-label">Journal Name *</label>
+                {{ form.name(class="form-input") }}
+                {% if form.name.errors %}<span class="form-error">{{ form.name.errors[0] }}</span>{% endif %}
+            </div>
+            <div class="field">
+                <label class="field-label">Subdomain *</label>
+                <div class="subdomain-wrap">
+                    <span class="subdomain-prefix">https://</span>
+                    {{ form.subdomain(class="subdomain-input", id="subdomainInput") }}
+                    <span class="subdomain-suffix">.researchhub.com</span>
+                </div>
+                {% if form.subdomain.errors %}<span class="form-error">{{ form.subdomain.errors[0] }}</span>{% endif %}
+                <span class="form-hint">Only lowercase letters, numbers, and hyphens. e.g. oxford-science</span>
+            </div>
+            <div class="field">
+                <label class="field-label">Description</label>
+                {{ form.description(class="form-input", rows="3", style="resize:vertical;min-height:80px") }}
+                {% if form.description.errors %}<span class="form-error">{{ form.description.errors[0] }}</span>{% endif %}
+            </div>
+            <div class="field">
+                <label class="field-label">Contact Email</label>
+                {{ form.contact_email(class="form-input") }}
+                {% if form.contact_email.errors %}<span class="form-error">{{ form.contact_email.errors[0] }}</span>{% endif %}
+            </div>
+            <button type="submit" class="btn-submit">🚀 Create My Journal</button>
+        </form>
+    </div>
+</div>
+<script>
+// Auto-format subdomain as user types journal name
+document.querySelector('[name="name"]').addEventListener('input', function(){
+    var sub = document.getElementById('subdomainInput');
+    if (!sub.dataset.edited) {
+        sub.value = this.value.toLowerCase()
+            .replace(/[^a-z0-9\s\-]/g, '')
+            .replace(/\s+/g, '-')
+            .substring(0, 50);
+    }
+});
+document.getElementById('subdomainInput').addEventListener('input', function(){
+    this.dataset.edited = 'true';
+    this.value = this.value.toLowerCase().replace(/[^a-z0-9\-]/g, '');
+});
+</script>
+{% endblock %}

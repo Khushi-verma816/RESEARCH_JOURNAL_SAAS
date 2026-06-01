@@ -1,0 +1,199 @@
+﻿{% extends "base.html" %}
+{% block title %}Offline Payments – Research Hub{% endblock %}
+{% block extra_css %}
+<style>
+.app{
+  display:flex;
+  min-height:100vh;
+  background:
+    radial-gradient(1100px 540px at 92% -5%, rgba(56,173,248,0.18), transparent 65%),
+    radial-gradient(960px 520px at -8% 10%, rgba(2,91,160,0.16), transparent 60%),
+    linear-gradient(160deg, #ecf4ff 0%, #f3f8ff 50%, #eaf3ff 100%)
+}
+html[data-theme="dark"] .app{
+  background:
+    radial-gradient(1100px 540px at 92% -5%, rgba(56,173,248,0.16), transparent 65%),
+    radial-gradient(960px 520px at -8% 10%, rgba(2,91,160,0.22), transparent 60%),
+    linear-gradient(160deg, #0c1017 0%, #101722 52%, #141e2c 100%)
+}
+.sidebar{width:252px;flex-shrink:0;background:linear-gradient(180deg,#0b3d6a 0%,#025ba0 48%,#0272c6 100%);border-right:1px solid rgba(255,255,255,0.22);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;overflow-y:auto;z-index:50;box-shadow:12px 0 36px rgba(2,91,160,0.20)}
+html[data-theme="dark"] .sidebar{background:linear-gradient(180deg,#10161f 0%,#141c28 52%,#192536 100%);border-right-color:rgba(124,200,251,0.24);box-shadow:14px 0 42px rgba(0,0,0,0.42)}
+.sidebar-brand{display:flex;align-items:center;gap:10px;padding:20px 20px 16px;border-bottom:1px solid rgba(255,255,255,0.22)}
+.sb-icon{width:34px;height:34px;border-radius:10px;background:linear-gradient(140deg,#7cc8fb,#38adf8);display:flex;align-items:center;justify-content:center;font-size:15px;color:#0b3d6a;box-shadow:0 8px 20px rgba(0,0,0,0.2)}
+.sb-name{font-family:var(--font-serif);font-size:1.08rem;color:#f5fbff}
+.sb-nav-section{padding:18px 12px 4px}
+.sb-section-title{font-size:.68rem;font-weight:700;color:rgba(218,238,255,0.78);text-transform:uppercase;letter-spacing:.09em;padding:0 8px;margin-bottom:6px}
+.sb-nav{display:flex;flex-direction:column;gap:3px}
+.sidebar-link{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--r);font-size:.87rem;font-weight:500;color:rgba(230,245,255,0.9);transition:all .18s;text-decoration:none}
+.sidebar-link:hover{background:rgba(255,255,255,0.12);color:#fff}
+.sidebar-link.active{background:linear-gradient(135deg,rgba(56,173,248,0.32),rgba(124,200,251,0.24));color:#fff;box-shadow:inset 0 0 0 1px rgba(255,255,255,0.28)}
+.sl-icon{width:30px;height:30px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;background:rgba(255,255,255,0.08)}
+.sidebar-link.active .sl-icon{background:rgba(255,255,255,0.24)}
+.sb-user{padding:14px 16px;margin:10px 12px 6px;border:1px solid rgba(255,255,255,0.24);border-radius:12px;background:rgba(255,255,255,0.08)}
+.sb-user-inner{display:flex;align-items:center;gap:10px}
+.sb-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#7cc8fb,#38adf8);color:#0b3d6a;font-size:.78rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-user-name{font-size:.84rem;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-user-role{font-size:.74rem;color:rgba(220,240,255,0.82);text-transform:capitalize}
+.sb-footer{margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,0.22)}
+.sb-logout-btn{width:100%;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.28);background:rgba(0,0,0,0.20);color:#f8fbff;font-size:.84rem;font-weight:600;text-decoration:none;transition:all .18s}
+.sb-logout-btn:hover{background:rgba(239,68,68,0.22);border-color:rgba(252,165,165,0.55)}
+.main{margin-left:252px;flex:1;display:flex;flex-direction:column;min-width:0}
+.topbar{height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 32px;background:var(--white);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:40}
+.topbar-title{font-size:.95rem;font-weight:600;color:var(--text-1)}
+.topbar-subtitle{font-size:.75rem;color:var(--text-3)}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.tb-theme-btn{width:34px;height:34px;border-radius:var(--r);border:1.5px solid var(--border-md);background:var(--surface-muted);color:var(--text-2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px}
+.tb-theme-btn .t-moon{display:block}.tb-theme-btn .t-sun{display:none}
+html[data-theme="dark"] .tb-theme-btn .t-moon{display:none}
+html[data-theme="dark"] .tb-theme-btn .t-sun{display:block}
+.page-body{padding:28px 32px;flex:1}
+.alert-info{background:var(--sky-50);border:1px solid var(--sky-200);color:var(--sky-700);padding:14px 16px;border-radius:var(--r-lg);font-size:.84rem;margin-bottom:24px;display:flex;gap:10px}
+/* Method cards */
+.method-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:26px}
+.method-card{background:var(--white);border:2px solid var(--border);border-radius:var(--r-xl);padding:18px;text-align:center;cursor:pointer;transition:all .2s;position:relative}
+.method-card:hover,.method-card.selected{border-color:var(--sky-400);background:var(--sky-50)}
+.method-card.selected::after{content:'\2713';position:absolute;top:10px;right:12px;color:var(--sky-600);font-weight:700}
+.method-icon{font-size:1.6rem;margin-bottom:6px}
+.method-name{font-size:.84rem;font-weight:600;color:var(--text-1)}
+.method-desc{font-size:.74rem;color:var(--text-3);margin-top:2px}
+/* Form */
+.form-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r-xl);padding:24px;margin-bottom:24px}
+.form-title{font-size:.92rem;font-weight:600;color:var(--text-1);margin-bottom:18px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-group{display:flex;flex-direction:column;gap:5px}
+.form-group.full{grid-column:1/-1}
+label{font-size:.82rem;font-weight:500;color:var(--text-2)}
+input.fi,select.fi,textarea.fi{padding:10px 12px;border-radius:var(--r);border:1.5px solid var(--border-md);background:var(--white);color:var(--text-1);font-size:.855rem;font-family:var(--font-sans);width:100%}
+input.fi:focus,select.fi:focus,textarea.fi:focus{outline:none;border-color:var(--sky-400)}
+textarea.fi{resize:vertical;min-height:76px}
+.btn-submit{padding:11px 28px;border-radius:var(--r);background:var(--sky-600);color:#fff;border:none;font-size:.9rem;font-weight:600;cursor:pointer;font-family:var(--font-sans);margin-top:6px}
+.btn-submit:hover{background:var(--sky-700)}
+/* Table */
+.table-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r-xl);overflow:hidden}
+.table-header{padding:16px 22px;border-bottom:1px solid var(--border);font-size:.9rem;font-weight:600;color:var(--text-1)}
+table{width:100%;border-collapse:collapse}
+th{font-size:.74rem;font-weight:700;color:var(--text-4);text-transform:uppercase;letter-spacing:.07em;padding:12px 16px;text-align:left;background:var(--surface-muted);border-bottom:1px solid var(--border)}
+td{padding:13px 16px;font-size:.855rem;color:var(--text-2);border-bottom:1px solid var(--border)}
+tr:last-child td{border-bottom:none}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:var(--r-pill);font-size:.72rem;font-weight:600}
+.badge-green{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border)}
+.badge-amber{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-border)}
+.badge-red{background:var(--red-bg);color:var(--red);border:1px solid var(--red-border)}
+@media(max-width:860px) and (pointer:coarse){.sidebar{transform:translateX(-100%)}.main{margin-left:0}.topbar,.page-body{padding-left:20px;padding-right:20px}}
+@media(max-width:640px){.method-cards{grid-template-columns:repeat(2,1fr)}.form-grid{grid-template-columns:1fr}}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="app">
+      {% include "includes/app_sidebar.html" %}
+
+  <div class="main">
+    <header class="topbar">
+      <div><div class="topbar-title">Offline Payments</div><div class="topbar-subtitle">Pay via cash, bank transfer, cheque, or UPI</div></div>
+      <div class="topbar-right"><button class="tb-theme-btn" onclick="toggleTheme()"><span class="t-moon">&#9790;</span><span class="t-sun">&#9728;</span></button></div>
+    </header>
+
+    <div class="page-body">
+      <div class="alert-info">
+        <span>&#9432;</span>
+        <div>Submit your payment details below. Our team verifies and activates your subscription within <strong>24–48 hours</strong>.</div>
+      </div>
+
+      <!-- Method Selection -->
+      <div class="method-cards" id="methodCards">
+        <div class="method-card selected" onclick="selectMethod('cash',this)">
+          <div class="method-icon">&#128181;</div>
+          <div class="method-name">Cash</div>
+          <div class="method-desc">In-person</div>
+        </div>
+        <div class="method-card" onclick="selectMethod('bank_transfer',this)">
+          <div class="method-icon">&#127974;</div>
+          <div class="method-name">Bank Transfer</div>
+          <div class="method-desc">NEFT / RTGS / IMPS</div>
+        </div>
+        <div class="method-card" onclick="selectMethod('cheque',this)">
+          <div class="method-icon">&#128221;</div>
+          <div class="method-name">Cheque</div>
+          <div class="method-desc">Payable at branch</div>
+        </div>
+        <div class="method-card" onclick="selectMethod('upi',this)">
+          <div class="method-icon">&#128241;</div>
+          <div class="method-name">UPI</div>
+          <div class="method-desc">GPay / PhonePe</div>
+        </div>
+      </div>
+
+      <!-- Form -->
+      <div class="form-card">
+        <div class="form-title">Payment Details</div>
+        <form method="POST" action="{{ url_for('billing.offline_payments') }}">
+          <input type="hidden" name="payment_method" id="paymentMethodInput" value="cash">
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Plan</label>
+              <select name="plan" class="fi">
+                {% for plan_name, plan_data in plans.items() %}
+                {% if plan_name != 'free' %}
+                <option value="{{ plan_name }}" {% if sub.plan==plan_name %}selected{% endif %}>
+                  {{ plan_name.title() }} — ₹{{ plan_data.price }}/mo
+                </option>
+                {% endif %}
+                {% endfor %}
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Amount (₹)</label>
+              <input type="number" name="amount" class="fi" placeholder="0.00" step="0.01" min="0" required>
+            </div>
+            <div class="form-group full">
+              <label>Reference / Transaction ID</label>
+              <input type="text" name="reference_id" class="fi" placeholder="Bank ref, cheque number, UPI transaction ID…">
+            </div>
+            <div class="form-group full">
+              <label>Notes (optional)</label>
+              <textarea name="notes" class="fi" placeholder="Any extra info for our team…"></textarea>
+            </div>
+          </div>
+          <button type="submit" class="btn-submit">Submit Payment Request</button>
+        </form>
+      </div>
+
+      <!-- History -->
+      {% if transactions %}
+      <div class="table-card">
+        <div class="table-header">Offline Payment History</div>
+        <table>
+          <thead>
+            <tr><th>Date</th><th>Plan</th><th>Amount</th><th>Method</th><th>Reference</th><th>Status</th></tr>
+          </thead>
+          <tbody>
+            {% for txn in transactions %}
+            {% set icon, color = txn.status_label %}
+            <tr>
+              <td>{{ txn.created_at.strftime('%d %b %Y') }}</td>
+              <td style="font-weight:600">{{ (txn.plan or '—').title() }}</td>
+              <td>₹{{ "%.2f"|format(txn.amount) }}</td>
+              <td>{{ txn.payment_method.replace('_',' ').title() }}</td>
+              <td style="color:var(--text-3);font-size:.82rem">{{ txn.reference_id or '—' }}</td>
+              <td><span class="badge badge-{{ color }}">{{ icon }} {{ txn.status.title() }}</span></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<script>
+function selectMethod(method, el) {
+  document.querySelectorAll('.method-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('paymentMethodInput').value = method;
+}
+</script>
+{% endblock %}
+
+

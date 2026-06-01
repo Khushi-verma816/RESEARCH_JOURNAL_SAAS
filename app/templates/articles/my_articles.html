@@ -1,0 +1,386 @@
+﻿{% extends "base.html" %}
+{% block title %}My Articles - Research Hub{% endblock %}
+
+{% block extra_css %}
+<style>
+.app {
+  display: flex;
+  min-height: 100vh;
+  background:
+    radial-gradient(1100px 540px at 92% -5%, rgba(56,173,248,0.18), transparent 65%),
+    radial-gradient(960px 520px at -8% 10%, rgba(2,91,160,0.16), transparent 60%),
+    linear-gradient(160deg, #ecf4ff 0%, #f3f8ff 50%, #eaf3ff 100%);
+}
+html[data-theme="dark"] .app {
+  background:
+    radial-gradient(1100px 540px at 92% -5%, rgba(56,173,248,0.16), transparent 65%),
+    radial-gradient(960px 520px at -8% 10%, rgba(2,91,160,0.22), transparent 60%),
+    linear-gradient(160deg, #0c1017 0%, #101722 52%, #141e2c 100%);
+}
+
+.sidebar {
+  width: 252px;
+  flex-shrink: 0;
+  background: linear-gradient(180deg, #0b3d6a 0%, #025ba0 48%, #0272c6 100%);
+  border-right: 1px solid rgba(255,255,255,0.22);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  overflow-y: auto;
+  z-index: 50;
+  box-shadow: 12px 0 36px rgba(2,91,160,0.20);
+}
+html[data-theme="dark"] .sidebar {
+  background: linear-gradient(180deg, #10161f 0%, #141c28 52%, #192536 100%);
+  border-right-color: rgba(124,200,251,0.24);
+  box-shadow: 14px 0 42px rgba(0,0,0,0.42);
+}
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.22);
+}
+.sb-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: linear-gradient(140deg, #7cc8fb, #38adf8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  color: #0b3d6a;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+}
+.sb-name { font-family: var(--font-serif); font-size: 1.08rem; color: #f5fbff; }
+
+.sb-user {
+  padding: 14px 16px;
+  margin: 10px 12px 6px;
+  border: 1px solid rgba(255,255,255,0.24);
+  border-radius: 12px;
+  background: rgba(255,255,255,0.08);
+}
+.sb-user-inner { display: flex; align-items: center; gap: 10px; }
+.sb-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #7cc8fb, #38adf8);
+  color: #0b3d6a;
+  font-size: 0.78rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.sb-user-name { font-size: 0.84rem; font-weight: 600; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sb-user-role { font-size: 0.74rem; color: rgba(220,240,255,0.82); text-transform: capitalize; }
+
+.sb-nav-section { padding: 18px 12px 4px; }
+.sb-section-title {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: rgba(218,238,255,0.78);
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  padding: 0 8px;
+  margin-bottom: 6px;
+}
+.sb-nav { display: flex; flex-direction: column; gap: 3px; }
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: var(--r);
+  font-size: 0.87rem;
+  font-weight: 500;
+  color: rgba(230,245,255,0.9);
+  transition: all 0.18s;
+  text-decoration: none;
+}
+.sidebar-link:hover { background: rgba(255,255,255,0.12); color: #ffffff; }
+.sidebar-link.active {
+  background: linear-gradient(135deg, rgba(56,173,248,0.32), rgba(124,200,251,0.24));
+  color: #ffffff;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.28);
+}
+.sl-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: var(--r-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+  background: rgba(255,255,255,0.08);
+}
+.sidebar-link.active .sl-icon { background: rgba(255,255,255,0.24); }
+.sl-badge { margin-left: auto; background: #ef4444; color: #fff; font-size: 0.65rem; font-weight: 700; padding: 2px 6px; border-radius: var(--r-pill); }
+
+.sb-footer {
+  margin-top: auto;
+  padding: 12px;
+  border-top: 1px solid rgba(255,255,255,0.22);
+}
+.sb-logout-btn {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.28);
+  background: rgba(0,0,0,0.20);
+  color: #f8fbff;
+  font-size: 0.84rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.18s;
+}
+.sb-logout-btn:hover {
+  background: rgba(239,68,68,0.22);
+  border-color: rgba(252,165,165,0.55);
+}
+
+.main { margin-left: 252px; flex: 1; min-width: 0; }
+.topbar {
+  height: 62px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  background: linear-gradient(100deg, rgba(244,250,255,0.9), rgba(222,239,255,0.82));
+  border-bottom: 1px solid rgba(2,91,160,0.18);
+  backdrop-filter: blur(7px);
+  position: sticky;
+  top: 0;
+  z-index: 40;
+}
+html[data-theme="dark"] .topbar {
+  background: linear-gradient(100deg, rgba(12,18,28,0.95), rgba(17,27,41,0.90));
+  border-bottom-color: rgba(124,200,251,0.22);
+}
+.topbar-title { font-size: 1.02rem; font-weight: 700; color: var(--text-1); display: flex; align-items: center; gap: 8px; }
+.topbar-right { display: flex; gap: 10px; align-items: center; }
+
+.page-body { padding: 28px 32px; }
+.stats-row { display: grid; grid-template-columns: repeat(5,1fr); gap: 14px; margin-bottom: 24px; }
+.stat-pill {
+  background: rgba(255,255,255,0.84);
+  border: 1px solid rgba(2,91,160,0.16);
+  border-radius: var(--r-lg);
+  padding: 16px;
+  text-align: center;
+  box-shadow: 0 8px 24px rgba(2,91,160,0.10);
+  backdrop-filter: blur(5px);
+}
+html[data-theme="dark"] .stat-pill {
+  background: rgba(14,21,32,0.92);
+  border-color: rgba(56,173,248,0.20);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.34);
+}
+.stat-pill-num { font-family: var(--font-serif); font-size: 1.6rem; color: var(--text-1); }
+.stat-pill-label { font-size: 0.75rem; color: var(--text-2); margin-top: 2px; }
+
+.articles-card {
+  background: rgba(255,255,255,0.88);
+  border: 1px solid rgba(2,91,160,0.14);
+  border-radius: var(--r-lg);
+  box-shadow: 0 12px 28px rgba(2,91,160,0.12);
+  backdrop-filter: blur(6px);
+  overflow: hidden;
+}
+html[data-theme="dark"] .articles-card {
+  background: rgba(14,21,32,0.92);
+  border-color: rgba(56,173,248,0.20);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.36);
+}
+.card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 18px;
+  border-bottom: 1px solid rgba(2,91,160,0.14);
+}
+html[data-theme="dark"] .card-head { border-bottom-color: rgba(56,173,248,0.20); }
+.card-title { font-size: 0.95rem; font-weight: 700; color: var(--text-1); }
+
+.articles-table { width: 100%; border-collapse: collapse; }
+.articles-table th {
+  text-align: left;
+  padding: 12px 16px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background: var(--surface-muted);
+  border-bottom: 1px solid var(--border);
+}
+.articles-table td {
+  padding: 14px 16px;
+  font-size: 0.875rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-1);
+  vertical-align: middle;
+}
+.articles-table tr:last-child td { border-bottom: none; }
+.articles-table tr:hover td { background: var(--surface-muted); }
+.article-title-cell { max-width: 320px; }
+.article-title-link { font-weight: 600; color: var(--text-1); transition: color 0.15s; text-decoration: none; }
+.article-title-link:hover { color: var(--sky-600); }
+.article-meta { font-size: 0.75rem; color: var(--text-3); margin-top: 3px; }
+
+.badge { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: var(--r-pill); font-size: 0.72rem; font-weight: 600; border: 1px solid transparent; }
+.badge-success { background: var(--green-bg); color: var(--green); border-color: var(--green-border); }
+.badge-warning { background: var(--amber-bg); color: var(--amber); border-color: var(--amber-border); }
+.badge-danger  { background: var(--red-bg); color: var(--red); border-color: var(--red-border); }
+.badge-info    { background: var(--sky-50); color: var(--sky-700); border-color: var(--sky-200); }
+.badge-neutral { background: var(--surface-muted); color: var(--text-3); border-color: var(--border-md); }
+
+.action-btns { display: flex; gap: 6px; }
+.btn-sm {
+  padding: 5px 12px;
+  border-radius: var(--r-sm);
+  font-size: 0.78rem;
+  font-weight: 600;
+  border: 1px solid var(--border-md);
+  background: var(--white);
+  color: var(--text-2);
+  cursor: pointer;
+  transition: all 0.18s;
+  text-decoration: none;
+  font-family: var(--font-sans);
+}
+.btn-sm:hover { border-color: var(--sky-400); color: var(--sky-600); }
+.btn-sm.danger { border-color: var(--red-border); color: var(--red); }
+.btn-sm.danger:hover { background: var(--red-bg); }
+
+.empty-state { text-align: center; padding: 70px 20px; }
+.empty-icon { font-size: 3rem; margin-bottom: 16px; }
+.empty-title { font-size: 1.2rem; color: var(--text-1); margin-bottom: 8px; }
+.empty-sub { font-size: 0.875rem; color: var(--text-3); margin-bottom: 24px; }
+
+.btn-new {
+  padding: 10px 22px;
+  background: var(--sky-600);
+  color: #fff;
+  border: none;
+  border-radius: var(--r);
+  font-weight: 600;
+  font-size: 0.875rem;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  box-shadow: var(--shadow-blue);
+  transition: all 0.2s;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.btn-new:hover { background: var(--sky-700); transform: translateY(-1px); }
+
+@media (max-width: 1200px) { .stats-row { grid-template-columns: repeat(3,1fr); } }
+@media (max-width: 860px) and (pointer: coarse) {
+  .sidebar { transform: translateX(-100%); }
+  .main { margin-left: 0; }
+  .topbar, .page-body { padding-left: 20px; padding-right: 20px; }
+}
+@media (max-width: 640px) {
+  .stats-row { grid-template-columns: repeat(2,1fr); }
+  .page-body { padding: 16px; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="app">
+      {% include "includes/app_sidebar.html" %}
+
+    <div class="main">
+        <header class="topbar">
+            <div class="topbar-title"><span>&#128196;</span><span>My Articles</span></div>
+            <div class="topbar-right">
+                <button class="theme-toggle" onclick="toggleTheme()">
+                    <span class="t-moon">&#127769;</span><span class="t-sun">&#9728;</span>
+                </button>
+                <a href="{{ url_for('articles.submit') }}" class="btn-new">+ New Article</a>
+            </div>
+        </header>
+
+        <div class="page-body">
+            <div class="stats-row">
+                <div class="stat-pill"><div class="stat-pill-num">{{ articles|length }}</div><div class="stat-pill-label">Total</div></div>
+                <div class="stat-pill"><div class="stat-pill-num">{{ articles|selectattr('status','eq','published')|list|length }}</div><div class="stat-pill-label">Published</div></div>
+                <div class="stat-pill"><div class="stat-pill-num">{{ articles|selectattr('status','eq','under_review')|list|length }}</div><div class="stat-pill-label">In Review</div></div>
+                <div class="stat-pill"><div class="stat-pill-num">{{ articles|selectattr('status','eq','submitted')|list|length }}</div><div class="stat-pill-label">Submitted</div></div>
+                <div class="stat-pill"><div class="stat-pill-num">{{ articles|selectattr('status','eq','draft')|list|length }}</div><div class="stat-pill-label">Drafts</div></div>
+            </div>
+
+            <div class="articles-card">
+                <div class="card-head"><div class="card-title">Recent Articles</div></div>
+
+                {% if articles %}
+                <table class="articles-table">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Category</th>
+                            <th>Status</th>
+                            <th>Submitted</th>
+                            <th>Views</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for article in articles %}
+                        <tr>
+                            <td class="article-title-cell">
+                                <a href="{{ url_for('articles.view', article_id=article.id) }}" class="article-title-link">{{ article.title }}</a>
+                                {% if article.co_authors %}<div class="article-meta">Co-authors: {{ article.co_authors }}</div>{% endif %}
+                            </td>
+                            <td style="color:var(--text-3);font-size:0.82rem">{{ article.category.replace('_',' ').title() if article.category else '-' }}</td>
+                            <td><span class="badge badge-{{ article.status_badge }}">{{ article.status_label }}</span></td>
+                            <td style="color:var(--text-3);font-size:0.82rem">{{ article.submitted_at.strftime('%b %d, %Y') if article.submitted_at else '-' }}</td>
+                            <td style="color:var(--text-3);font-size:0.82rem">{{ article.views }}</td>
+                            <td>
+                                <div class="action-btns">
+                                    <a href="{{ url_for('articles.view', article_id=article.id) }}" class="btn-sm">View</a>
+                                    {% if article.status in ['draft','submitted'] %}
+                                    <a href="{{ url_for('articles.edit', article_id=article.id) }}" class="btn-sm">Edit</a>
+                                    {% endif %}
+                                    {% if article.status == 'draft' %}
+                                    <form method="POST" action="{{ url_for('articles.delete', article_id=article.id) }}" style="display:inline">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="btn-sm danger" onclick="return confirm('Delete this draft?')">Delete</button>
+                                    </form>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon">&#128221;</div>
+                    <div class="empty-title">No articles yet</div>
+                    <div class="empty-sub">Submit your first research article to get started.</div>
+                    <a href="{{ url_for('articles.submit') }}" class="btn-new">&#9997; Submit Your First Article</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

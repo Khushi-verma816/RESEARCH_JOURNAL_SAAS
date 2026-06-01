@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block title %}{{ article.title }} – Research Hub{% endblock %}
+{% block extra_css %}
+<style>
+.page-wrap{min-height:100vh;background:var(--off-white);padding:40px 24px}
+.article-wrap{max-width:860px;margin:0 auto}
+.back-link{display:inline-flex;align-items:center;gap:6px;font-size:0.855rem;color:var(--text-3);margin-bottom:24px;transition:color 0.15s}
+.back-link:hover{color:var(--sky-600)}
+.article-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r-xl);overflow:hidden;box-shadow:var(--shadow-sm)}
+.article-header{padding:36px 40px;border-bottom:1px solid var(--border)}
+.article-category{display:inline-flex;align-items:center;gap:6px;font-size:0.75rem;font-weight:600;color:var(--sky-600);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:14px}
+.article-title{font-size:clamp(1.5rem,3vw,2.2rem);color:var(--text-1);line-height:1.25;margin-bottom:16px}
+.article-meta-row{display:flex;flex-wrap:wrap;gap:16px;align-items:center}
+.meta-item{display:flex;align-items:center;gap:6px;font-size:0.82rem;color:var(--text-3)}
+.meta-item strong{color:var(--text-2)}
+.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:var(--r-pill);font-size:0.72rem;font-weight:600;border:1px solid transparent}
+.badge-success{background:var(--green-bg);color:var(--green);border-color:var(--green-border)}
+.badge-warning{background:var(--amber-bg);color:var(--amber);border-color:var(--amber-border)}
+.badge-danger{background:var(--red-bg);color:var(--red);border-color:var(--red-border)}
+.badge-info{background:var(--sky-50);color:var(--sky-700);border-color:var(--sky-200)}
+.badge-neutral{background:var(--surface-muted);color:var(--text-3);border-color:var(--border-md)}
+.article-body{padding:36px 40px}
+.section-label{font-size:0.75rem;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:0.09em;margin-bottom:12px}
+.abstract-box{background:var(--surface-muted);border-left:3px solid var(--sky-400);border-radius:0 var(--r) var(--r) 0;padding:20px 22px;margin-bottom:28px;font-size:0.925rem;color:var(--text-2);line-height:1.8}
+.keywords-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:28px}
+.keyword-tag{padding:4px 12px;background:var(--sky-50);border:1px solid var(--sky-200);border-radius:var(--r-pill);font-size:0.78rem;color:var(--sky-700);font-weight:500}
+.content-body{font-size:0.95rem;color:var(--text-2);line-height:1.9;white-space:pre-wrap}
+.article-footer{padding:24px 40px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--surface-muted)}
+.doi-box{font-family:var(--font-mono);font-size:0.8rem;color:var(--sky-600)}
+.action-row{display:flex;gap:10px}
+.btn-action{padding:8px 18px;border-radius:var(--r);font-size:0.855rem;font-weight:600;font-family:var(--font-sans);cursor:pointer;transition:all 0.18s;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:var(--sky-600);color:#fff;border:none;box-shadow:var(--shadow-blue)}
+.btn-primary:hover{background:var(--sky-700)}
+.btn-outline{border:1.5px solid var(--border-md);background:var(--white);color:var(--text-2)}
+.btn-outline:hover{border-color:var(--sky-400);color:var(--sky-600)}
+.review-box{margin:0 40px 28px;background:var(--amber-bg);border:1px solid var(--amber-border);border-radius:var(--r-lg);padding:18px 20px}
+.review-box-title{font-size:0.8rem;font-weight:700;color:var(--amber);margin-bottom:8px}
+.review-box-text{font-size:0.875rem;color:var(--text-2);line-height:1.7}
+</style>
+{% endblock %}
+{% block content %}
+<div class="page-wrap">
+    <div class="article-wrap">
+        <a href="{{ url_for('articles.my_articles') }}" class="back-link">← Back to My Articles</a>
+
+        <div class="article-card">
+            <div class="article-header">
+                {% if article.category %}
+                <div class="article-category">📂 {{ article.category.replace('_',' ').title() }}</div>
+                {% endif %}
+                <h1 class="article-title">{{ article.title }}</h1>
+                <div class="article-meta-row">
+                    <div class="meta-item">👤 <strong>{{ article.author.full_name }}</strong></div>
+                    {% if article.co_authors %}<div class="meta-item">👥 {{ article.co_authors }}</div>{% endif %}
+                    {% if article.published_at %}<div class="meta-item">📅 {{ article.published_at.strftime('%B %d, %Y') }}</div>{% endif %}
+                    <div class="meta-item">👁️ {{ article.views }} views</div>
+                    <span class="badge badge-{{ article.status_badge }}">{{ article.status_label }}</span>
+                </div>
+            </div>
+
+            <div class="article-body">
+                <div class="section-label">Abstract</div>
+                <div class="abstract-box">{{ article.abstract }}</div>
+
+                {% if article.keyword_list %}
+                <div class="section-label">Keywords</div>
+                <div class="keywords-row">
+                    {% for kw in article.keyword_list %}
+                    <span class="keyword-tag">{{ kw }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                {% if article.content %}
+                <div class="section-label">Full Article</div>
+                <div class="content-body">{{ article.content }}</div>
+                {% endif %}
+            </div>
+
+            {% if article.review_notes %}
+            <div class="review-box">
+                <div class="review-box-title">📝 Reviewer Comments</div>
+                <div class="review-box-text">{{ article.review_notes }}</div>
+            </div>
+            {% endif %}
+
+            <div class="article-footer">
+                <div>{% if article.doi %}<div class="doi-box">DOI: {{ article.doi }}</div>{% endif %}</div>
+                <div class="action-row">
+                    {% if current_user.is_authenticated and current_user.id == article.author_id and article.status in ['draft','submitted'] %}
+                    <a href="{{ url_for('articles.edit', article_id=article.id) }}" class="btn-action btn-outline">✏️ Edit</a>
+                    {% endif %}
+                    {% if current_user.is_authenticated and current_user.is_editor() %}
+                    <a href="{{ url_for('articles.editor_panel') }}" class="btn-action btn-primary">🔍 Editor Panel</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

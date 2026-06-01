@@ -1,0 +1,509 @@
+{% extends "base.html" %}
+{% block title %}AI Assistant - Research Hub{% endblock %}
+{% block extra_css %}
+<style>
+.app {
+  display: flex;
+  min-height: 100vh;
+  background:
+    radial-gradient(1100px 540px at 92% -5%, rgba(56,173,248,0.18), transparent 65%),
+    radial-gradient(960px 520px at -8% 10%, rgba(2,91,160,0.16), transparent 60%),
+    linear-gradient(160deg, #ecf4ff 0%, #f3f8ff 50%, #eaf3ff 100%);
+}
+html[data-theme="dark"] .app {
+  background:
+    radial-gradient(1100px 540px at 92% -5%, rgba(56,173,248,0.16), transparent 65%),
+    radial-gradient(960px 520px at -8% 10%, rgba(2,91,160,0.22), transparent 60%),
+    linear-gradient(160deg, #0c1017 0%, #101722 52%, #141e2c 100%);
+}
+
+.sidebar {
+  width: 252px;
+  flex-shrink: 0;
+  background: linear-gradient(180deg, #0b3d6a 0%, #025ba0 48%, #0272c6 100%);
+  border-right: 1px solid rgba(255,255,255,0.22);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  overflow-y: auto;
+  z-index: 50;
+  box-shadow: 12px 0 36px rgba(2,91,160,0.20);
+}
+html[data-theme="dark"] .sidebar {
+  background: linear-gradient(180deg, #10161f 0%, #141c28 52%, #192536 100%);
+  border-right-color: rgba(124,200,251,0.24);
+  box-shadow: 14px 0 42px rgba(0,0,0,0.42);
+}
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.22);
+}
+.sb-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: linear-gradient(140deg, #7cc8fb, #38adf8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  color: #0b3d6a;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+}
+.sb-name { font-family: var(--font-serif); font-size: 1.08rem; color: #f5fbff; }
+
+.sb-user {
+  padding: 14px 16px;
+  margin: 10px 12px 6px;
+  border: 1px solid rgba(255,255,255,0.24);
+  border-radius: 12px;
+  background: rgba(255,255,255,0.08);
+}
+.sb-user-inner { display: flex; align-items: center; gap: 10px; }
+.sb-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #7cc8fb, #38adf8);
+  color: #0b3d6a;
+  font-size: 0.78rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.sb-user-name { font-size: 0.84rem; font-weight: 600; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sb-user-role { font-size: 0.74rem; color: rgba(220,240,255,0.82); text-transform: capitalize; }
+
+.sb-nav-section { padding: 18px 12px 4px; }
+.sb-section-title {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: rgba(218,238,255,0.78);
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  padding: 0 8px;
+  margin-bottom: 6px;
+}
+.sb-nav { display: flex; flex-direction: column; gap: 3px; }
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: var(--r);
+  font-size: 0.87rem;
+  font-weight: 500;
+  color: rgba(230,245,255,0.9);
+  transition: all 0.18s;
+  text-decoration: none;
+}
+.sidebar-link:hover { background: rgba(255,255,255,0.12); color: #ffffff; }
+.sidebar-link.active {
+  background: linear-gradient(135deg, rgba(56,173,248,0.32), rgba(124,200,251,0.24));
+  color: #ffffff;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.28);
+}
+.sl-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: var(--r-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+  background: rgba(255,255,255,0.08);
+}
+.sidebar-link.active .sl-icon { background: rgba(255,255,255,0.24); }
+
+.sb-footer {
+  margin-top: auto;
+  padding: 12px;
+  border-top: 1px solid rgba(255,255,255,0.22);
+}
+.sb-logout-btn {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.28);
+  background: rgba(0,0,0,0.20);
+  color: #f8fbff;
+  font-size: 0.84rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.18s;
+}
+.sb-logout-btn:hover {
+  background: rgba(239,68,68,0.22);
+  border-color: rgba(252,165,165,0.55);
+}
+
+.main { margin-left: 252px; flex: 1; min-width: 0; }
+.topbar {
+  height: 62px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  background: linear-gradient(100deg, rgba(244,250,255,0.9), rgba(222,239,255,0.82));
+  border-bottom: 1px solid rgba(2,91,160,0.18);
+  backdrop-filter: blur(7px);
+  position: sticky;
+  top: 0;
+  z-index: 40;
+}
+html[data-theme="dark"] .topbar {
+  background: linear-gradient(100deg, rgba(12,18,28,0.95), rgba(17,27,41,0.90));
+  border-bottom-color: rgba(124,200,251,0.22);
+}
+.topbar-title { font-size: 1.02rem; font-weight: 700; color: var(--text-1); display: flex; align-items: center; gap: 8px; }
+.page-body { padding: 28px 32px; }
+
+.tools-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-bottom:28px}
+.tool-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r-xl);padding:24px;cursor:pointer;transition:all 0.22s;position:relative;overflow:hidden}
+.tool-card:hover{border-color:var(--sky-300);box-shadow:var(--shadow-md);transform:translateY(-2px)}
+.tool-card.active-tool{border-color:var(--sky-500);box-shadow:0 0 0 3px rgba(14,145,232,0.12)}
+.tool-card-icon{font-size:2rem;margin-bottom:12px}
+.tool-card-title{font-size:0.95rem;font-weight:700;color:var(--text-1);margin-bottom:5px}
+.tool-card-desc{font-size:0.82rem;color:var(--text-3);line-height:1.5}
+.tool-badge{position:absolute;top:14px;right:14px;background:var(--sky-50);border:1px solid var(--sky-200);color:var(--sky-700);font-size:0.68rem;font-weight:700;padding:2px 8px;border-radius:var(--r-pill)}
+
+.tool-panel{display:none;background:var(--white);border:1px solid var(--border);border-radius:var(--r-xl);padding:28px;margin-bottom:24px}
+.tool-panel.active{display:block}
+.tool-panel-title{font-size:1.2rem;font-weight:700;color:var(--text-1);margin-bottom:6px;display:flex;align-items:center;gap:10px}
+.tool-panel-sub{font-size:0.855rem;color:var(--text-3);margin-bottom:22px}
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:18px}
+.field-label{font-size:0.8rem;font-weight:600;color:var(--text-2)}
+textarea.form-input{resize:vertical;min-height:100px;line-height:1.6}
+.btn-ai{padding:11px 24px;background:linear-gradient(135deg,var(--sky-600),var(--sky-500));color:#fff;border:none;border-radius:var(--r);font-weight:700;font-size:0.9rem;font-family:var(--font-sans);cursor:pointer;transition:all 0.22s;box-shadow:var(--shadow-blue);display:inline-flex;align-items:center;gap:8px}
+.btn-ai:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(14,145,232,0.35)}
+.btn-ai:disabled{opacity:0.6;cursor:not-allowed;transform:none}
+.result-box{background:var(--surface-muted);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;margin-top:20px;display:none}
+.result-box.show{display:block}
+.result-label{font-size:0.75rem;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
+.result-text{font-size:0.9rem;color:var(--text-1);line-height:1.8;white-space:pre-wrap}
+.copy-btn{padding:4px 12px;border-radius:var(--r-sm);background:var(--white);border:1px solid var(--border-md);color:var(--text-3);font-size:0.75rem;font-weight:600;cursor:pointer;transition:all 0.18s;font-family:var(--font-sans)}
+.copy-btn:hover{border-color:var(--sky-400);color:var(--sky-600)}
+.loading-dots{display:inline-flex;gap:4px;align-items:center}
+.loading-dots span{width:6px;height:6px;border-radius:50%;background:#fff;animation:bounce 1.2s infinite}
+.loading-dots span:nth-child(2){animation-delay:0.2s}
+.loading-dots span:nth-child(3){animation-delay:0.4s}
+@keyframes bounce{0%,80%,100%{transform:scale(0.6);opacity:0.5}40%{transform:scale(1);opacity:1}}
+
+.chat-wrap{background:var(--white);border:1px solid var(--border);border-radius:var(--r-xl);overflow:hidden}
+.chat-header{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+.chat-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--sky-600),var(--sky-400));display:flex;align-items:center;justify-content:center;font-size:16px}
+.chat-name{font-weight:700;color:var(--text-1);font-size:0.9rem}
+.chat-status{font-size:0.75rem;color:var(--green)}
+.chat-messages{height:380px;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:14px}
+.msg{display:flex;gap:10px;max-width:85%}
+.msg.user{align-self:flex-end;flex-direction:row-reverse}
+.msg-avatar{width:30px;height:30px;border-radius:50%;background:var(--surface-muted);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.msg.user .msg-avatar{background:var(--sky-600);color:#fff;border-color:var(--sky-600)}
+.msg-bubble{padding:11px 15px;border-radius:16px;font-size:0.875rem;line-height:1.75;color:var(--text-1);background:var(--surface-muted);border:1px solid var(--border);}
+.msg.user .msg-bubble{background:var(--sky-600);color:#fff;border-color:var(--sky-600)}
+.chat-input-row{padding:16px 20px;border-top:1px solid var(--border);display:flex;gap:10px}
+.chat-input{flex:1;padding:10px 14px;border:1.5px solid var(--border-md);border-radius:var(--r);background:var(--white);color:var(--text-1);font-size:0.875rem;font-family:var(--font-sans);outline:none;transition:border-color 0.18s}
+.chat-input:focus{border-color:var(--sky-400)}
+.chat-send{padding:10px 20px;background:var(--sky-600);color:#fff;border:none;border-radius:var(--r);font-weight:700;font-size:0.875rem;font-family:var(--font-sans);cursor:pointer;transition:all 0.18s}
+.chat-send:hover{background:var(--sky-700)}
+.chat-send:disabled{opacity:0.5;cursor:not-allowed}
+
+.style-select{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.style-btn{padding:6px 14px;border-radius:var(--r-pill);border:1.5px solid var(--border-md);background:var(--white);color:var(--text-3);font-size:0.8rem;font-weight:600;cursor:pointer;transition:all 0.18s;font-family:var(--font-sans)}
+.style-btn.selected{border-color:var(--sky-500);background:var(--sky-50);color:var(--sky-700)}
+
+@media (max-width: 860px) and (pointer: coarse) {
+  .sidebar { transform: translateX(-100%); }
+  .main { margin-left: 0; }
+  .topbar, .page-body { padding-left: 20px; padding-right: 20px; }
+}
+@media(max-width:700px){.tools-grid{grid-template-columns:1fr}}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="app">
+      {% include "includes/app_sidebar.html" %}
+
+    <div class="main">
+        <header class="topbar">
+            <div class="topbar-title"><span>&#129302;</span><span>AI Research Assistant</span></div>
+            <button class="theme-toggle" onclick="toggleTheme()"><span class="t-moon">&#127769;</span><span class="t-sun">&#9728;</span></button>
+        </header>
+
+        <div class="page-body">
+            <div class="tools-grid">
+                <div class="tool-card" onclick="showTool('abstract', this)">
+                    <div class="tool-badge">AI</div>
+                    <div class="tool-card-icon">&#9997;</div>
+                    <div class="tool-card-title">Abstract Generator</div>
+                    <div class="tool-card-desc">Generate a professional academic abstract from your title and keywords</div>
+                </div>
+                <div class="tool-card" onclick="showTool('keywords', this)">
+                    <div class="tool-badge">AI</div>
+                    <div class="tool-card-icon">&#127991;</div>
+                    <div class="tool-card-title">Keyword Extractor</div>
+                    <div class="tool-card-desc">Automatically extract relevant academic keywords from your article text</div>
+                </div>
+                <div class="tool-card" onclick="showTool('citation', this)">
+                    <div class="tool-badge">AI</div>
+                    <div class="tool-card-icon">&#128218;</div>
+                    <div class="tool-card-title">Citation Formatter</div>
+                    <div class="tool-card-desc">Format references in APA, MLA, Chicago or BibTeX style instantly</div>
+                </div>
+                <div class="tool-card" onclick="showTool('grammar', this)">
+                    <div class="tool-badge">AI</div>
+                    <div class="tool-card-icon">&#9989;</div>
+                    <div class="tool-card-title">Grammar and Style Check</div>
+                    <div class="tool-card-desc">Check and improve grammar, clarity and academic writing style</div>
+                </div>
+                <div class="tool-card" onclick="location.href='{{ url_for('ai.content_creation') }}'">
+                    <div class="tool-badge">NEW</div>
+                    <div class="tool-card-icon">&#9999;</div>
+                    <div class="tool-card-title">Content Creation</div>
+                    <div class="tool-card-desc">Generate full research sections from a custom prompt</div>
+                </div>
+            </div>
+
+            <div id="tool-abstract" class="tool-panel">
+                <div class="tool-panel-title">&#9997; Abstract Generator</div>
+                <div class="tool-panel-sub">Enter your article details and AI will write a professional abstract.</div>
+                <div class="field"><label class="field-label">Article Title *</label><input type="text" id="abs-title" class="form-input" placeholder="Enter your article title..."></div>
+                <div class="field"><label class="field-label">Research Category</label><input type="text" id="abs-category" class="form-input" placeholder="e.g. Machine Learning, Medicine, Physics..."></div>
+                <div class="field"><label class="field-label">Keywords (optional)</label><input type="text" id="abs-keywords" class="form-input" placeholder="e.g. neural networks, deep learning, classification"></div>
+                <button class="btn-ai" onclick="generateAbstract()" id="abs-btn"><span id="abs-btn-text">Generate Abstract</span></button>
+                <div id="abs-result" class="result-box"><div class="result-label">Generated Abstract <button class="copy-btn" onclick="copyResult('abs-output')">Copy</button></div><div class="result-text" id="abs-output"></div></div>
+            </div>
+
+            <div id="tool-keywords" class="tool-panel">
+                <div class="tool-panel-title">&#127991; Keyword Extractor</div>
+                <div class="tool-panel-sub">Paste your article text and AI will extract the most relevant academic keywords.</div>
+                <div class="field"><label class="field-label">Article Text *</label><textarea id="kw-content" class="form-input" rows="6" placeholder="Paste your article abstract or full text here..."></textarea></div>
+                <button class="btn-ai" onclick="extractKeywords()" id="kw-btn"><span id="kw-btn-text">Extract Keywords</span></button>
+                <div id="kw-result" class="result-box"><div class="result-label">Extracted Keywords <button class="copy-btn" onclick="copyResult('kw-output')">Copy</button></div><div class="result-text" id="kw-output"></div></div>
+            </div>
+
+            <div id="tool-citation" class="tool-panel">
+                <div class="tool-panel-title">&#128218; Citation Formatter</div>
+                <div class="tool-panel-sub">Enter reference details and choose your citation style.</div>
+                <div class="field"><label class="field-label">Citation Style</label><div class="style-select"><button class="style-btn selected" onclick="selectStyle(this,'APA')">APA</button><button class="style-btn" onclick="selectStyle(this,'MLA')">MLA</button><button class="style-btn" onclick="selectStyle(this,'Chicago')">Chicago</button><button class="style-btn" onclick="selectStyle(this,'BibTeX')">BibTeX</button><button class="style-btn" onclick="selectStyle(this,'Vancouver')">Vancouver</button></div></div>
+                <div class="field"><label class="field-label">Reference Information *</label><textarea id="cit-info" class="form-input" rows="4" placeholder="Enter reference details..."></textarea></div>
+                <button class="btn-ai" onclick="formatCitation()" id="cit-btn"><span id="cit-btn-text">Format Citation</span></button>
+                <div id="cit-result" class="result-box"><div class="result-label">Formatted Citation <button class="copy-btn" onclick="copyResult('cit-output')">Copy</button></div><div class="result-text" id="cit-output"></div></div>
+            </div>
+
+            <div id="tool-grammar" class="tool-panel">
+                <div class="tool-panel-title">&#9989; Grammar and Style Check</div>
+                <div class="tool-panel-sub">Paste your text and AI will check grammar, style and academic writing quality.</div>
+                <div class="field"><label class="field-label">Text to Check *</label><textarea id="gr-content" class="form-input" rows="8" placeholder="Paste your text here..."></textarea></div>
+                <button class="btn-ai" onclick="checkGrammar()" id="gr-btn"><span id="gr-btn-text">Check Grammar and Style</span></button>
+                <div id="gr-result" class="result-box"><div class="result-label">Review Result <button class="copy-btn" onclick="copyResult('gr-output')">Copy</button></div><div class="result-text" id="gr-output"></div></div>
+            </div>
+
+            <div class="chat-wrap">
+                <div class="chat-header"><div class="chat-avatar">&#129302;</div><div><div class="chat-name">Research AI Assistant</div><div class="chat-status">Online</div></div></div>
+                <div class="chat-messages" id="chat-messages">
+                    <div class="msg ai">
+                        <div class="msg-avatar">&#129302;</div>
+                        <div class="msg-bubble">
+                            <strong>Hello! I'm ResearchHub AI</strong> — your intelligent assistant.<br><br>
+                            I can help with <strong>anything</strong>:<br>
+                            &bull; Math &amp; calculations (<code>2 * 2</code>, <code>100 / 4</code>)<br>
+                            &bull; Research papers &amp; academic writing<br>
+                            &bull; Science, history, geography<br>
+                            &bull; Coding &amp; programming<br>
+                            &bull; Hindi or English — any language!<br><br>
+                            <em>Just ask anything &mdash; like ChatGPT!</em>
+                        </div>
+                    </div>
+                </div>
+                <div class="chat-input-row">
+                    <input type="text" id="chat-input" class="chat-input" placeholder="Ask me anything — math, science, research, coding..." onkeydown="if(event.key==='Enter')sendChat()">
+                    <button class="chat-send" onclick="sendChat()" id="chat-send-btn">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let selectedStyle = 'APA';
+let chatHistory = [];
+
+function showTool(name, card) {
+    document.querySelectorAll('.tool-panel').forEach(function(p){ p.classList.remove('active'); });
+    document.querySelectorAll('.tool-card').forEach(function(c){ c.classList.remove('active-tool'); });
+    document.getElementById('tool-' + name).classList.add('active');
+    if (card) card.classList.add('active-tool');
+    document.getElementById('tool-' + name).scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function selectStyle(btn, style) {
+    document.querySelectorAll('.style-btn').forEach(function(b){ b.classList.remove('selected'); });
+    btn.classList.add('selected');
+    selectedStyle = style;
+}
+
+function setLoading(btnId, textId, loading, defaultText) {
+    const btn = document.getElementById(btnId);
+    const txt = document.getElementById(textId);
+    btn.disabled = loading;
+    txt.innerHTML = loading ? '<span class="loading-dots"><span></span><span></span><span></span></span>' : defaultText;
+}
+
+function showResult(resultId, outputId, text) {
+    const box = document.getElementById(resultId);
+    const out = document.getElementById(outputId);
+    out.textContent = text;
+    box.classList.add('show');
+}
+
+function copyResult(outputId) {
+    const text = document.getElementById(outputId).textContent;
+    navigator.clipboard.writeText(text);
+}
+
+async function generateAbstract() {
+    const title = document.getElementById('abs-title').value.trim();
+    const category = document.getElementById('abs-category').value.trim();
+    const keywords = document.getElementById('abs-keywords').value.trim();
+    if (!title) { alert('Please enter an article title.'); return; }
+    setLoading('abs-btn', 'abs-btn-text', true, 'Generate Abstract');
+    try {
+        const res = await fetch('/ai/generate-abstract', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({title, category, keywords}) });
+        const data = await res.json();
+        if (data.error) { alert('Error: ' + data.error); return; }
+        showResult('abs-result', 'abs-output', data.result);
+    } catch(e) { alert('Request failed: ' + e.message); }
+    finally { setLoading('abs-btn', 'abs-btn-text', false, 'Generate Abstract'); }
+}
+
+async function extractKeywords() {
+    const content = document.getElementById('kw-content').value.trim();
+    if (!content) { alert('Please paste some text.'); return; }
+    setLoading('kw-btn', 'kw-btn-text', true, 'Extract Keywords');
+    try {
+        const res = await fetch('/ai/extract-keywords', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({content}) });
+        const data = await res.json();
+        if (data.error) { alert('Error: ' + data.error); return; }
+        showResult('kw-result', 'kw-output', data.result);
+    } catch(e) { alert('Request failed: ' + e.message); }
+    finally { setLoading('kw-btn', 'kw-btn-text', false, 'Extract Keywords'); }
+}
+
+async function formatCitation() {
+    const info = document.getElementById('cit-info').value.trim();
+    if (!info) { alert('Please enter reference information.'); return; }
+    setLoading('cit-btn', 'cit-btn-text', true, 'Format Citation');
+    try {
+        const res = await fetch('/ai/format-citation', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({info, style: selectedStyle}) });
+        const data = await res.json();
+        if (data.error) { alert('Error: ' + data.error); return; }
+        showResult('cit-result', 'cit-output', data.result);
+    } catch(e) { alert('Request failed: ' + e.message); }
+    finally { setLoading('cit-btn', 'cit-btn-text', false, 'Format Citation'); }
+}
+
+async function checkGrammar() {
+    const content = document.getElementById('gr-content').value.trim();
+    if (!content) { alert('Please paste some text.'); return; }
+    setLoading('gr-btn', 'gr-btn-text', true, 'Check Grammar and Style');
+    try {
+        const res = await fetch('/ai/grammar-check', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({content}) });
+        const data = await res.json();
+        if (data.error) { alert('Error: ' + data.error); return; }
+        showResult('gr-result', 'gr-output', data.result);
+    } catch(e) { alert('Request failed: ' + e.message); }
+    finally { setLoading('gr-btn', 'gr-btn-text', false, 'Check Grammar and Style'); }
+}
+
+function parseMarkdown(text) {
+    // Escape HTML
+    let safe = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    // Code blocks ```...```
+    safe = safe.replace(/```([\s\S]*?)```/g, '<pre style="background:rgba(0,0,0,0.06);border-radius:6px;padding:10px 14px;overflow-x:auto;margin:8px 0;font-size:0.82rem"><code>$1</code></pre>');
+    // Inline code `...`
+    safe = safe.replace(/`([^`]+)`/g, '<code style="background:rgba(0,0,0,0.07);padding:1px 5px;border-radius:4px;font-size:0.85em">$1</code>');
+    // H1 # heading
+    safe = safe.replace(/^# (.+)$/gm, '<h2 style="font-size:1.05rem;font-weight:800;margin:14px 0 6px;color:var(--sky-700)">$1</h2>');
+    // H2 ## heading
+    safe = safe.replace(/^## (.+)$/gm, '<h3 style="font-size:0.97rem;font-weight:700;margin:12px 0 5px;color:var(--text-1)">$1</h3>');
+    // H3 ### heading
+    safe = safe.replace(/^### (.+)$/gm, '<h4 style="font-size:0.9rem;font-weight:700;margin:10px 0 4px;color:var(--text-2)">$1</h4>');
+    // Bold **text**
+    safe = safe.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+    // Italic *text*
+    safe = safe.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+    // Bullet list items - or *
+    safe = safe.replace(/^[\-\*] (.+)$/gm, '<li style="margin:3px 0 3px 16px">$1</li>');
+    // Numbered list
+    safe = safe.replace(/^(\d+)\. (.+)$/gm, '<li style="margin:4px 0 4px 16px"><strong>$1.</strong> $2</li>');
+    // Horizontal rule ---
+    safe = safe.replace(/^---$/gm, '<hr style="border:none;border-top:1px solid var(--border);margin:12px 0">');
+    // Double newline = paragraph break
+    safe = safe.replace(/\n\n/g, '</p><p style="margin:8px 0">');
+    // Single newline = <br>
+    safe = safe.replace(/\n/g, '<br>');
+    return '<p style="margin:0;line-height:1.75">' + safe + '</p>';
+}
+
+async function sendChat() {
+    const input = document.getElementById('chat-input');
+    const message = input.value.trim();
+    if (!message) return;
+
+    const messages = document.getElementById('chat-messages');
+    const safeMsg = message.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    messages.innerHTML += '<div class="msg user"><div class="msg-avatar">&#128100;</div><div class="msg-bubble">' + safeMsg + '</div></div>';
+    input.value = '';
+
+    // Append user turn to history before sending
+    chatHistory.push({ role: 'user', content: message });
+
+    const loadingId = 'loading-' + Date.now();
+    messages.innerHTML += '<div class="msg ai" id="' + loadingId + '"><div class="msg-avatar">&#129302;</div><div class="msg-bubble"><span class="loading-dots"><span></span><span></span><span></span></span></div></div>';
+    messages.scrollTop = messages.scrollHeight;
+
+    document.getElementById('chat-send-btn').disabled = true;
+    try {
+        const res = await fetch('/ai/chat', {
+            method: 'POST',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({ message, history: chatHistory.slice(0, -1) })
+        });
+        const data = await res.json();
+        const loadingEl = document.getElementById(loadingId);
+        const bubble = loadingEl.querySelector('.msg-bubble');
+        if (data.error) {
+            bubble.textContent = 'Error: ' + data.error;
+            // Remove the failed user turn from history
+            chatHistory.pop();
+        } else {
+            bubble.innerHTML = parseMarkdown(data.result);
+            // Append assistant reply to history
+            chatHistory.push({ role: 'assistant', content: data.result });
+        }
+    } catch(e) {
+        document.getElementById(loadingId).querySelector('.msg-bubble').textContent = 'Request failed.';
+        // Remove the failed user turn from history
+        chatHistory.pop();
+    } finally {
+        document.getElementById('chat-send-btn').disabled = false;
+        messages.scrollTop = messages.scrollHeight;
+    }
+}
+</script>
+{% endblock %}
